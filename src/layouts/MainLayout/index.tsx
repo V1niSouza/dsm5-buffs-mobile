@@ -9,7 +9,7 @@ interface MainLayoutProps {
 
 export const MainLayout: React.FC<MainLayoutProps> = ({
   children,
-  backgroundColor = '#000',
+  backgroundColor = '#fff',
 }) => {
   const { wp, hp } = useDimensions();
 

@@ -11,6 +11,7 @@ export const colors = {
     gray:{
         base: "#6B7280",
         claro: "#F3F4F6",
-        text: "#9CA3AF"
+        text: "#9CA3AF",
+        disabled: "#E5E7EB"
     }
 }

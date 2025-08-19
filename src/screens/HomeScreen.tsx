@@ -1,38 +1,44 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { MainLayout } from '../layouts/MainLayout';
-import { LayoutRetanguloSimple } from '../components/Dropdown';
-import { useDimensions } from '../utils/useDimensions';
-import Movimentacoes from '../components/Movimentacoes';
-import AlertasPendentes from '../components/Lembretes';
+// HomeScreen.tsx
+import React, { useState } from "react";
+import { View, StyleSheet, FlatList } from "react-native";
+import Propriedades from "../components/Dropdown";
+import AlertasPendentes from "../components/Lembretes";
+import Movimentacoes from "../components/Movimentacoes";
 
 export const HomeScreen = () => {
-  const { wp, hp } = useDimensions();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  const components = [
+    { key: "propriedades" },
+    { key: "alertas" },
+    { key: "movimentacoes" },
+    { key: "parametros"},
+  ];
+
+  const renderItem = ({ item }: { item: { key: string } }) => {
+    switch (item.key) {
+      case "propriedades":
+        return <Propriedades dropdownOpen={dropdownOpen} setDropdownOpen={setDropdownOpen} />;
+      case "alertas":
+        return <AlertasPendentes />;
+      case "movimentacoes":
+        return <Movimentacoes />;
+      default:
+        return null;
+    }
+  };
 
   return (
-    <MainLayout>
-      <View style={styles.container}>
-        <ScrollView>
-          <View>
-            <LayoutRetanguloSimple typeIcon="XXX" titulo="Propriedades"/>
-          </View>
-          <View style={{marginTop: 10}}>
-            <AlertasPendentes />
-          </View>
-          <View style={{marginTop: 10}}>
-            <Movimentacoes/>
-          </View>
-        </ScrollView>
-      </View>
-    </MainLayout>
+    <FlatList
+      data={components}
+      renderItem={renderItem}
+      keyExtractor={(item) => item.key}
+      contentContainerStyle={styles.container}
+      scrollEnabled={!dropdownOpen} // controla o scroll quando o dropdown está aberto
+    />
   );
 };
 
-
 const styles = StyleSheet.create({
-  container: { 
-    backgroundColor: '#a14848ff',
-    flex: 1,
-   },
+  container: { flexGrow: 1, backgroundColor: "#fff", padding: 16 },
 });
-
