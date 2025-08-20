@@ -1,6 +1,8 @@
 export const colors = {
     yellow: {
-        base: "#FACC15",
+        base: "#FFCF78",
+        dark: "#F2B84D",
+        static: "#F59E0B"
     },
     white: {
         base: "#FFF"
@@ -13,5 +15,14 @@ export const colors = {
         claro: "#F3F4F6",
         text: "#9CA3AF",
         disabled: "#E5E7EB"
+    },
+    green:{
+        active: "#9DFFBE"
+    },
+    red:{
+        inactive: '#ffe3e3'
+    },
+    brown:{
+        base: "#43310B"
     }
 }

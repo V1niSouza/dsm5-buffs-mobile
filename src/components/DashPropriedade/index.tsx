@@ -1,52 +1,103 @@
-import React, { useState } from "react";
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from "react-native";
+import React from "react";
+import { View, Text, StyleSheet } from "react-native";
+import { colors } from "../../styles/colors";
+import TextTitle from "../TextTitle";
 
 export default function DashPropriedade() {
+  // Valores de exemplo — depois você pode puxar da API ou state
+  const total = 247;
+  const femeas = 149;
+  const machos = 98;
+  const bezerros = 43;
+  const novilhas = 80;
+  const vacas = 124;
+  const touros = 24;
 
   return (
     <View style={styles.container}>
+      {/* Cabeçalho */}
+      <View style={styles.header}>
+        <TextTitle>Resumo do Rebanho</TextTitle>
+        <Text style={styles.subtitle}>{total} búfalos no total</Text>
+      </View>
 
+      {/* Primeira linha */}
+      <View style={styles.row}>
+        <View style={[styles.item, {borderBottomWidth: 0.2}]}>
+          <Text style={styles.value}>{machos}</Text>
+          <Text style={styles.label}>Machos</Text>
+        </View>
+        <View style={[styles.item, {borderBottomWidth: 0.2}]}>
+          <Text style={styles.value}>{femeas}</Text>
+          <Text style={styles.label}>Fêmeas</Text>
+        </View>
+      </View>
+
+      {/* Segunda linha */}
+      <View style={styles.row}>
+        <View style={styles.item}>
+          <Text style={styles.value}>{bezerros}</Text>
+          <Text style={styles.label}>Bezerros</Text>
+        </View>
+        <View style={styles.item}>
+          <Text style={styles.value}>{novilhas}</Text>
+          <Text style={styles.label}>Novilhas</Text>
+        </View>
+        <View style={styles.item}>
+          <Text style={styles.value}>{vacas}</Text>
+          <Text style={styles.label}>Vacas</Text>
+        </View>
+        <View style={styles.item}>
+          <Text style={styles.value}>{touros}</Text>
+          <Text style={styles.label}>Touros</Text>
+        </View>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff", padding: 16 },
-
-  header: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 16 },
-
-  title: { fontSize: 18, fontWeight: "bold" },
-
-  date: { color: "#6B7280" },
-
-  button: { backgroundColor: "#FACC15", paddingVertical: 8, paddingHorizontal: 16, borderRadius: 12 },
-
-  buttonText: { fontWeight: "600" },
-
-  listHeader: { flexDirection: "row", backgroundColor: "#F3F4F6", paddingVertical: 8, paddingHorizontal: 12, borderRadius: 12, marginBottom: 8 },
-
-  listHeaderText: { fontWeight: "600", color: "#4B5563" },
-
-  itemContainer: { backgroundColor: "#fff", borderRadius: 24, padding: 12, marginBottom: 12, borderWidth: 1, borderColor: "#E5E7EB", shadowColor: "#000", shadowOpacity: 0.05, shadowOffset: { width: 0, height: 2 }, shadowRadius: 4, elevation: 2 },
-
-  itemRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
-
-  itemTitle: { fontWeight: "bold" },
-
-  itemHour: { color: "#6B7280", fontSize: 12 },
-
-  qtdBox: { width: 40, height: 28, backgroundColor: "#FEF3C7", borderRadius: 6, justifyContent: "center", alignItems: "center" },
-  qtdText: { fontWeight: "bold", color: "#B45309" },
-
-  motivoText: { marginTop: 4, fontSize: 12, color: "#9CA3AF" },
-
-  pagination: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 12 },
-
-  pageButton: { backgroundColor: "#FACC15", paddingVertical: 6, paddingHorizontal: 12, borderRadius: 8 },
-
-  pageButtonDisabled: { backgroundColor: "#E5E7EB" },
-
-  pageButtonText: { fontWeight: "600" },
-
-  pageInfo: { fontWeight: "600" },
+  container: { 
+    flex: 1, 
+    padding: 16, 
+    backgroundColor: colors.white.base,
+    borderRadius: 20,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: colors.gray.disabled,
+    shadowColor: colors.black.base,
+    shadowOpacity: 0.05,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    elevation: 1, // deixa abaixo do dropdown
+    zIndex: 1,    // iOS
+  },
+  header: {
+    marginBottom: 16,
+  },
+  subtitle: { 
+    fontSize: 14, 
+    color: colors.gray.base 
+  },
+  row: { 
+    flexDirection: "row", 
+    justifyContent: "space-around", 
+    marginBottom: 16,
+  },
+  item: { 
+    alignItems: "center", 
+    flex: 1,
+    borderRightWidth: 0.2,
+    borderLeftWidth: 0.2,
+    borderColor: colors.gray.disabled,
+  },
+  value: { 
+    fontSize: 20, 
+    fontWeight: "bold", 
+    marginBottom: 4 
+  },
+  label: { 
+    fontSize: 12, 
+    color: colors.gray.base 
+  },
 });

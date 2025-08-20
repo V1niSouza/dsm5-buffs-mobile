@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { View, Text, FlatList, StyleSheet, TouchableOpacity } from "react-native";
 import { colors } from "../../styles/colors";
 import YellowButton from "../Button";
+import TextTitle from "../TextTitle";
 
 type Alerta = {
   id: number;
@@ -51,8 +52,9 @@ export default function AlertasPendentes() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Alertas Pendentes ({alertas.length})</Text>
-
+      <View style={styles.header}>
+        <TextTitle>Alertas Pendentes ({alertas.length})</TextTitle>
+      </View>
       <FlatList
         data={dadosPagina}
         keyExtractor={(item) => item.id.toString()}
@@ -98,9 +100,10 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   header: { 
-    fontSize: 18, 
-    fontWeight: "bold", 
-    marginBottom: 12 
+    flexDirection: "row", 
+    justifyContent: "space-between", 
+    alignItems: "center", 
+    marginBottom: 16 
   },
   scrollContent: { 
     paddingBottom: 8 

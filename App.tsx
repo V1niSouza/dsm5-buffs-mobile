@@ -17,6 +17,12 @@ import { ReproducaoScreen } from './src/screens/ReproducaoScreen';
 import { PiquetesScreen } from './src/screens/PiquetesScreen';
 import { colors } from './src/styles/colors';
 
+// Icons SVG
+import BuffsLogo from './assets/images/logoBuffs.svg'; 
+import Bufalo from './src/icons/bufalo';
+import Home from './src/icons/home';
+import Lactation from './src/icons/lactation';
+
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
@@ -33,9 +39,9 @@ function MainTab() {
         headerTitleStyle: {
           fontSize: 24,
           fontWeight: "bold",
-          color: colors.black.base,
+          color: colors.brown.base,
         },
-        headerTitleAlign: "center",
+        headerTitleAlign: "left",
 
         // --- BARRA DE ABAS (TAB BAR) ---
         tabBarStyle: {
@@ -56,9 +62,44 @@ function MainTab() {
         tabBarInactiveTintColor: "gray",
 
       }}>
-      <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Rebanho" component={RebanhoScreen} />
-      <Tab.Screen name="Lactação" component={LactacaoScreen} />
+      <Tab.Screen 
+        name="Home" 
+        component={HomeScreen} 
+        options={{
+          tabBarIcon: ({ focused, color, size }) => (
+            <Home 
+              width={focused ? 30 : 20}         // maior quando ativo
+              height={focused ? 30 : 20}        // maior quando ativo
+              stroke={focused ? colors.yellow.dark : 'gray'} // muda cor
+            />
+          ),
+          headerTitle: () => <BuffsLogo width={80} height={80} />,
+        }}
+      />
+      <Tab.Screen 
+        name="Rebanho" 
+        component={RebanhoScreen} 
+        options={{
+          tabBarIcon: ({ focused, color, size }) => (
+            <Bufalo 
+              width={focused ? 35 : 25}         // maior quando ativo
+              height={focused ? 35 : 25}        // maior quando ativo
+              fill={focused ? colors.yellow.dark : 'gray'} // muda cor
+            />
+          )
+        }}/>
+      <Tab.Screen
+        name="Lactação"
+        component={LactacaoScreen}
+        options={{
+          tabBarIcon: ({ focused, color, size }) => (
+            <Lactation 
+              width={focused ? 35 : 25}         // maior quando ativo
+              height={focused ? 35 : 25}        // maior quando ativo
+              fill={focused ? colors.yellow.dark : 'gray'} // muda cor
+            />
+          )
+        }} />
       <Tab.Screen name="Reprodução" component={ReproducaoScreen} />
       <Tab.Screen name="Piquetes" component={PiquetesScreen} />
     </Tab.Navigator>

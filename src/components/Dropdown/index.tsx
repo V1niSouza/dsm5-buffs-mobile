@@ -3,6 +3,7 @@ import { View, Text, StyleSheet } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
 import Button from "../Button";
 import { colors } from "../../styles/colors";
+import TextTitle from "../TextTitle";
 
 interface PropriedadesProps {
   dropdownOpen: boolean;
@@ -21,7 +22,7 @@ export default function Propriedades({ dropdownOpen, setDropdownOpen }: Propried
     <View style={styles.container}>
       {/* Cabeçalho */}
       <View style={styles.header}>
-        <Text style={styles.title}>Propriedades</Text>
+        <TextTitle>Propriedades</TextTitle>
       </View>
 
       {/* DropDown */}
@@ -39,7 +40,7 @@ export default function Propriedades({ dropdownOpen, setDropdownOpen }: Propried
           containerStyle={styles.dropdownContainer}
           style={styles.dropdown}
           dropDownContainerStyle={styles.dropDownContainer}
-
+          listMode="MODAL"
         />
       </View>
     </View>
@@ -47,21 +48,56 @@ export default function Propriedades({ dropdownOpen, setDropdownOpen }: Propried
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16, 
+  container: { 
+    flex: 1, 
+    padding: 16, 
     backgroundColor: "#fff",
-      borderRadius: 20,
-      marginBottom: 12,
-      borderWidth: 1,
-      borderColor: colors.gray.disabled,
-      shadowColor: colors.black.base,
-      shadowOpacity: 0.05,
-      shadowOffset: { width: 0, height: 2 },
-      shadowRadius: 4,
-      elevation: 2, },
-  header: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 16 },
-  title: { fontSize: 18, fontWeight: "bold" },
-  dropdownWrapper: { zIndex: 1000 },
-  dropdownContainer: { height: 50 },
-  dropdown: { backgroundColor: "#fff", borderRadius: 12, borderColor: "#ccc" },
-  dropDownContainer: { backgroundColor: "#fff", borderRadius: 12, borderColor: "#ccc" },
+    borderRadius: 20,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: colors.gray.disabled,
+    shadowColor: colors.black.base,
+    shadowOpacity: 0.05,
+    shadowOffset: { 
+      width: 0, 
+      height: 2 
+    },
+    shadowRadius: 4,
+    elevation: 2, 
+  },
+
+  header: { 
+    flexDirection: "row", 
+    justifyContent: "space-between", 
+    alignItems: "center", 
+    marginBottom: 16 
+  },
+
+  title: { 
+    fontSize: 18, 
+    fontWeight: "bold" 
+  },
+
+  dropdownWrapper: {
+    zIndex: 1000, // iOS
+    elevation: 1000, // Android
+  },
+
+  dropdownContainer: { 
+    height: 50,
+  },
+
+  dropdown: { 
+    backgroundColor: "#fff", 
+    borderRadius: 12, 
+    borderColor: "#ccc" 
+  },
+
+  dropDownContainer: {
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    borderColor: "#ccc",
+    zIndex: 1000, // iOS
+    elevation: 1000, // Android
+  },
 });
