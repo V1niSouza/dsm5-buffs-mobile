@@ -2,14 +2,15 @@ import React, { useState } from "react";
 import { View, TextInput, StyleSheet, TouchableOpacity, ScrollView, Text } from "react-native";
 import { colors } from "../../styles/colors";
 import TextTitle from "../TextTitle";
-import Bufalo from '../../icons/bufalo';
+import SearchIcon from "../../icons/search";
 
 const filterOptions = [
   "Ativo",
   "Inativo",
-  "Categoria POO",
+  "Categoria PO",
   "Categoria PA",
-  "Categoria DSM",
+  "Categoria PC",
+  "Categoria CCG",
 ];
 
 export default function SearchBar() {
@@ -28,7 +29,7 @@ export default function SearchBar() {
     <View style={styles.container}>
       {/* Cabeçalho */}
       <View style={styles.header}>
-        <TextTitle>Local Bufalo por Brinco:</TextTitle>
+        <TextTitle>Buscar animal por Brinco:</TextTitle>
       </View>
 
       {/* Barra de pesquisa */}
@@ -41,7 +42,7 @@ export default function SearchBar() {
           placeholderTextColor={colors.gray.base}
         />
         <TouchableOpacity style={styles.iconWrapper} onPress={() => console.log("Pesquisar", search)}>
-           <Bufalo fill={colors.yellow.dark} />
+           <SearchIcon fill={colors.black.base} size={18}/>
         </TouchableOpacity>
       </View>
       <Text style={styles.subtitle}>Filtrar Por:</Text>
@@ -69,17 +70,8 @@ export default function SearchBar() {
 const styles = StyleSheet.create({
   container: { 
     flex: 1, 
-    padding: 16, 
-    backgroundColor: "#fff",
-    borderRadius: 20,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: colors.gray.disabled,
-    shadowColor: colors.black.base,
-    shadowOpacity: 0.05,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
-    elevation: 2, 
+    paddingBottom:16, 
+ 
   },
 
   header: { 
@@ -99,16 +91,21 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.gray.disabled,
     marginBottom: 12,
+    overflow: "hidden",
   },
 
   input: {
-    flex: 1,
+    flex: 0.9,
     fontSize: 16,
     color: colors.gray.base,
   },
 
   iconWrapper: {
-    marginLeft: 8,
+    width: '10%',
+    height: '100%',
+    alignItems:'center',
+    justifyContent:'center',
+    marginLeft: 'auto',
   },
 
   filterScroll: {

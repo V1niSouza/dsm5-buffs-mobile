@@ -3,6 +3,7 @@ import { View, Text, FlatList, StyleSheet, TouchableOpacity } from "react-native
 import { colors } from "../../styles/colors";
 import YellowButton from "../Button";
 import TextTitle from "../TextTitle";
+import CalendarIcon from "../../icons/calendar";
 
 type Alerta = {
   id: number;
@@ -42,7 +43,7 @@ export default function AlertasPendentes() {
       </View>
 
       <View style={styles.alertaFooter}>
-        <Text style={styles.alertaHorario}>⏰ {item.horario}</Text>
+        <Text style={styles.alertaHorario}><CalendarIcon fill={colors.yellow.base} size={15}/> {item.horario}</Text>
         <View style={styles.categoriaBox}>
           <Text style={styles.categoriaText}>{item.categoria}</Text>
         </View>

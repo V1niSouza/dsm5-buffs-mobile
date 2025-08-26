@@ -3,8 +3,8 @@ import { TouchableOpacity, Text, StyleSheet } from "react-native";
 import { colors } from "../../styles/colors";
 
 type YellowButtonProps = {
-  title: string;
-  onPress: () => void;
+  title?: string;
+  onPress?: () => void;
   disabled?: boolean;
 };
 

@@ -10,9 +10,8 @@ export type Animal = {
   id: string | number;
   status: boolean;   // true = verde, false = vermelho
   brinco: string;
-  nome: string;
   raca: string;
-  sexo: string;
+  mediaProduzida: number;
 };
 
 type Props = {
@@ -20,7 +19,7 @@ type Props = {
   onVerMais: (animal: Animal) => void; // callback para abrir outra tela/tabela
 };
 
-export default function TableAnimais({ data, onVerMais }: Props) {
+export default function TableLactation({ data, onVerMais }: Props) {
   const itensPorPagina = 15;
   const [paginaAtual, setPaginaAtual] = useState(0);
 
@@ -32,16 +31,15 @@ export default function TableAnimais({ data, onVerMais }: Props) {
   const totalPaginas = Math.ceil(data.length / itensPorPagina);
 
   return (
-    <View style={styles.container}>
+    <View>
       {/* Cabeçalho */}
       <View style={styles.listHeader}>
         <View style={{ flex: 0.3, alignItems: 'center', justifyContent: 'center' }}>
           <BuffsLogo width={18} height={18} />
         </View>
         <Text style={[styles.listHeaderText, { flex: 1 }]}>Brinco</Text>
-        <Text style={[styles.listHeaderText, { flex: 1 }]}>Nome</Text>
-        <Text style={[styles.listHeaderText, { flex: 1 }]}>Raça</Text>
-        <Text style={[styles.listHeaderText, { flex: 1 }]}>Sexo</Text>
+        <Text style={[styles.listHeaderText, { flex: 2 }]}>Raça</Text>
+        <Text style={[styles.listHeaderText, { flex: 2 }]}>Med. Produzida</Text>
         <Text style={[styles.listHeaderText, { flex: 1 }]}>Ver Mais</Text>
       </View>
 
@@ -64,14 +62,11 @@ export default function TableAnimais({ data, onVerMais }: Props) {
             <Text style={[styles.itemText, { flex: 1 }]} numberOfLines={1}>
               {item.brinco}
             </Text>
-            <Text style={[styles.itemText, { flex: 1 }]} numberOfLines={1}>
-              {item.nome}
-            </Text>
-            <Text style={[styles.itemText, { flex: 1 }]} numberOfLines={1}>
+            <Text style={[styles.itemText, { flex: 2 }]} numberOfLines={1}>
               {item.raca}
             </Text>
-            <Text style={[styles.itemText, { flex: 1 }]} numberOfLines={1}>
-              {item.sexo}
+            <Text style={[styles.itemText, { flex: 2 }]} numberOfLines={1}>
+              {item.mediaProduzida}
             </Text>
 
             {/* Botão Ver Mais */}

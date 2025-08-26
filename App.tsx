@@ -22,6 +22,8 @@ import BuffsLogo from './assets/images/logoBuffs.svg';
 import Bufalo from './src/icons/bufalo';
 import Home from './src/icons/home';
 import Lactation from './src/icons/lactation';
+import GlobeIcon from './src/icons/sex';
+import Fance from './src/icons/fance';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -66,6 +68,7 @@ function MainTab() {
         name="Home" 
         component={HomeScreen} 
         options={{
+          headerShown: false,
           tabBarIcon: ({ focused, color, size }) => (
             <Home 
               width={focused ? 30 : 20}         // maior quando ativo
@@ -80,6 +83,7 @@ function MainTab() {
         name="Rebanho" 
         component={RebanhoScreen} 
         options={{
+          headerShown: false,
           tabBarIcon: ({ focused, color, size }) => (
             <Bufalo 
               width={focused ? 35 : 25}         // maior quando ativo
@@ -92,6 +96,7 @@ function MainTab() {
         name="Lactação"
         component={LactacaoScreen}
         options={{
+          headerShown: false,
           tabBarIcon: ({ focused, color, size }) => (
             <Lactation 
               width={focused ? 35 : 25}         // maior quando ativo
@@ -100,8 +105,30 @@ function MainTab() {
             />
           )
         }} />
-      <Tab.Screen name="Reprodução" component={ReproducaoScreen} />
-      <Tab.Screen name="Piquetes" component={PiquetesScreen} />
+      <Tab.Screen 
+        name="Reprodução" 
+        component={ReproducaoScreen} 
+        options={{
+          headerShown: false,
+          tabBarIcon: ({ focused, color, size }) => (
+            <GlobeIcon
+              size={focused ? 25 : 22}         // maior quando ativo
+              fill={focused ? colors.yellow.dark : 'gray'} // muda cor
+            />
+          )
+        }}/>
+      <Tab.Screen 
+        name="Piquetes" 
+        component={PiquetesScreen}         
+        options={{
+          headerShown: false,
+          tabBarIcon: ({ focused, color, size }) => (
+            <Fance
+              size={focused ? 25 : 22}         // maior quando ativo
+              fill={focused ? colors.yellow.dark : 'gray'} // muda cor
+            />
+          )
+        }}/>
     </Tab.Navigator>
   );
 }
