@@ -8,27 +8,9 @@ import { colors } from '../styles/colors';
 import Plus from '../../assets/images/plus.svg';
 import Scanner from '../../assets/images/qr-scan.svg'; 
 
-
-
 export const RebanhoScreen = () => {
   const { wp, hp } = useDimensions();
-  const scrollY = React.useRef(new Animated.Value(0)).current;
 
-  // Faz sumir o header 2 ao rolar a tela
-  const header2Opacity = scrollY.interpolate({
-    inputRange: [0, 50], // altura do scroll para desaparecer
-    outputRange: [1, 0],
-    extrapolate: 'clamp',
-  });
-
-  // Quando header2 some: O titulo aparece no header1
-  const header1TextOpacity = scrollY.interpolate({
-    inputRange: [0, 50],
-    outputRange: [0, 1],
-    extrapolate: 'clamp',
-  });
-
-  
   const animais: Animal[] = [
     { id: 1, status: true, brinco: "A123", nome: "Estrela", raca: "Murrah", sexo: "Fêmea" },
     { id: 2, status: false, brinco: "B456", nome: "TouroX", raca: "Mediterrâneo", sexo: "Macho" },
@@ -52,18 +34,12 @@ export const RebanhoScreen = () => {
 
 
   return (
-    <View>
-      <View style={styles.headerNotifications}>
+    <View style={styles.container}>
+      <View style={styles.header}>
         {/* Texto centralizado */}
-        <Animated.Text 
-          style={[
-            styles.header1Text, 
-            { opacity: header1TextOpacity }
-          ]}
-        >
-          Rebanho
-        </Animated.Text>
-
+          <View style={{ alignItems: 'center' }}>
+            <Text style={styles.header1Text}>Rebanho</Text>
+          </View>
         {/* Botões à direita */}
         <View style={styles.headerButtons}>
           <TouchableOpacity onPress={() => console.log("Tanque")} style={styles.button}>
@@ -74,57 +50,40 @@ export const RebanhoScreen = () => {
           </TouchableOpacity>
         </View>
       </View>
-
-    <Animated.ScrollView
-      onScroll={Animated.event(
-        [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-        { useNativeDriver: true }
-      )}
-      scrollEventThrottle={16}
-      contentContainerStyle={{ paddingBottom: 25 }}
-    >
-      <Animated.View style={[styles.header2, { opacity: header2Opacity }]}>
-        <Text style={styles.header2Text}>Rebanho</Text>
-      </Animated.View>
-
-
       <MainLayout>
         <ScrollView>
-          <View style={styles.container}>
+          <View style={styles.content}>
             <SearchBar />
             <TableAnimais
               data={animais}
-              onVerMais={(animal: Animal) => {   // <-- adiciona a tipagem aqui
+              onVerMais={(animal: Animal) => {   
                 console.log("Ver mais sobre:", animal);
-                // ex: navigation.navigate("AnimalDetalhes", { animal })
               }}
             />
           </View>
         </ScrollView>
       </MainLayout>
-      </Animated.ScrollView>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-    headerNotifications: {
-    height: 60,
+  container: {
+    flex: 1,
+  },
+  header: {
+    height: 80,
     backgroundColor: colors.yellow.base,
+    justifyContent: 'center',
     paddingLeft: 16,
-    paddingTop: 20,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center", // mantém o texto no centro
-    position: "relative",
-    paddingVertical: 10,
+    borderBottomWidth: 0.5,
+    borderColor: colors.black.base
   },
   header1Text: {
     fontSize: 20,
     fontWeight: "bold",
     textAlign: "center",
-    marginTop: 10,
-    flex: 1, // garante centralização
+    marginTop: 30,
     color: colors.brown.base,
   },
   headerButtons: {
@@ -149,10 +108,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: colors.brown.base,
   },
-  container: {
+  content: {
     backgroundColor: "#fff",
     borderRadius: 12,
-    padding: 8,
+    paddingTop: 16,
+    paddingBottom: 16,
+    paddingHorizontal: 10,
     borderWidth: 1,
     marginBottom: 50,
     borderColor: colors.gray.disabled,
