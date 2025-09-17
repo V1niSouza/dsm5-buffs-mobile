@@ -8,6 +8,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 // Layout
 import { MainLayout } from './src/layouts/MainLayout';
+import { colors } from './src/styles/colors';
 
 // Telas TabBar
 import { HomeScreen } from './src/screens/HomeScreen';
@@ -15,7 +16,9 @@ import { RebanhoScreen } from './src/screens/RebanhoScreen';
 import { LactacaoScreen } from './src/screens/LactacaoScreen';
 import { ReproducaoScreen } from './src/screens/ReproducaoScreen';
 import { PiquetesScreen } from './src/screens/PiquetesScreen';
-import { colors } from './src/styles/colors';
+import { LoginScreen } from './src/screens/LoginScreen';
+import { SignupScreen } from './src/screens/SignupScreen';
+
 
 // Icons SVG
 import BuffsLogo from './assets/images/logoBuffs.svg'; 
@@ -25,8 +28,14 @@ import Lactation from './src/icons/lactation';
 import GlobeIcon from './src/icons/sex';
 import Fance from './src/icons/fance';
 
+export type RootStackParamList = {
+  Login: undefined;
+  Signup: undefined;
+  MainTab: undefined;
+};
+
 const Tab = createBottomTabNavigator();
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 // TabBar principal
 function MainTab() {
@@ -137,6 +146,8 @@ function MainTab() {
 function AppContent() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="Login" component={LoginScreen} />
+      <Stack.Screen name="Signup" component={SignupScreen} />
       <Stack.Screen name="MainTab" component={MainTab} />
     </Stack.Navigator>
   );
