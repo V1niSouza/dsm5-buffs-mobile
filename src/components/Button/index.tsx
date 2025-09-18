@@ -1,21 +1,28 @@
 import React from "react";
-import { TouchableOpacity, Text, StyleSheet } from "react-native";
+import { TouchableOpacity, Text, StyleSheet, ActivityIndicator } from "react-native";
 import { colors } from "../../styles/colors";
 
 type YellowButtonProps = {
   title?: string;
   onPress?: () => void;
   disabled?: boolean;
+  loading?: boolean;
 };
 
-export default function YellowButton({ title, onPress, disabled }: YellowButtonProps) {
+export default function YellowButton({ title, onPress, disabled, loading }: YellowButtonProps) {
+  const isDisabled = disabled || loading;
+
   return (
     <TouchableOpacity
       onPress={onPress}
-      disabled={disabled}
-      style={[styles.button, disabled && styles.disabled]}
+      disabled={isDisabled}
+      style={[styles.button, isDisabled && styles.disabled]}
     >
-      <Text style={styles.text}>{title}</Text>
+      {loading ? (
+        <ActivityIndicator color="#000" />
+      ) : (
+        <Text style={styles.text}>{title}</Text>
+      )}
     </TouchableOpacity>
   );
 }
@@ -26,6 +33,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 12,
+    alignItems: "center",
   },
   text: {
     fontWeight: "600",

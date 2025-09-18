@@ -7,6 +7,7 @@ import { colors } from "../styles/colors";
 import BuffsLogo from '../../assets/images/logoBuffs.svg'; 
 import User from '../../assets/images/user.svg';
 import { MainLayout } from "../layouts/MainLayout";
+import { UserMenu } from "../components/UserMenu";
 
 export const HomeScreen = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -19,9 +20,7 @@ export const HomeScreen = () => {
             <BuffsLogo width={90} height={90} />
           </View>
           <View style={styles.headerButtons}>
-            <TouchableOpacity onPress={() => console.log("Tanque")} style={styles.button}>
-              <User width={20} height={20} style={{ margin: 6}}/>
-            </TouchableOpacity>
+            <UserMenu />
           </View>
       </View>
       <MainLayout>

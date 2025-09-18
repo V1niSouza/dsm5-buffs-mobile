@@ -1,5 +1,7 @@
+import { AuthProvider, useAuth } from './src/context/AuthContext'
+
 // App.tsx
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Platform, StatusBar, useColorScheme } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -18,7 +20,7 @@ import { ReproducaoScreen } from './src/screens/ReproducaoScreen';
 import { PiquetesScreen } from './src/screens/PiquetesScreen';
 import { LoginScreen } from './src/screens/LoginScreen';
 import { SignupScreen } from './src/screens/SignupScreen';
-
+import { LoadingScreen } from './src/screens/LoadingScreen';
 
 // Icons SVG
 import BuffsLogo from './assets/images/logoBuffs.svg'; 
@@ -27,15 +29,20 @@ import Home from './src/icons/home';
 import Lactation from './src/icons/lactation';
 import GlobeIcon from './src/icons/sex';
 import Fance from './src/icons/fance';
+import { supabase } from './src/lib/supabase';
+import { CompleteProfileScreen } from './src/screens/CompleteProfile';
+
 
 export type RootStackParamList = {
   Login: undefined;
   Signup: undefined;
   MainTab: undefined;
+  CompleteProfile: undefined;
 };
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator<RootStackParamList>();
+
 
 // TabBar principal
 function MainTab() {
@@ -144,11 +151,38 @@ function MainTab() {
 
 // Stack geral
 function AppContent() {
+  const {user, setAuth, loading, needsProfile} = useAuth();
+
+useEffect(() => {
+  const { data } = supabase.auth.onAuthStateChange((event, session) => {
+    if (session) {
+      setAuth(session.user);
+    } else {
+      setAuth(null);
+    }
+  });
+
+  return () => {
+    data?.subscription?.unsubscribe?.();
+  };
+}, [setAuth]);
+
+  if (loading) {
+    return <LoadingScreen />;
+  }
+
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Login" component={LoginScreen} />
-      <Stack.Screen name="Signup" component={SignupScreen} />
-      <Stack.Screen name="MainTab" component={MainTab} />
+      {!user ? (
+        <>
+          <Stack.Screen name="Login" component={LoginScreen} />
+          <Stack.Screen name="Signup" component={SignupScreen} />
+        </>
+      ) : needsProfile ? (
+          <Stack.Screen name="CompleteProfile" component={CompleteProfileScreen} />
+      )  : (
+          <Stack.Screen name="MainTab" component={MainTab} />
+      )}
     </Stack.Navigator>
   );
 }
@@ -158,9 +192,11 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <NavigationContainer>
-        <AppContent />
-      </NavigationContainer>
+          <AuthProvider>
+            <NavigationContainer>
+              <AppContent />
+            </NavigationContainer>
+          </AuthProvider>
     </SafeAreaProvider>
   );
 }

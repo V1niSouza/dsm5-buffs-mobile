@@ -20,6 +20,7 @@ export const colors = {
         active: "#9DFFBE"
     },
     red:{
+        base: "#df2a2aff",
         inactive: '#ffe3e3'
     },
     brown:{
