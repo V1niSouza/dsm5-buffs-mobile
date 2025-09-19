@@ -5,7 +5,7 @@ export const checkUserProfile = async (token?: string) => {
     const profile = await apiFetch("/usuarios/me", { token });
     return { hasProfile: true, profile };
   } catch (error: any) {
-    if (error.status === 404|| error.message.includes("Nenhum perfil")) {
+    if (error.status === 404 || error.message.includes("Nenhum perfil")) {
       return { hasProfile: false, profile: null };
     }
     throw error;
@@ -17,7 +17,7 @@ export const createProfile = async (token: string, data: any) => {
   try {
     const profile = await apiFetch("/usuarios/perfil", {
       method: "POST",
-      data,
+      body: data, // 👈 aqui troca para body
       token,
     });
     return { success: true, profile };

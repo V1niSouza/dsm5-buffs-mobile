@@ -1,50 +1,73 @@
-import { supabase } from "./supabase";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type ApiOptions = {
   method?: string;
-  data?: any;
-  token?: string | null;
+  body?: any;
+  headers?: Record<string, string>;
 };
 
-export const apiFetch = async (
-  endpoint: string,
-  { method = "GET", data = null, token = null }: ApiOptions = {}
-) => {
-  try {
-    if (!token) {
-      const session = (await supabase.auth.getSession()).data.session;
-      token = session?.access_token || null;
-      if (!token) throw new Error("Usuário não autenticado.");
-    }
+const API_URL = process.env.API_URL?.replace(/\/$/, "") || "";
 
-    const url = `${process.env.API_URL?.replace(/\/$/, "")}/${endpoint.replace(/^\//, "")}`;
+// 🔑 Função centralizada para garantir token válido
+const getValidToken = async (): Promise<string | null> => {
+  const token = await AsyncStorage.getItem("userToken");
+  const refresh = await AsyncStorage.getItem("refreshToken");
+  const expiresStr = await AsyncStorage.getItem("expiresAt");
 
-    const response = await fetch(url, {
-      method,
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: data ? JSON.stringify(data) : undefined,
-    });
+  if (!token || !refresh || !expiresStr) return null;
 
-    const json = await response.json().catch(() => ({}));
+  const expires = Number(expiresStr);
+  const now = Math.floor(Date.now() / 1000);
 
-    if (!response.ok) {
-      const err = new Error(json.message || `Erro ${response.status}`);
-      // @ts-ignore
-      err.status = response.status;
-      throw err;
-    }
+  if (expires > now) return token; // token ainda válido
 
-    return json;
-  } catch (error: any) {
-    if (!error.status || error.status !== 404){
-        console.error("❌ Erro em apiFetch:", error.message);
-    }
-    throw error;
+  // token expirou → renovar
+  const res = await fetch(`${API_URL}/auth/refresh`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ refresh_token: refresh }),
+  });
+
+  if (!res.ok) {
+    await AsyncStorage.multiRemove(["userToken", "refreshToken", "expiresAt"]);
+    throw new Error("Sessão expirada. Faça login novamente.");
   }
+
+  const data = await res.json();
+  await AsyncStorage.setItem("userToken", data.access_token);
+  await AsyncStorage.setItem("expiresAt", data.expires_at.toString());
+  await AsyncStorage.setItem("refreshToken", data.refresh_token);
+
+  return data.access_token;
 };
 
-const apiClient = { apiFetch };
-export default apiClient;
+export const apiFetch = async (endpoint: string, { method = "GET", body = null, headers = {} }: ApiOptions = {}) => {
+  const url = `${API_URL}/${endpoint.replace(/^\//, "")}`;
+
+  const token = await getValidToken();
+
+  const fetchOptions: RequestInit = {
+    method,
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...headers,
+    },
+    ...(body ? { body: typeof body === "string" ? body : JSON.stringify(body) } : {}),
+  };
+
+  const response = await fetch(url, fetchOptions);
+
+  const text = await response.text();
+  let json;
+  try { json = JSON.parse(text); } catch { json = text; }
+
+  if (!response.ok) {
+    const err = new Error((json && typeof json === "object" && json.message) || `Erro ${response.status}`);
+    // @ts-ignore
+    err.status = response.status;
+    throw err;
+  }
+
+  return json;
+};

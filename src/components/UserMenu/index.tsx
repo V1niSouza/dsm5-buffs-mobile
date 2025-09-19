@@ -1,24 +1,18 @@
 import React, { useState } from "react";
-import { View, TouchableOpacity, Text, StyleSheet, Modal, Alert } from "react-native";
+import { View, TouchableOpacity, Text, StyleSheet, Modal } from "react-native";
 import User from "../../../assets/images/user.svg";
-import { supabase } from "../../lib/supabase";
 import { colors } from "../../styles/colors";
-
 import Exit from "../../icons/exit";
+import { useAuth } from "../../context/AuthContext";
 
 export const UserMenu = () => {
   const [visible, setVisible] = useState(false);
+  const { logout } = useAuth(); // 🔑 pegar a função de logout
 
-  async function handleSignOut() {
-    const { error } = await supabase.auth.signOut();
-    setAuth(null)
-    if (error) {
-        Alert.alert('Error', 'Erro ao sair da conta, tente mais tarde.')
-        setVisible(false);
-        return;
-    }
-    setVisible(false);   
-  }
+  const handleLogout = () => {
+    setVisible(false); // fechar o menu
+    logout();          // chamar logout do contexto
+  };
 
   return (
     <>
@@ -38,10 +32,9 @@ export const UserMenu = () => {
           style={styles.overlay}
           activeOpacity={1}
           onPressOut={() => setVisible(false)}
-          
         >
           <View style={styles.menu}>
-            <TouchableOpacity onPress={handleSignOut} style={styles.menuButton}>
+            <TouchableOpacity style={styles.menuButton} onPress={handleLogout}>
               <Exit width={14} height={14} color={colors.red.base} />
               <Text style={styles.menuText}>Sign Out</Text>
             </TouchableOpacity>
@@ -61,7 +54,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "flex-start",
     alignItems: "flex-end",
-    backgroundColor:"transparent",
+    backgroundColor: "transparent",
   },
   menu: {
     marginTop: 50,
@@ -69,7 +62,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderRadius: 8,
     padding: 10,
-    shadowColor: "E />E />#000",
+    shadowColor: "#000",
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 5,
@@ -86,7 +79,3 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
 });
-function setAuth(arg0: null) {
-    throw new Error("Function not implemented.");
-}
-

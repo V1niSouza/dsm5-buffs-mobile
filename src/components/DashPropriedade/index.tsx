@@ -3,16 +3,26 @@ import { View, Text, StyleSheet } from "react-native";
 import { colors } from "../../styles/colors";
 import TextTitle from "../TextTitle";
 
-export default function DashPropriedade() {
-  // Valores de exemplo — depois você pode puxar da API ou state
-  const total = 247;
-  const femeas = 149;
-  const machos = 98;
-  const bezerros = 43;
-  const novilhas = 80;
-  const vacas = 124;
-  const touros = 24;
 
+interface DashPropriedadeProps {
+  total: number;
+  machos: number;
+  femeas: number;
+  bezerros: number;
+  novilhas: number;
+  vacas: number;
+  touros: number;
+}
+
+export default function DashPropriedade({
+  total,
+  machos,
+  femeas,
+  bezerros,
+  novilhas,
+  vacas,
+  touros,
+}: DashPropriedadeProps) {
   return (
     <View style={styles.container}>
       {/* Cabeçalho */}

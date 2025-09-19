@@ -29,8 +29,6 @@ import Home from './src/icons/home';
 import Lactation from './src/icons/lactation';
 import GlobeIcon from './src/icons/sex';
 import Fance from './src/icons/fance';
-import { supabase } from './src/lib/supabase';
-import { CompleteProfileScreen } from './src/screens/CompleteProfile';
 
 
 export type RootStackParamList = {
@@ -149,23 +147,9 @@ function MainTab() {
   );
 }
 
-// Stack geral
+// App.tsx (parte relevante)
 function AppContent() {
-  const {user, setAuth, loading, needsProfile} = useAuth();
-
-useEffect(() => {
-  const { data } = supabase.auth.onAuthStateChange((event, session) => {
-    if (session) {
-      setAuth(session.user);
-    } else {
-      setAuth(null);
-    }
-  });
-
-  return () => {
-    data?.subscription?.unsubscribe?.();
-  };
-}, [setAuth]);
+  const { userToken, loading } = useAuth();
 
   if (loading) {
     return <LoadingScreen />;
@@ -173,19 +157,19 @@ useEffect(() => {
 
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      {!user ? (
+      {!userToken ? (
         <>
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Signup" component={SignupScreen} />
         </>
-      ) : needsProfile ? (
-          <Stack.Screen name="CompleteProfile" component={CompleteProfileScreen} />
-      )  : (
-          <Stack.Screen name="MainTab" component={MainTab} />
+      ) : (
+        <Stack.Screen name="MainTab" component={MainTab} />
       )}
     </Stack.Navigator>
   );
 }
+
+
 export default function App() {
   const isDarkMode = useColorScheme() === 'dark';
 
