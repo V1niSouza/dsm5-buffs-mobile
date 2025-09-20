@@ -21,6 +21,7 @@ import { PiquetesScreen } from './src/screens/PiquetesScreen';
 import { LoginScreen } from './src/screens/LoginScreen';
 import { SignupScreen } from './src/screens/SignupScreen';
 import { LoadingScreen } from './src/screens/LoadingScreen';
+import { PropriedadeProvider } from './src/context/PropriedadeContext';
 
 // Icons SVG
 import BuffsLogo from './assets/images/logoBuffs.svg'; 
@@ -177,9 +178,11 @@ export default function App() {
     <SafeAreaProvider>
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
           <AuthProvider>
-            <NavigationContainer>
-              <AppContent />
-            </NavigationContainer>
+            <PropriedadeProvider>
+              <NavigationContainer>
+                <AppContent />
+              </NavigationContainer>
+            </PropriedadeProvider>
           </AuthProvider>
     </SafeAreaProvider>
   );

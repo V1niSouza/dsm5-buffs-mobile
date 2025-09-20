@@ -1,18 +1,21 @@
 import { apiFetch } from "../lib/apiClient";
 
-export const getBufalos = async (token?: string) => {
+export const getBufalos = async (propriedadeId: number, token?: string) => {
   try {
     const result = await apiFetch("/bufalos");
     // Processamento de dados:
-    const bufalosAtivos = result.filter((b: any) => b.status === true).length;
+    const bufalosFiltrados = result.filter((b: any) => b.id_propriedade === propriedadeId);
 
-    const machos = result.filter((b: any) => b.sexo === "M" && b.status === true).length;
-    const femeas = result.filter((b: any) => b.sexo === "F" && b.status === true).length;
+    const bufalosAtivos = bufalosFiltrados.filter((b: any) => b.status === true).length;
 
-    const bezerros = result.filter((b: any) => b.nivel_maturidade === "B" && b.status === true).length;
-    const novilhas = result.filter((b: any) => b.nivel_maturidade === "N" && b.status === true).length;
-    const vacas = result.filter((b: any) => b.nivel_maturidade === "V" && b.status === true).length;
-    const touros = result.filter((b: any) => b.nivel_maturidade === "T" && b.status === true).length;
+    const machos = bufalosFiltrados.filter((b: any) => b.sexo === "M" && b.status === true).length;
+    const femeas = bufalosFiltrados.filter((b: any) => b.sexo === "F" && b.status === true).length;
+
+    const bezerros = bufalosFiltrados.filter((b: any) => b.nivel_maturidade === "B" && b.status === true).length;
+    const novilhas = bufalosFiltrados.filter((b: any) => b.nivel_maturidade === "N" && b.status === true).length;
+    const vacas = bufalosFiltrados.filter((b: any) => b.nivel_maturidade === "V" && b.status === true).length;
+    const touros = bufalosFiltrados.filter((b: any) => b.nivel_maturidade === "T" && b.status === true).length;
+
 
     return {
       raw: result,      // Todos os dados crus

@@ -8,10 +8,13 @@ import BuffsLogo from '../../assets/images/logoBuffs.svg';
 import { MainLayout } from "../layouts/MainLayout";
 import { UserMenu } from "../components/UserMenu";
 
+import { usePropriedade } from "../context/PropriedadeContext";
 import bufaloService from "../services/bufaloService";
 import propriedadeService from "../services/propriedadeService";
 
+
 export const HomeScreen = () => {
+  const { propriedadeSelecionada } = usePropriedade();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [countsSex, setCountsSex] = useState({ machos: 0, femeas: 0 });
   const [countsMat, setCountsMat] = useState({ bezerros: 0, novilhas: 0, vacas: 0, touros: 0 });
@@ -21,8 +24,9 @@ export const HomeScreen = () => {
   const [refreshing, setRefreshing] = useState(false);
 
   const fetchBufalos = async () => {
+    if (!propriedadeSelecionada) return;
     try {
-      const { raw, countsSex, countsMat, count } = await bufaloService.getBufalos();
+      const { raw, countsSex, countsMat, count } = await bufaloService.getBufalos(propriedadeSelecionada);
       setCountsSex(countsSex);
       setCountsMat(countsMat);
       setCount(count);
@@ -41,9 +45,12 @@ export const HomeScreen = () => {
   };
 
   useEffect(() => {
-    fetchBufalos();
-  //  fetchPropriedades();
+    fetchPropriedades();
   }, []);
+
+  useEffect(() => {
+    fetchBufalos();
+  }, [propriedadeSelecionada]);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -53,6 +60,8 @@ export const HomeScreen = () => {
     ]);
     setRefreshing(false);
   };
+
+  
 
   return (
     <View style={styles.container}>

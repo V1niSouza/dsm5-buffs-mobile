@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
-import Button from "../Button";
 import { colors } from "../../styles/colors";
 import TextTitle from "../TextTitle";
+import { usePropriedade } from "../../context/PropriedadeContext";
 
 interface PropriedadesProps {
   dropdownOpen: boolean;
@@ -12,19 +12,22 @@ interface PropriedadesProps {
 }
 
 export default function Propriedades({ dropdownOpen, setDropdownOpen, prop }: PropriedadesProps) {
+  const { propriedadeSelecionada, setPropriedadeSelecionada } = usePropriedade();
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState<string | null>(null);
   const [items, setItems] = useState<any[]>([]);
 
   useEffect(() => {
     if (prop && prop.length > 0) {
-      console.log("Propriedades recebidas:", prop);
       const mapped = prop.map((p: any) => ({
-        label: p.nome, 
-        value: p.id_propriedade     
+        label: p.nome,
+        value: p.id_propriedade,
       }));
       setItems(mapped);
-      setValue(mapped[0].value);
+
+      // se não tiver nada selecionado ainda, define a primeira
+      if (!propriedadeSelecionada) {
+        setPropriedadeSelecionada(mapped[0].value);
+      }
     }
   }, [prop]);
 
@@ -39,13 +42,20 @@ export default function Propriedades({ dropdownOpen, setDropdownOpen, prop }: Pr
       <View style={styles.dropdownWrapper}>
         <DropDownPicker
           open={open}
-          value={value}
+          value={propriedadeSelecionada} 
           items={items}
           setOpen={(o) => {
             setOpen(o);
-            setDropdownOpen(typeof o === 'boolean' ? o : false); // avisa o pai
+            setDropdownOpen(typeof o === "boolean" ? o : false);
           }}
-          setValue={setValue}
+          setValue={(callback) => {
+            const newValue = 
+            typeof callback === "function"
+            ? callback(propriedadeSelecionada)
+            : callback; 
+            setPropriedadeSelecionada(newValue as number | null);
+              
+          }}
           setItems={setItems}
           placeholder="Selecione uma propriedade"
           containerStyle={styles.dropdownContainer}

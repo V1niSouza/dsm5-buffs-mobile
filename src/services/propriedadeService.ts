@@ -2,9 +2,7 @@ import { apiFetch } from "../lib/apiClient";
 
 export const getPropriedades = async (token?: string) => {
   try {
-    const result = await apiFetch("/propriedades", { token });
-    // Processamento de dados:
-    
+    const result = await apiFetch("/propriedades");
     return {
       propriedades: result,      // Todos os dados crus
     };
