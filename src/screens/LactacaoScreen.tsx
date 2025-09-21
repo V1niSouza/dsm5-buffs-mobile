@@ -1,31 +1,29 @@
-import React from 'react';
-import { View, Text, StyleSheet, Animated, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { 
+  View, 
+  Text, 
+  StyleSheet, 
+  TouchableOpacity, 
+  ScrollView, 
+  RefreshControl 
+} from 'react-native';
 import { useDimensions } from '../utils/useDimensions';
 import TableLactation, { Animal } from '../components/TableLactation';
-import SearchBar from '../components/SearchBar';
 import { colors } from '../styles/colors';
 import DashLactation from '../components/DashLactacao';
 import { MainLayout } from '../layouts/MainLayout';
 import Bucket from '../../assets/images/bucket.svg';
 import Truck from '../../assets/images/truck-side.svg';
+import SimpleSearch from '../components/SimpleSearch';
 
 export const LactacaoScreen = () => {
   const { wp, hp } = useDimensions();
-  const scrollY = React.useRef(new Animated.Value(0)).current;
+  const [refreshing, setRefreshing] = useState(false);
 
-  // Faz sumir o header 2 ao rolar a tela
-  const header2Opacity = scrollY.interpolate({
-    inputRange: [0, 50], // altura do scroll para desaparecer
-    outputRange: [1, 0],
-    extrapolate: 'clamp',
-  });
-
-  // Quando header2 some: O titulo aparece no header1
-  const header1TextOpacity = scrollY.interpolate({
-    inputRange: [0, 50],
-    outputRange: [0, 1],
-    extrapolate: 'clamp',
-  });
+  const onRefresh = async () => {
+    setRefreshing(true);
+    setRefreshing(false);
+  };
 
   const animais: Animal[] = [
     { id: 1, status: true, brinco: "A123", raca: "Murrah", mediaProduzida: 12.5 },
@@ -49,82 +47,76 @@ export const LactacaoScreen = () => {
   ];
 
   return (
-    <View>
-      <View style={styles.headerNotifications}>
-        {/* Texto centralizado */}
-        <Animated.Text 
-          style={[
-            styles.header1Text, 
-            { opacity: header1TextOpacity }
-          ]}
-        >
-          Lactação
-        </Animated.Text>
+    <View style={styles.container}>
+      {/* Header */}
+      <View style={styles.header}>
+        <View style={{ alignItems: 'center' }}>
+          <Text style={styles.header1Text}>Lactação</Text>
+        </View>
 
         {/* Botões à direita */}
         <View style={styles.headerButtons}>
-          <TouchableOpacity onPress={() => console.log("Registrar medida do tanque")} style={styles.button}>
-            <Bucket width={18} height={18} style={{ margin: 4}}/>
+          <TouchableOpacity 
+            onPress={() => console.log("Registrar medida do tanque")} 
+            style={styles.button}
+          >
+            <Bucket width={18} height={18} style={{ margin: 4 }} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => console.log("Registrar retirada ")} style={styles.button}>
-            <Truck width={15} height={15} style={{ margin: 6}}/>
+
+          <TouchableOpacity 
+            onPress={() => console.log("Registrar retirada")} 
+            style={styles.button}
+          >
+            <Truck width={15} height={15} style={{ margin: 6 }} />
           </TouchableOpacity>
         </View>
       </View>
 
-    <Animated.ScrollView
-      onScroll={Animated.event(
-        [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-        { useNativeDriver: true }
-      )}
-      scrollEventThrottle={16}
-      contentContainerStyle={{ paddingBottom: 25 }}
-    >
-      <Animated.View style={[styles.header2, { opacity: header2Opacity }]}>
-        <Text style={styles.header2Text}>Lactação</Text>
-      </Animated.View>
-
-        <MainLayout>
-          {/* Dashboard */}
+      <MainLayout>
+        <ScrollView
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        >
           <DashLactation />
-          <View style={styles.container}>
+          <View style={styles.content}>
+            <SimpleSearch animais={animais} onFiltered={(filtered) => console.log("Animais filtrados:", filtered)} />
             <TableLactation
-              data={animais}
-              onVerMais={(animal: Animal) => console.log("Ver mais:", animal)}
-            />
+                data={animais}
+                onVerMais={(animal: Animal) => console.log("Ver mais:", animal)}
+              />
           </View>
-        </MainLayout>
-      </Animated.ScrollView>
+        </ScrollView>
+      </MainLayout>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-    headerNotifications: {
-    height: 60,
-    backgroundColor: colors.yellow.base,
-    paddingLeft: 16,
-    paddingTop: 20,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center", // mantém o texto no centro
-    position: "relative",
-    paddingVertical: 10,
+  container: { 
+    flex: 1 
   },
-  header1Text: {
-    fontSize: 20,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginTop: 10,
-    flex: 1, // garante centralização
-    color: colors.brown.base,
+  header: { 
+    height: 80, 
+    backgroundColor: colors.yellow.base, 
+    justifyContent: 'center', 
+    paddingLeft: 16, 
+    borderBottomWidth: 0.5, 
+    borderColor: colors.black.base 
   },
-  headerButtons: {
-    marginTop: 25,
-    flexDirection: "row",
-    position: "absolute",
-    right: 20, // fixa os botões à direita
-    gap: 20, // espaço entre eles
+  header1Text: { 
+    fontSize: 20, 
+    fontWeight: "bold", 
+    textAlign: "center", 
+    marginTop: 30, 
+    color: colors.brown.base 
+  },
+  headerButtons: { 
+    marginTop: 25, 
+    flexDirection: "row", 
+    position: "absolute", 
+    right: 20, 
+    gap: 20 
   },
   button: {
     backgroundColor: colors.yellow.dark,
@@ -141,12 +133,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: colors.brown.base,
   },
-  container: {
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    padding: 8,
-    borderWidth: 1,
-    marginBottom: 50,
-    borderColor: colors.gray.disabled,
+  content: { 
+    backgroundColor: "#fff", 
+    borderRadius: 12, 
+    paddingTop: 16, 
+    paddingBottom: 16, 
+    paddingHorizontal: 10, 
+    borderWidth: 1, 
+    marginBottom: 50, 
+    borderColor: colors.gray.disabled 
   },
+
 });

@@ -1,107 +1,94 @@
-import React from 'react';
-import { View, Text, StyleSheet, Animated, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, RefreshControl } from 'react-native';
 import { MainLayout } from '../layouts/MainLayout';
 import { useDimensions } from '../utils/useDimensions';
 import { colors } from '../styles/colors';
+import Plus from '../../assets/images/plus.svg';
+import { MapLeaflet } from '../components/Mapa';
 
 export const PiquetesScreen = () => {
   const { wp, hp } = useDimensions();
-  const scrollY = React.useRef(new Animated.Value(0)).current;
+  const [refreshing, setRefreshing] = useState(false);
 
-  // Faz sumir o header 2 ao rolar a tela
-  const header2Opacity = scrollY.interpolate({
-    inputRange: [0, 50], // altura do scroll para desaparecer
-    outputRange: [1, 0],
-    extrapolate: 'clamp',
-  });
+  const [piqueteCoords, setPiqueteCoords] = useState([ { latitude: -24.497, longitude: -47.842 }, { latitude: -24.496, longitude: -47.841 }, { latitude: -24.495, longitude: -47.843 }, ]);
 
-  // Quando header2 some: O titulo aparece no header1
-  const header1TextOpacity = scrollY.interpolate({
-    inputRange: [0, 50],
-    outputRange: [0, 1],
-    extrapolate: 'clamp',
-  });
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    // aqui você pode recarregar as coordenadas da API
+    setRefreshing(false);
+  };
 
 
   return (
-    <View>
-      <View style={styles.headerNotifications}>
-        {/* Texto centralizado */}
-        <Animated.Text 
-          style={[
-            styles.header1Text, 
-            { opacity: header1TextOpacity }
-          ]}
-        >
-          Reprodução
-        </Animated.Text>
+    <View style={styles.container}>
+      {/* Header */}
+      <View style={styles.header}>
+        <View style={{ alignItems: 'center' }}>
+          <Text style={styles.header1Text}>lotes/piquetes</Text>
+        </View>
+        {/* Botões à direita */}
+        <View style={styles.headerButtons}>
+          <TouchableOpacity
+            onPress={() => console.log("Registrar novo Piquete")}
+            style={styles.button}
+          >
+            <Plus width={15} height={15} style={{ margin: 6 }} />
+          </TouchableOpacity>
+        </View>
       </View>
 
-    <Animated.ScrollView
-      onScroll={Animated.event(
-        [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-        { useNativeDriver: true }
-      )}
-      scrollEventThrottle={16}
-      contentContainerStyle={{ paddingBottom: 25 }}
-    >
-      <Animated.View style={[styles.header2, { opacity: header2Opacity }]}>
-        <Text style={styles.header2Text}>Reprodução</Text>
-      </Animated.View>
-        <MainLayout>
-          <Text>Teste Piquetes</Text> 
-        </MainLayout>
-      </Animated.ScrollView>
+      <MainLayout>
+        <ScrollView
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        >
+          <View style={styles.content}>
+            <MapLeaflet piqueteCoords={piqueteCoords}/>
+          </View>
+        </ScrollView>
+      </MainLayout>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-    headerNotifications: {
-    height: 60,
+  header: {
+    height: 80,
     backgroundColor: colors.yellow.base,
+    justifyContent: 'center',
     paddingLeft: 16,
-    paddingTop: 20,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center", // mantém o texto no centro
-    position: "relative",
-    paddingVertical: 10,
-  },
-  header1Text: {
-    fontSize: 20,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginTop: 10,
-    flex: 1, // garante centralização
-    color: colors.brown.base,
-  },
-  headerButtons: {
-    marginTop: 25,
-    flexDirection: "row",
-    position: "absolute",
-    right: 20, // fixa os botões à direita
-    gap: 20, // espaço entre eles
+    borderBottomWidth: 0.5,
+    borderColor: colors.black.base,
   },
   button: {
     backgroundColor: colors.yellow.dark,
     borderRadius: 50,
   },
-  header2: {
-    height: 35,
-    justifyContent: 'center',
-    paddingLeft: 16,
-    backgroundColor: colors.yellow.base,
-  },
-  header2Text: {
-    fontSize: 25,
+  header1Text: {
+    fontSize: 20,
     fontWeight: 'bold',
+    textAlign: 'center',
+    marginTop: 30,
     color: colors.brown.base,
   },
+  headerButtons: {
+    marginTop: 25,
+    flexDirection: 'row',
+    position: 'absolute',
+    right: 20,
+    gap: 20,
+  },
   container: {
-    backgroundColor: "#fff",
+    flex: 1,
+  },
+  content: {
+    backgroundColor: '#fff',
     borderRadius: 12,
-    padding: 8,
+    paddingTop: 16,
+    paddingBottom: 16,
+    paddingHorizontal: 10,
     borderWidth: 1,
     marginBottom: 50,
     borderColor: colors.gray.disabled,

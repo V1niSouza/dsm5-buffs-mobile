@@ -19,3 +19,13 @@ buildscript {
 }
 
 apply plugin: "com.facebook.react.rootproject"
+
+// ---- Adicione abaixo deste ponto ----
+subprojects {
+    project.configurations.all {
+        resolutionStrategy {
+            // força a versão do play-services-location
+            force 'com.google.android.gms:play-services-location:21.0.1'
+        }
+    }
+}
