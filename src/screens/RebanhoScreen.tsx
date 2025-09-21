@@ -14,7 +14,18 @@ import Scanner from '../../assets/images/qr-scan.svg';
 import { usePropriedade } from '../context/PropriedadeContext';
 import bufaloService from '../services/bufaloService';
 
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
 type Tag = { id?: string; [key: string]: any };
+
+type RootStackParamList = {
+  MainTab: undefined;
+  AnimalDetail: { animal: Animal };
+};
+
+const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
 
 export const RebanhoScreen = () => {
   const { wp, hp } = useDimensions();
@@ -164,7 +175,9 @@ const handleReadTag = async () => {
             <SearchBar animais={animais} onFiltered={setAnimaisFiltrados}/>
             <TableAnimais
               data={animaisFiltrados}
-              onVerMais={(animal: Animal) => console.log('Animal:', animal)}
+                onVerMais={(animal: Animal) => {
+                navigation.navigate('AnimalDetail', { animal });
+              }}
             />
           </View>
         </ScrollView>
