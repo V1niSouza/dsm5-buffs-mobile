@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Animated, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, Animated, TouchableOpacity, RefreshControl } from 'react-native';
 import { MainLayout } from '../layouts/MainLayout';
 import { useDimensions } from '../utils/useDimensions';
 import TableAnimais, { Animal } from '../components/TableRebanho'; // <-- importa o tipo
@@ -7,31 +7,57 @@ import SearchBar from '../components/SearchBar';
 import { colors } from '../styles/colors';
 import Plus from '../../assets/images/plus.svg';
 import Scanner from '../../assets/images/qr-scan.svg'; 
+import { usePropriedade } from '../context/PropriedadeContext';
+import bufaloService from '../services/bufaloService';
+
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
+type RootStackParamList = {
+  MainTab: undefined;
+  AnimalDetail: { animal: Animal };
+};
+const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
 export const RebanhoScreen = () => {
   const { wp, hp } = useDimensions();
+  const { propriedadeSelecionada } = usePropriedade();
+  const [animais, setAnimais] = React.useState<Animal[]>([]);
+  const [animaisFiltrados, setAnimaisFiltrados] = React.useState<Animal[]>([]);
+  const [refreshing, setRefreshing] = React.useState(false);
 
-  const animais: Animal[] = [
-    { id: 1, status: true, brinco: "A123", nome: "Estrela", raca: "Murrah", sexo: "Fêmea" },
-    { id: 2, status: false, brinco: "B456", nome: "TouroX", raca: "Mediterrâneo", sexo: "Macho" },
-    { id: 3, status: true, brinco: "C789", nome: "Luna", raca: "Jafarabadi", sexo: "Fêmea" },
-    { id: 4, status: true, brinco: "D101", nome: "Bella", raca: "Murrah", sexo: "Fêmea" },
-    { id: 5, status: false, brinco: "E202", nome: "Max", raca: "Mediterrâneo", sexo: "Macho" },
-    { id: 6, status: true, brinco: "F303", nome: "Mila", raca: "Jafarabadi", sexo: "Fêmea" },
-    { id: 7, status: true, brinco: "G404", nome: "Thor", raca: "Murrah", sexo: "Macho" },
-    { id: 8, status: false, brinco: "H505", nome: "Nina", raca: "Mediterrâneo", sexo: "Fêmea" },
-    { id: 9, status: true, brinco: "I606", nome: "Rocky", raca: "Jafarabadi", sexo: "Macho" },
-    { id: 10, status: true, brinco: "J707", nome: "Daisy", raca: "Murrah", sexo: "Fêmea" },
-    { id: 11, status: false, brinco: "K808", nome: "Brutus", raca: "Mediterrâneo", sexo: "Macho" },
-    { id: 12, status: true, brinco: "L909", nome: "Lola", raca: "Jafarabadi", sexo: "Fêmea" },
-    { id: 13, status: false, brinco: "M010", nome: "Hercules", raca: "Murrah", sexo: "Macho" },
-    { id: 14, status: true, brinco: "N111", nome: "Sophie", raca: "Mediterrâneo", sexo: "Fêmea" },
-    { id: 15, status: true, brinco: "O212", nome: "Zeus", raca: "Jafarabadi", sexo: "Macho" },
-    { id: 16, status: false, brinco: "P313", nome: "Chloe", raca: "Murrah", sexo: "Fêmea" },
-    { id: 17, status: true, brinco: "Q414", nome: "Rocky II", raca: "Mediterrâneo", sexo: "Macho" },
-    { id: 18, status: true, brinco: "R515", nome: "Bella II", raca: "Jafarabadi", sexo: "Fêmea" },
-  ];
+  const fetchBufalos = async () => {
+    try {
+      const { raw } = await bufaloService.getBufalos();
 
+      const filtrados = raw
+      .filter((b: any) => b.id_propriedade === propriedadeSelecionada)
+      .map((b: any) => ({
+        id: b.id_bufalo,
+        status: b.status,
+        brinco: b.brinco,
+        nome: b.nome,
+        raca: b.racaNome,
+        sexo: b.sexo === 'M' ? 'Macho' : 'Femêa'
+      }));
+      setAnimais(filtrados);
+      setAnimaisFiltrados(filtrados);
+    } catch (err) {
+      console.error("Erro ao buscar búfalos:", err);
+    }
+  };
+
+  useEffect(() => {
+    if (propriedadeSelecionada) {
+      fetchBufalos();
+    }
+  }, [propriedadeSelecionada]);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchBufalos();
+    setRefreshing(false);
+  };
 
   return (
     <View style={styles.container}>
@@ -51,13 +77,17 @@ export const RebanhoScreen = () => {
         </View>
       </View>
       <MainLayout>
-        <ScrollView>
+        <ScrollView refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }>
           <View style={styles.content}>
-            <SearchBar />
+            <SearchBar 
+              animais={animais} 
+              onFiltered={setAnimaisFiltrados}/>
             <TableAnimais
-              data={animais}
+              data={animaisFiltrados}
               onVerMais={(animal: Animal) => {   
-                console.log("Ver mais sobre:", animal);
+                navigation.navigate('AnimalDetail', { animal });
               }}
             />
           </View>

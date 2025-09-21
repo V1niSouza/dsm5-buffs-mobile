@@ -7,7 +7,8 @@ import Button from "../Button";
 
 
 export type Animal = {
-  id: string | number;
+  categoria: string;
+  id: number | number;
   status: boolean;   // true = verde, false = vermelho
   brinco: string;
   nome: string;
@@ -17,7 +18,7 @@ export type Animal = {
 
 type Props = {
   data: Animal[];
-  onVerMais: (animal: Animal) => void; // callback para abrir outra tela/tabela
+  onVerMais: (animal: Animal) => void; 
 };
 
 export default function TableAnimais({ data, onVerMais }: Props) {
@@ -68,7 +69,7 @@ export default function TableAnimais({ data, onVerMais }: Props) {
               {item.nome}
             </Text>
             <Text style={[styles.itemText, { flex: 2 }]} numberOfLines={1}>
-              {item.raca}
+              {item.raca ?? "Sem raça"}
             </Text>
             <Text style={[styles.itemText, { flex: 1 }]} numberOfLines={1}>
               {item.sexo}

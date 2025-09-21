@@ -1,8 +1,22 @@
 import { apiFetch } from "../lib/apiClient";
 
-export const getBufalos = async (propriedadeId: number, token?: string) => {
+export const getBufalos = async (propriedadeId?: number, token?: string) => {
   try {
     const result = await apiFetch("/bufalos");
+
+    const racas = await apiFetch("/racas"); 
+
+    const mapRacas: Record<number, string> = {};
+    racas.forEach((r: any) => {
+      mapRacas[r.id_raca] = r.nome;
+    });
+
+    const bufalosTratados = result.map((b: any) => ({
+      ...b,
+      racaNome: mapRacas[b.id_raca] || "Desconhecida",
+    }));
+
+
     // Processamento de dados:
     const bufalosFiltrados = result.filter((b: any) => b.id_propriedade === propriedadeId);
 
@@ -16,9 +30,8 @@ export const getBufalos = async (propriedadeId: number, token?: string) => {
     const vacas = bufalosFiltrados.filter((b: any) => b.nivel_maturidade === "V" && b.status === true).length;
     const touros = bufalosFiltrados.filter((b: any) => b.nivel_maturidade === "T" && b.status === true).length;
 
-
     return {
-      raw: result,      // Todos os dados crus
+      raw: bufalosTratados,      
       countsSex: { machos, femeas },
       countsMat:  { bezerros, novilhas, vacas, touros },
       count: { bufalosAtivos }

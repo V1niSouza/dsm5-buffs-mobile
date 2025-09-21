@@ -88,7 +88,6 @@ export const LactacaoScreen = () => {
           {/* Dashboard */}
           <DashLactation />
           <View style={styles.container}>
-            <SearchBar />
             <TableLactation
               data={animais}
               onVerMais={(animal: Animal) => console.log("Ver mais:", animal)}

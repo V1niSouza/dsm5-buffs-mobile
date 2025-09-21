@@ -22,6 +22,7 @@ import { LoginScreen } from './src/screens/LoginScreen';
 import { SignupScreen } from './src/screens/SignupScreen';
 import { LoadingScreen } from './src/screens/LoadingScreen';
 import { PropriedadeProvider } from './src/context/PropriedadeContext';
+import { AnimalDetailScreen } from './src/screens/AnimalDetailScreen';
 
 // Icons SVG
 import BuffsLogo from './assets/images/logoBuffs.svg'; 
@@ -35,6 +36,7 @@ import Fance from './src/icons/fance';
 export type RootStackParamList = {
   Login: undefined;
   Signup: undefined;
+  AnimalDetail: undefined;
   MainTab: undefined;
   CompleteProfile: undefined;
 };
@@ -164,7 +166,10 @@ function AppContent() {
           <Stack.Screen name="Signup" component={SignupScreen} />
         </>
       ) : (
+        <>
         <Stack.Screen name="MainTab" component={MainTab} />
+        <Stack.Screen name="AnimalDetail" component={AnimalDetailScreen} />
+        </>
       )}
     </Stack.Navigator>
   );

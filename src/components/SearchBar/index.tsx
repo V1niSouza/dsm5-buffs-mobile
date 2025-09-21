@@ -1,19 +1,29 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, TextInput, StyleSheet, TouchableOpacity, ScrollView, Text } from "react-native";
 import { colors } from "../../styles/colors";
 import TextTitle from "../TextTitle";
 import SearchIcon from "../../icons/search";
+import { Animal } from "../TableRebanho";
+
+interface SearchBarProps {
+  animais: Animal[],
+  onFiltered: (animaisFiltrados: Animal[]) => void,
+}
+
 
 const filterOptions = [
   "Ativo",
   "Inativo",
+  "Macho",
+  "Femêa",
   "Categoria PO",
   "Categoria PA",
   "Categoria PC",
   "Categoria CCG",
 ];
 
-export default function SearchBar() {
+
+export default function SearchBar({ animais, onFiltered }: SearchBarProps) {
   const [search, setSearch] = useState("");
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
 
@@ -24,6 +34,33 @@ export default function SearchBar() {
       setActiveFilters([...activeFilters, filter]);
     }
   };
+
+  useEffect(() => {
+  const filtered = animais
+    .filter(a => a.brinco.includes(search))
+    .filter(a => {
+      if (!activeFilters.length) return true;
+      return (
+        activeFilters.includes(
+          typeof a.status === "boolean"
+            ? a.status
+              ? "Ativo"
+              : "Inativo"
+            : String(a.status)
+        ) ||
+        activeFilters.includes(
+          typeof a.sexo === "boolean"
+            ? a.sexo
+              ? "Macho"
+              : "Femêa"
+            : String(a.sexo)
+        ) ||
+        activeFilters.includes(a.categoria ?? "")
+      );
+    });
+
+  onFiltered(filtered);
+  }, [search, activeFilters, animais]);
 
   return (
     <View style={styles.container}>
