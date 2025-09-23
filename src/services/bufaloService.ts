@@ -44,4 +44,37 @@ export const getBufalos = async (propriedadeId?: number, token?: string) => {
   }
 };
 
-export default { getBufalos };
+const getBufaloDetalhes = async (id: number) => {
+  try {
+    const bufalo = await apiFetch(`/bufalos/${id}`);
+    const racas = await apiFetch("/racas");
+    const mapRacas: Record<number, string> = {};
+    racas.forEach((r: any) => (mapRacas[r.id_raca] = r.nome));
+
+    // Função auxiliar para pegar nome do pai/mãe
+    const getParentescoNome = async (id_parent: number, tipo: 'pai' | 'mae') => {
+      if (!id_parent) return "Desconhecido";
+      const registro = await apiFetch(`/bufalos/${id_parent}`).catch(async () => {
+        // Se não for bufalo, tenta no material-genetico
+        const matGen = await apiFetch(`/material-genetico/${id_parent}`);
+        return { brinco: matGen.nome || "Desconhecido" };
+      });
+      return registro.brinco || "Desconhecido";
+    };
+
+    const paiNome = await getParentescoNome(bufalo.id_pai, 'pai');
+    const maeNome = await getParentescoNome(bufalo.id_mae, 'mae');
+
+    return {
+      ...bufalo,
+      racaNome: mapRacas[bufalo.id_raca] || "Desconhecida",
+      paiNome,
+      maeNome,
+    };
+  } catch (err) {
+    console.error("Erro ao buscar detalhes do búfalo:", err);
+    throw err;
+  }
+};
+
+export default { getBufalos, getBufaloDetalhes };

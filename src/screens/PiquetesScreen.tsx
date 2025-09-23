@@ -15,7 +15,6 @@ export const PiquetesScreen = () => {
 
   const onRefresh = async () => {
     setRefreshing(true);
-    // aqui você pode recarregar as coordenadas da API
     setRefreshing(false);
   };
 
@@ -25,7 +24,7 @@ export const PiquetesScreen = () => {
       {/* Header */}
       <View style={styles.header}>
         <View style={{ alignItems: 'center' }}>
-          <Text style={styles.header1Text}>lotes/piquetes</Text>
+          <Text style={styles.header1Text}>Lotes/Piquetes</Text>
         </View>
         {/* Botões à direita */}
         <View style={styles.headerButtons}>
@@ -59,8 +58,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.yellow.base,
     justifyContent: 'center',
     paddingLeft: 16,
-    borderBottomWidth: 0.5,
-    borderColor: colors.black.base,
   },
   button: {
     backgroundColor: colors.yellow.dark,

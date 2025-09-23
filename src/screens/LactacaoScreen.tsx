@@ -80,7 +80,7 @@ export const LactacaoScreen = () => {
         >
           <DashLactation />
           <View style={styles.content}>
-            <SimpleSearch animais={animais} onFiltered={(filtered) => console.log("Animais filtrados:", filtered)} />
+            <SimpleSearch animais={animais} onFiltered={(filtered) => {}} />
             <TableLactation
                 data={animais}
                 onVerMais={(animal: Animal) => console.log("Ver mais:", animal)}
@@ -101,8 +101,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.yellow.base, 
     justifyContent: 'center', 
     paddingLeft: 16, 
-    borderBottomWidth: 0.5, 
-    borderColor: colors.black.base 
   },
   header1Text: { 
     fontSize: 20, 

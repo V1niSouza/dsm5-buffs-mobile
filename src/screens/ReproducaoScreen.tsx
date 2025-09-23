@@ -76,8 +76,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.yellow.base, 
     justifyContent: 'center', 
     paddingLeft: 16, 
-    borderBottomWidth: 0.5, 
-    borderColor: colors.black.base 
   },
   button: {
     backgroundColor: colors.yellow.dark,

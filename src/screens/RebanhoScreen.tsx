@@ -187,24 +187,117 @@ const handleReadTag = async () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  header: { height: 80, backgroundColor: colors.yellow.base, justifyContent: 'center', paddingLeft: 16, borderBottomWidth: 0.5, borderColor: colors.black.base },
-  header1Text: { fontSize: 20, fontWeight: "bold", textAlign: "center", marginTop: 30, color: colors.brown.base },
-  headerButtons: { marginTop: 25, flexDirection: "row", position: "absolute", right: 20, gap: 20 },
-  button: { backgroundColor: colors.yellow.dark, borderRadius: 50 },
-  content: { backgroundColor: "#fff", borderRadius: 12, paddingTop: 16, paddingBottom: 16, paddingHorizontal: 10, borderWidth: 1, marginBottom: 50, borderColor: colors.gray.disabled },
-  centeredView: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)' },
-  modalView: { margin: 20, backgroundColor: 'white', borderRadius: 20, padding: 35, alignItems: 'center', width: '80%' },
-  modalTitle: { fontSize: 22, fontWeight: 'bold', marginBottom: 10, color: colors.brown.base },
-  modalSubtitle: { fontSize: 16, marginBottom: 20, textAlign: 'center' },
-  statusText: { fontSize: 16, fontStyle: 'italic', marginBottom: 15 },
-  modalButton: { borderRadius: 10, padding: 10, elevation: 2, marginHorizontal: 5, marginVertical: 5 },
-  buttonStart: { backgroundColor: colors.green.active },
-  buttonClose: { backgroundColor: colors.gray.base, marginTop: 20 },
-  textStyle: { color: 'white', fontWeight: 'bold', textAlign: 'center' },
-  tagListContainer: { width: '100%', maxHeight: 150, borderWidth: 1, borderColor: colors.gray.disabled, borderRadius: 10, padding: 10, marginTop: 15 },
-  tagListTitle: { fontSize: 16, fontWeight: 'bold', marginBottom: 5, color: colors.brown.base },
-  tagList: { flex: 1 },
-  tagItem: { paddingVertical: 5, borderBottomWidth: 0.5, borderBottomColor: colors.gray.disabled },
-  tagText: { fontSize: 14, color: colors.black.base },
+  container: { 
+    flex: 1
+   },
+  header: { 
+    height: 80, 
+    backgroundColor: colors.yellow.base, 
+    justifyContent: 'center', 
+    paddingLeft: 16 
+  },
+  header1Text: { 
+    fontSize: 20, 
+    fontWeight: "bold", 
+    textAlign: "center", 
+    marginTop: 30, 
+    color: colors.brown.base 
+  },
+  headerButtons: { 
+    marginTop: 25, 
+    flexDirection: "row", 
+    position: "absolute", 
+    right: 20, 
+    gap: 20 
+  },
+  button: { 
+    backgroundColor: colors.yellow.dark, 
+    borderRadius: 50 
+  },
+  content: { 
+    backgroundColor: "#fff", 
+    borderRadius: 12, 
+    paddingTop: 16, 
+    paddingBottom: 16, 
+    paddingHorizontal: 10, 
+    borderWidth: 1, 
+    marginBottom: 50, 
+    borderColor: colors.gray.disabled 
+  },
+  centeredView: { 
+    flex: 1, 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    backgroundColor: 'rgba(0, 0, 0, 0.5)' 
+  },
+  modalView: { 
+    margin: 20, 
+    backgroundColor: 'white', 
+    borderRadius: 20, 
+    padding: 35, 
+    alignItems: 'center', 
+    width: '80%' 
+  },
+  modalTitle: { 
+    fontSize: 22, 
+    fontWeight: 'bold', 
+    marginBottom: 10, 
+    color: colors.brown.base 
+  },
+  modalSubtitle: { 
+    fontSize: 16, 
+    marginBottom: 20, 
+    textAlign: 'center' 
+  },
+  statusText: { 
+    fontSize: 16, 
+    fontStyle: 'italic',
+    marginBottom: 15 
+  },
+  modalButton: { 
+    borderRadius: 10, 
+    padding: 10, 
+    elevation: 2, 
+    marginHorizontal: 5,
+    marginVertical: 5 
+  },
+  buttonStart: { 
+    backgroundColor: colors.green.active 
+  },
+  buttonClose: { 
+    backgroundColor: colors.gray.base, 
+    marginTop: 20 
+  },
+  textStyle: { 
+    color: 'white', 
+    fontWeight: 'bold', 
+    textAlign: 'center' 
+  },
+  tagListContainer: { 
+    width: '100%', 
+    maxHeight: 150, 
+    borderWidth: 1, 
+    borderColor: colors.gray.disabled, 
+    borderRadius: 10, 
+    padding: 10, 
+    marginTop: 15 
+  },
+  tagListTitle: { 
+    fontSize: 16, 
+    fontWeight: 'bold', 
+    marginBottom: 5, 
+    color: colors.brown.base 
+  },
+  tagList: { 
+    flex: 1
+  },
+  tagItem: { 
+    paddingVertical: 5, 
+    borderBottomWidth: 0.5, 
+    borderBottomColor: colors.gray.disabled 
+  },
+  tagText: { 
+    fontSize: 14, 
+    color: colors.black.base 
+  },
 });
