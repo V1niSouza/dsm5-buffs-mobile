@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   View, 
   Text, 
@@ -8,43 +8,56 @@ import {
   RefreshControl 
 } from 'react-native';
 import { useDimensions } from '../utils/useDimensions';
-import TableLactation, { Animal } from '../components/TableLactation';
+import TableLactation, { AnimalLac } from '../components/TableLactation';
 import { colors } from '../styles/colors';
 import DashLactation from '../components/DashLactacao';
 import { MainLayout } from '../layouts/MainLayout';
 import Bucket from '../../assets/images/bucket.svg';
 import Truck from '../../assets/images/truck-side.svg';
 import SimpleSearch from '../components/SimpleSearch';
+import { getCiclosLactacao } from '../services/lactacaoService';
 
 export const LactacaoScreen = () => {
   const { wp, hp } = useDimensions();
   const [refreshing, setRefreshing] = useState(false);
+  const [animais, setAnimais] = useState<AnimalLac[]>([]);
+  const [animaisFiltrados, setAnimaisFiltrados] = useState<AnimalLac[]>([]);
+  const [totalLactando, setTotalLactando] = useState<number>(0);
+  const [dataFormatada, setDataFormatada] = useState<any | null>(null);
+  const [quantidadeAtual, setQuantidadeAtual] = useState<any | null>(true);
 
-  const onRefresh = async () => {
+  const fetchCiclos = async () => {
     setRefreshing(true);
+    try {
+      const { ciclos, totalLactando, dataFormatada, quantidadeAtual } = await getCiclosLactacao();
+      const animaisFormatados: AnimalLac[] = ciclos.map(c => ({
+        id: c.id_ciclo_lactacao,
+        status: c.status === "Lactando",
+        brinco: c.bufalo?.nome || "Desconhecido",
+        raca: c.bufalo?.raca || "Desconhecida",
+        mediaProduzida: 0
+      }));
+      setAnimais(animaisFormatados);
+      setAnimaisFiltrados(animaisFormatados);
+      setTotalLactando(totalLactando); 
+      setDataFormatada(dataFormatada);
+      setQuantidadeAtual(quantidadeAtual);
+    } catch (error) {
+      console.error("Erro ao buscar ciclos de lactação:", error);
+      setAnimais([]);
+      setAnimaisFiltrados([]);
+    }
     setRefreshing(false);
   };
 
-  const animais: Animal[] = [
-    { id: 1, status: true, brinco: "A123", raca: "Murrah", mediaProduzida: 12.5 },
-    { id: 2, status: false, brinco: "B456", raca: "Mediterrâneo", mediaProduzida: 8.9 },
-    { id: 3, status: true, brinco: "C789", raca: "Jafarabadi", mediaProduzida: 15.2 },
-    { id: 4, status: true, brinco: "D101", raca: "Murrah", mediaProduzida: 11.0 },
-    { id: 5, status: false, brinco: "E202", raca: "Mediterrâneo", mediaProduzida: 7.4 },
-    { id: 6, status: true, brinco: "F303", raca: "Jafarabadi", mediaProduzida: 14.1 },
-    { id: 7, status: true, brinco: "G404", raca: "Murrah", mediaProduzida: 10.8 },
-    { id: 8, status: false, brinco: "H505", raca: "Mediterrâneo", mediaProduzida: 9.6 },
-    { id: 9, status: true, brinco: "I606", raca: "Jafarabadi", mediaProduzida: 13.7 },
-    { id: 10, status: true, brinco: "J707", raca: "Murrah", mediaProduzida: 12.9 },
-    { id: 11, status: false, brinco: "K808", raca: "Mediterrâneo", mediaProduzida: 8.3 },
-    { id: 12, status: true, brinco: "L909", raca: "Jafarabadi", mediaProduzida: 14.8 },
-    { id: 13, status: false, brinco: "M010", raca: "Murrah", mediaProduzida: 9.2 },
-    { id: 14, status: true, brinco: "N111", raca: "Mediterrâneo", mediaProduzida: 11.5 },
-    { id: 15, status: true, brinco: "O212", raca: "Jafarabadi", mediaProduzida: 13.1 },
-    { id: 16, status: false, brinco: "P313", raca: "Murrah", mediaProduzida: 7.9 },
-    { id: 17, status: true, brinco: "Q414", raca: "Mediterrâneo", mediaProduzida: 12.2 },
-    { id: 18, status: true, brinco: "R515", raca: "Jafarabadi", mediaProduzida: 15.0 },
-  ];
+  useEffect(() => {
+    fetchCiclos();
+  }, []);
+
+  const onRefresh = async () => {
+    await fetchCiclos();
+  };
+
 
   return (
     <View style={styles.container}>
@@ -78,13 +91,20 @@ export const LactacaoScreen = () => {
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
         >
-          <DashLactation />
+          <DashLactation
+            totalArmazenado={quantidadeAtual || 0}
+            vacasLactando={totalLactando}
+            dataAtualizacao={dataFormatada || "N/D"} />
           <View style={styles.content}>
-            <SimpleSearch animais={animais} onFiltered={(filtered) => {}} />
-            <TableLactation
-                data={animais}
-                onVerMais={(animal: Animal) => console.log("Ver mais:", animal)}
-              />
+          <SimpleSearch 
+            animais={animais} 
+            onFiltered={(filtered) => setAnimaisFiltrados(filtered)} 
+          />
+
+          <TableLactation
+            data={animaisFiltrados} // 👈 usa filtrados aqui
+            onVerMais={(animal: AnimalLac) => console.log("Ver mais:", animal)}
+          />
           </View>
         </ScrollView>
       </MainLayout>
@@ -120,17 +140,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.yellow.dark,
     borderRadius: 50,
   },
-  header2: {
-    height: 35,
-    justifyContent: 'center',
-    paddingLeft: 16,
-    backgroundColor: colors.yellow.base,
-  },
-  header2Text: {
-    fontSize: 25,
-    fontWeight: 'bold',
-    color: colors.brown.base,
-  },
   content: { 
     backgroundColor: "#fff", 
     borderRadius: 12, 
@@ -141,5 +150,4 @@ const styles = StyleSheet.create({
     marginBottom: 50, 
     borderColor: colors.gray.disabled 
   },
-
 });

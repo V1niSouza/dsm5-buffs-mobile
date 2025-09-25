@@ -20,7 +20,7 @@ export default function Propriedades({ dropdownOpen, setDropdownOpen, prop }: Pr
     if (prop && prop.length > 0) {
       const mapped = prop.map((p: any) => ({
         label: p.nome,
-        value: p.id_propriedade,
+        value: p.id,
       }));
       setItems(mapped);
 

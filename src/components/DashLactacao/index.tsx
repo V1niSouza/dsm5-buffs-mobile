@@ -3,32 +3,35 @@ import { View, Text, StyleSheet } from "react-native";
 import { colors } from "../../styles/colors";
 import TextTitle from "../TextTitle";
 
-export default function DashLactation() {
-  // Valores de exemplo — depois você pode puxar da API ou state
-  const total = "20/04/2005";
-  const femeas = 149;
-  const machos = 98;
-  const bezerros = 43;
-  const novilhas = 80;
-  const vacas = 124;
-  const touros = 24;
+interface DashLactationProps {
+  totalArmazenado: number;      // quantidade de leite no estoque
+  vacasLactando: number;        // total de vacas em lactação
+  dataAtualizacao: string;      // data do último registro
+}
+
+
+export default function DashLactation({
+  totalArmazenado,
+  vacasLactando,
+  dataAtualizacao,
+}: DashLactationProps) {
 
   return (
     <View style={styles.container}>
       {/* Cabeçalho */}
       <View style={styles.header}>
         <TextTitle>Resumo da Produção de Leite</TextTitle>
-        <Text style={styles.subtitle}>Data de atualização: {total}</Text>
+        <Text style={styles.subtitle}>Data de atualização: {dataAtualizacao}</Text>
       </View>
 
       {/* Primeira linha */}
       <View style={styles.row}>
         <View style={[styles.item, {borderBottomWidth: 0.2}]}>
-          <Text style={styles.value}>{machos} L</Text>
+          <Text style={styles.value}>{totalArmazenado} L</Text>
           <Text style={styles.label}>Total Armazenado</Text>
         </View>
         <View style={[styles.item, {borderBottomWidth: 0.2}]}>
-          <Text style={styles.value}>{femeas}</Text>
+          <Text style={styles.value}>{vacasLactando}</Text>
           <Text style={styles.label}>Vacas em Lactação</Text>
         </View>
       </View>

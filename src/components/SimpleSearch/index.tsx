@@ -3,20 +3,28 @@ import { View, TextInput, StyleSheet, TouchableOpacity } from "react-native";
 import { colors } from "../../styles/colors";
 import TextTitle from "../TextTitle";
 import SearchIcon from "../../icons/search";
-import { Animal } from "../TableRebanho";
+import { AnimalLac } from "../TableLactation";
 
 interface SearchOnlyProps {
-  animais: Animal[],
-  onFiltered: (animaisFiltrados: Animal[]) => void,
+  animais: AnimalLac[];
+  onFiltered: (animaisFiltrados: AnimalLac[]) => void;
 }
 
 export default function SimpleSearch({ animais, onFiltered }: SearchOnlyProps) {
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    const filtered = animais.filter(a => a.brinco.includes(search));
-    onFiltered(filtered);
-  }, [search, animais]);
+    if (search.trim() === "") {
+      // 🔹 Sem busca → devolve todos
+      onFiltered(animais);
+    } else {
+      // 🔹 Filtra apenas pelo brinco
+      const filtered = animais.filter(a =>
+        a.brinco.toLowerCase().includes(search.toLowerCase())
+      );
+      onFiltered(filtered);
+    }
+  }, [search]); // 👈 só depende do texto digitado
 
   return (
     <View style={styles.container}>

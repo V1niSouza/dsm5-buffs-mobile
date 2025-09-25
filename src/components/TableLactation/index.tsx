@@ -5,8 +5,7 @@ import BuffsLogo from '../../../assets/images/buffs.svg';
 import Prontuario from '../../../assets/images/prontuario.svg'; 
 import Button from "../Button";
 
-
-export type Animal = {
+export type AnimalLac = {
   id: string | number;
   status: boolean;   // true = verde, false = vermelho
   brinco: string;
@@ -15,8 +14,8 @@ export type Animal = {
 };
 
 type Props = {
-  data: Animal[];
-  onVerMais: (animal: Animal) => void; // callback para abrir outra tela/tabela
+  data: AnimalLac[];
+  onVerMais: (animal: AnimalLac) => void; // callback para abrir outra tela/tabela
 };
 
 export default function TableLactation({ data, onVerMais }: Props) {
