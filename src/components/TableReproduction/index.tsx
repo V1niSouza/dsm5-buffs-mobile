@@ -8,10 +8,11 @@ import Button from "../Button";
 
 export type Animal = {
   id: string | number;
-  status: boolean;   // true = verde, false = vermelho
+  status: "Falha" | "Confirmada" | "Em Processo";  
   brincoVaca: string;
   brincoTouro: string;
   tipoInseminacao: string;
+  dt_evento: string; // data formatada
 };
 
 type Props = {
@@ -23,10 +24,14 @@ export default function TableReproduction({ data, onVerMais }: Props) {
   const itensPorPagina = 15;
   const [paginaAtual, setPaginaAtual] = useState(0);
 
+  const dadosOrdenados = [...data].sort(
+    (a, b) => new Date(b.dt_evento).getTime() - new Date(a.dt_evento).getTime()
+  );
+
   // range da página atual
   const startIndex = paginaAtual * itensPorPagina;
   const endIndex = startIndex + itensPorPagina;
-  const dadosPagina = data.slice(startIndex, endIndex);
+  const dadosPagina = dadosOrdenados.slice(startIndex, endIndex);
 
   const totalPaginas = Math.ceil(data.length / itensPorPagina);
 
@@ -39,7 +44,7 @@ export default function TableReproduction({ data, onVerMais }: Props) {
         </View>
         <Text style={[styles.listHeaderText, { flex: 1 }]}>B. Bufala</Text>
         <Text style={[styles.listHeaderText, { flex: 1 }]}>B. Bufalo</Text>
-        <Text style={[styles.listHeaderText, { flex: 2 }]}>Tipo INseminação</Text>
+        <Text style={[styles.listHeaderText, { flex: 1.5 }]}>Tp. Inseminação</Text>
         <Text style={[styles.listHeaderText, { flex: 1 }]}>Ver Mais</Text>
       </View>
 
@@ -47,16 +52,23 @@ export default function TableReproduction({ data, onVerMais }: Props) {
       <FlatList
         data={dadosPagina}
         scrollEnabled={false}
-        keyExtractor={(item) => String(item.id)}
+        keyExtractor={(item, index) => item.id ? String(item.id) : String(index)}
         renderItem={({ item }) => (
           <View style={styles.itemRow}>
             {/* Status */}
-            <View
-              style={[
-                styles.statusCircle,
-                { backgroundColor: item.status ? colors.green.active : colors.red.inactive },
-              ]}
-            />
+        <View
+          style={[
+            styles.statusCircle,
+            {
+              backgroundColor:
+                item.status === "Confirmada"
+                  ? colors.green.active
+                  : item.status === "Falha"
+                  ? colors.red.inactive
+                  : colors.yellow.base, // exemplo
+            },
+          ]}
+        />
 
             {/* Colunas */}
             <Text style={[styles.itemText, { flex: 1 }]} numberOfLines={1}>
@@ -65,7 +77,7 @@ export default function TableReproduction({ data, onVerMais }: Props) {
             <Text style={[styles.itemText, { flex: 1 }]} numberOfLines={1}>
               {item.brincoTouro}
             </Text>
-            <Text style={[styles.itemText, { flex: 2}]} numberOfLines={1}>
+            <Text style={[styles.itemText, { flex: 1.5}]} numberOfLines={1}>
               {item.tipoInseminacao}
             </Text>
 

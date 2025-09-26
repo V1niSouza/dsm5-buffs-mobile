@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Animated, TouchableOpacity, ScrollView, RefreshControl } from 'react-native';
 import { MainLayout } from '../layouts/MainLayout';
 import { useDimensions } from '../utils/useDimensions';
@@ -6,30 +6,33 @@ import TableReproduction, { Animal } from '../components/TableReproduction';
 import { colors } from '../styles/colors';
 import Plus from '../../assets/images/plus.svg';
 import SimpleSearch from '../components/SimpleSearch';
+import { getReproducoes } from '../services/reproducaoService';
 
 export const ReproducaoScreen = () => {
   const { wp, hp } = useDimensions();
   const [refreshing, setRefreshing] = useState(false);
+  const [animais, setAnimais] = useState<Animal[]>([]);
 
-  const onRefresh = async () => {
+
+  const fetchReproducoes = async () => {
     setRefreshing(true);
+    try {
+      const data = await getReproducoes();
+      setAnimais(data);
+    } catch (error) {
+      console.error(error);
+      setAnimais([]);
+    }
     setRefreshing(false);
   };
 
+  useEffect(() => {
+    fetchReproducoes();
+  }, []);
 
-  const animais: Animal[] = [
-    { id: 1, status: true,  brincoVaca: "V001", brincoTouro: "T101", tipoInseminacao: "IA" },
-    { id: 2, status: false, brincoVaca: "V002", brincoTouro: "T102", tipoInseminacao: "Natural" },
-    { id: 3, status: true,  brincoVaca: "V003", brincoTouro: "T103", tipoInseminacao: "IATF"},
-    { id: 4, status: false, brincoVaca: "V004", brincoTouro: "T104", tipoInseminacao: "IA" },
-    { id: 5, status: true,  brincoVaca: "V005", brincoTouro: "T105", tipoInseminacao: "Natural" },
-    { id: 6, status: true,  brincoVaca: "V006", brincoTouro: "T106", tipoInseminacao: "IATF" },
-    { id: 7, status: false, brincoVaca: "V007", brincoTouro: "T107", tipoInseminacao: "IA" },
-    { id: 8, status: true,  brincoVaca: "V008", brincoTouro: "T108", tipoInseminacao: "Natural" },
-    { id: 9, status: false, brincoVaca: "V009", brincoTouro: "T109", tipoInseminacao: "IATF" },
-    { id: 10, status: true, brincoVaca: "V010", brincoTouro: "T110", tipoInseminacao: "IA" },
-  ];
-
+  const onRefresh = async () => {
+    await fetchReproducoes();
+  };
 
   return (
     <View style={styles.container}>
@@ -39,33 +42,28 @@ export const ReproducaoScreen = () => {
           <Text style={styles.header1Text}>Reprodução</Text>
         </View>
 
-        {/* Botões à direita */}
+        {/* Botão à direita */}
         <View style={styles.headerButtons}>
-          <TouchableOpacity onPress={() => console.log("Registrar retirada ")} style={styles.button}>
-            <Plus width={15} height={15} style={{ margin: 6}}/>
+          <TouchableOpacity onPress={() => console.log("Registrar cobertura")} style={styles.button}>
+            <Plus width={15} height={15} style={{ margin: 6 }} />
           </TouchableOpacity>
         </View>
       </View>
 
       <MainLayout>
         <ScrollView
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         >
-            <View style={styles.container}>
-              <View style={styles.content}>
-                <TableReproduction
-                  data={animais}
-                  onVerMais={(animal: Animal) => {   // <-- adiciona a tipagem aqui
-                    console.log("Ver mais sobre:", animal);
-                    // ex: navigation.navigate("AnimalDetalhes", { animal })
-                  }}
-                  />
-                </View>
-            </View>
-          </ScrollView>
-        </MainLayout>
+          <View style={styles.content}>
+            <TableReproduction
+              data={animais}
+              onVerMais={(animal: Animal) => {
+                console.log("Ver mais sobre:", animal);
+              }}
+            />
+          </View>
+        </ScrollView>
+      </MainLayout>
     </View>
   );
 };
