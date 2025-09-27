@@ -16,7 +16,17 @@ export const zootecService = {
       console.error("Erro ao adicionar histórico zootécnico:", err);
       throw err;
     }
-  }
+  },
+  delete: async (id_zootec: number) => {
+    try {
+      return await apiFetch(`/dados-zootecnicos/${id_zootec}`, {
+        method: "DELETE",
+      });
+    } catch (err) {
+      console.error("Erro ao excluir histórico zootécnico:", err);
+      throw err;
+    }
+  },
 };
 
 export default zootecService;

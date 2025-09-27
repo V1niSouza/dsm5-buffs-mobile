@@ -1,8 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl, Modal, Pressable, 
-  FlatList
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl, Pressable, Modal, FlatList} from 'react-native';
 import NfcManager, { NfcTech } from 'react-native-nfc-manager';
 import { MainLayout } from '../layouts/MainLayout';
 import { useDimensions } from '../utils/useDimensions';
@@ -16,6 +13,8 @@ import bufaloService from '../services/bufaloService';
 
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { FormBufalo } from '../components/FormBufalo';
+import { Modal as CustomModal  } from '../components/Modal';
 
 type Tag = { id?: string; [key: string]: any };
 
@@ -33,7 +32,7 @@ export const RebanhoScreen = () => {
   const [animais, setAnimais] = useState<Animal[]>([]);
   const [animaisFiltrados, setAnimaisFiltrados] = useState<Animal[]>([]);
   const [refreshing, setRefreshing] = useState(false);
-
+  const [modalVisible, setModalVisible] = useState(false);
   const [showScannerModal, setShowScannerModal] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
   const [scannedTags, setScannedTags] = useState<string[]>([]);
@@ -160,7 +159,7 @@ const handleReadTag = async () => {
           <TouchableOpacity onPress={() => setShowScannerModal(true)} style={styles.button}>
             <Scanner width={18} height={18} style={{ margin: 4 }}/>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => console.log("Abrir modal")} style={styles.button}>
+          <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.button}>
             <Plus width={15} height={15} style={{ margin: 6 }}/>
           </TouchableOpacity>
         </View>
@@ -182,6 +181,16 @@ const handleReadTag = async () => {
           </View>
         </ScrollView>
       </MainLayout>
+
+      <CustomModal visible={modalVisible} onClose={() => setModalVisible(false)}>
+        <FormBufalo
+          onSuccess={() => {
+            fetchBufalos(); // recarrega a lista
+            setModalVisible(false); // fecha modal
+          }}
+        />
+      </CustomModal>
+
     </View>
   );
 };

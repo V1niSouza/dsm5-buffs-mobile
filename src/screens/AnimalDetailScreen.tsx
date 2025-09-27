@@ -8,6 +8,10 @@ import bufaloService from '../services/bufaloService';
 import zootecnicoService from '../services/zootecnicoService';
 import sanitarioService from '../services/sanitarioService';
 import { Loading } from '../components/Loading';
+import { Modal } from "../components/Modal";
+import { FormZootecnico } from "../components/FormZootecnico";
+import { FormSanitario } from "../components/FormSanitario";
+import { ConfirmModal } from '../components/ModalDeleteConfirm';
 
 type RootStackParamList = {
   AnimalDetail: { animal: Animal };
@@ -18,11 +22,17 @@ type AnimalDetailRouteProp = RouteProp<RootStackParamList, 'AnimalDetail'>;
 export const AnimalDetailScreen = () => {
   const route = useRoute<AnimalDetailRouteProp>();
   const { animal } = route.params;
-
+  const [modalVisible, setModalVisible] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [detalhes, setDetalhes] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<'zootec' | 'sanitario'>('zootec');
+
+  const [confirmDeleteZootecVisible, setConfirmDeleteZootecVisible] = useState(false);
+  const [confirmDeleteSanitarioVisible, setConfirmDeleteSanitarioVisible] = useState(false);
+
+  const [selectedZootec, setSelectedZootec] = useState<any>(null);
+  const [selectedSanitario, setSelectedSanitario] = useState<any>(null);
 
   // paginação
   const PAGE_SIZE = 10;
@@ -67,10 +77,22 @@ export const AnimalDetailScreen = () => {
       <Text>Porte: {item.porte_corporal}</Text>
       <Text>Pelagem: {item.cor_pelagem}</Text>
       <Text>Pesagem: {item.tipo_pesagem}</Text>
+
+      <TouchableOpacity
+        style={styles.deleteButton}
+        onPress={() => {
+          setSelectedZootec(item);       // guarda o item que será excluído
+          setConfirmDeleteZootecVisible(true); // abre o modal
+        }}
+      >
+        <Text style={styles.deleteText}>Excluir</Text>
+      </TouchableOpacity>
     </View>
   );
 
-  const renderSanitario = ({ item }: any) => (
+  const renderSanitario = ({ item }: any) => {
+      console.log("Sanitário item:", item);
+    return (
     <View style={styles.card}>
       <Text style={styles.cardTitle}>{item.doenca}</Text>
       <Text>{new Date(item.dt_aplicacao).toLocaleDateString()}</Text>
@@ -78,9 +100,19 @@ export const AnimalDetailScreen = () => {
       <Text>Descrição: {item.medicacao?.descricao}</Text>
       <Text>Dosagem: {item.dosagem} {item.unidade_medida}</Text>
       <Text>Retorno: {item.necessita_retorno ? 'Sim' : 'Não'}</Text>
+
+      <TouchableOpacity
+        style={styles.deleteButton}
+        onPress={() => {
+          setSelectedSanitario(item);       // guarda o item que será excluído
+          setConfirmDeleteSanitarioVisible(true); // abre o modal
+        }}
+      >
+        <Text style={styles.deleteText}>Excluir</Text>
+      </TouchableOpacity>
     </View>
   );
-
+  }
   // paginação
   const getPaginatedData = () => {
     if (!detalhes) return [];
@@ -161,17 +193,92 @@ export const AnimalDetailScreen = () => {
         {/* Botão flutuante */}
         <TouchableOpacity
           style={styles.fab}
-          onPress={() => {
-            if (tab === 'zootec') {
-              console.log("Adicionar registro zootécnico");
-            } else {
-              console.log("Adicionar registro sanitário");
-            }
-          }}
+          onPress={() => setModalVisible(true)}
         >
           <Text style={{ color: "#fff", fontSize: 28 }}>+</Text>
         </TouchableOpacity>
       </MainLayout>
+
+
+    <Modal visible={modalVisible} onClose={() => setModalVisible(false)}>
+      {tab === "zootec" ? (
+        <FormZootecnico
+          onSubmit={async (data) => {
+            try {
+              await zootecnicoService.add(animal.id, data);
+              await fetchAllData(); // recarregar lista
+            } catch (err) {
+              console.error("Erro ao salvar zootécnico:", err);
+            } finally {
+              setModalVisible(false);
+            }
+          }}
+          onClose={() => setModalVisible(false)}
+        />
+      ) : (
+        <FormSanitario
+          idBufalo={animal.id}
+          onSubmit={async (data) => {
+            try {
+              await sanitarioService.add(data);
+              await fetchAllData(); // recarregar lista
+            } catch (err) {
+              console.error("Erro ao salvar sanitário:", err);
+            } finally {
+              setModalVisible(false);
+            }
+          }}
+          onClose={() => setModalVisible(false)}
+        />
+      )}
+    </Modal>
+
+    <ConfirmModal
+      visible={confirmDeleteZootecVisible}
+      message="Deseja realmente excluir o registro zootécnico?"
+      onCancel={() => setConfirmDeleteZootecVisible(false)}
+      onConfirm={async () => {
+        try {
+          await zootecnicoService.delete(Number(selectedZootec.id_zootec));
+          setDetalhes((prev: any) => ({
+            ...prev,
+            dadosZootecnicos: prev.dadosZootecnicos.filter(
+              (              h: { id_zootec: any; }) => h.id_zootec !== selectedZootec.id_zootec
+            ),
+          }));
+        } catch (err) {
+          console.error("Erro ao excluir:", err);
+        } finally {
+          setConfirmDeleteZootecVisible(false);
+          setSelectedZootec(null);
+        }
+      }}
+    />
+
+    <ConfirmModal
+      visible={confirmDeleteSanitarioVisible}
+      message="Deseja realmente excluir o registro sanitário?"
+      onCancel={() => setConfirmDeleteSanitarioVisible(false)}
+      onConfirm={async () => {
+        try {
+          console.log("ID Sanitário para exclusão:", selectedSanitario.id_sanit);
+          await sanitarioService.delete(Number(selectedSanitario.id_sanit));
+          setDetalhes((prev: any) => ({
+            ...prev,
+            dadosSanitarios: prev.dadosSanitarios.filter(
+              (              h: { id_sanit: any; }) => h.id_sanit !== selectedSanitario.id_sanit
+            ),
+          }));
+        } catch (err) {
+          console.error("Erro ao excluir:", err);
+        } finally {
+          setConfirmDeleteSanitarioVisible(false);
+          setSelectedSanitario(null);
+        }
+      }}
+    />
+
+
     </View>
   );
 };
@@ -259,5 +366,16 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  deleteButton: {
+    backgroundColor: "red",
+    padding: 8,
+    borderRadius: 6,
+    marginTop: 8,
+    alignItems: "center",
+  },
+  deleteText: {
+    color: "#fff",
+    fontWeight: "bold",
   },
 });

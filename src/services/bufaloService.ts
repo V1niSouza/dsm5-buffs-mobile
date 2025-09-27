@@ -3,7 +3,6 @@ import { apiFetch } from "../lib/apiClient";
 export const getBufalos = async (propriedadeId?: number, token?: string) => {
   try {
     const result = await apiFetch("/bufalos");
-
     const racas = await apiFetch("/racas"); 
 
     const mapRacas: Record<number, string> = {};
@@ -77,4 +76,56 @@ const getBufaloDetalhes = async (id: number) => {
   }
 };
 
-export default { getBufalos, getBufaloDetalhes };
+export const createBufalo = async (data: any) => {
+  try {
+    const bufalo = await apiFetch("/bufalos", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+    return bufalo;
+  } catch (err) {
+    console.error("Erro ao criar búfalo:", err);
+    throw err;
+  }
+};
+
+export const updateBufalo = async (id: number, data: any) => {
+  try {
+    const bufalo = await apiFetch(`/bufalos/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    });
+    return bufalo;
+  } catch (err) {
+    console.error(`Erro ao atualizar búfalo ${id}:`, err);
+    throw err;
+  }
+};
+
+export const deleteBufalo = async (id: number) => {
+  try {
+    await apiFetch(`/bufalos/${id}`, {
+      method: "DELETE",
+    });
+    return true;
+  } catch (err) {
+    console.error(`Erro ao deletar búfalo ${id}:`, err);
+    throw err;
+  }
+};
+
+
+export const getRacas = async () => {
+  try {
+    const racas = await apiFetch("/racas");
+    return racas; // já é a lista de raças
+    console.log(racas);
+  } catch (err) {
+    console.error("Erro ao buscar raças:", err);
+    throw err;
+  }
+};
+
+
+
+export default { getBufalos, getBufaloDetalhes, createBufalo, updateBufalo, deleteBufalo, getRacas };
