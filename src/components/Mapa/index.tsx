@@ -1,5 +1,4 @@
 import React, { useRef } from 'react';
-import { View } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { useCurrentLocation } from '../../hooks/useCurrentLocation';
 
@@ -9,7 +8,13 @@ interface MapLeafletProps {
 
 export const MapLeaflet: React.FC<MapLeafletProps> = ({ piqueteCoords }) => {
   const webviewRef = useRef<WebView>(null);
-  const currentLocation = useCurrentLocation(); // <-- usa o hook
+  const simulatedLocation = {
+  latitude: -24.4975,  // ponto médio entre -24.5 e -24.495
+  longitude: -47.4975, // ponto médio entre -47.5 e -47.495
+};
+
+  const currentLocation = simulatedLocation; // <-- usa o hook
+
 
   const coordsJS = piqueteCoords.map(c => `[${c.latitude}, ${c.longitude}]`).join(',');
 
@@ -35,7 +40,6 @@ export const MapLeaflet: React.FC<MapLeafletProps> = ({ piqueteCoords }) => {
 
           const coords = [${coordsJS}];
           const polygon = L.polygon(coords, { color: 'orange', fillOpacity: 0.3 }).addTo(map);
-          coords.forEach(c => L.marker(c).addTo(map));
 
           ${currentLocation ? `
             const myIcon = L.icon({

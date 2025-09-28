@@ -1,23 +1,49 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, RefreshControl } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, RefreshControl, ActivityIndicator } from 'react-native';
 import { MainLayout } from '../layouts/MainLayout';
 import { useDimensions } from '../utils/useDimensions';
 import { colors } from '../styles/colors';
 import Plus from '../../assets/images/plus.svg';
 import { MapLeaflet } from '../components/Mapa';
+import { piqueteService, Piquete } from "../services/piqueteService";
+import { usePropriedade } from "../context/PropriedadeContext";
 
 export const PiquetesScreen = () => {
   const { wp, hp } = useDimensions();
+  const [piquetes, setPiquetes] = useState<Piquete[]>([]);
   const [refreshing, setRefreshing] = useState(false);
-
+  const [loading, setLoading] = useState(true);
   const [piqueteCoords, setPiqueteCoords] = useState([ { latitude: -24.497, longitude: -47.842 }, { latitude: -24.496, longitude: -47.841 }, { latitude: -24.495, longitude: -47.843 }, ]);
+  
+  const { propriedadeSelecionada } = usePropriedade();
+  useEffect(() => {
+    const fetchPiquetes = async () => {
+      try {
+        if (!propriedadeSelecionada) return; 
+        const data = await piqueteService.getAll(propriedadeSelecionada);
+        setPiquetes(data);
+      } catch (error) {
+        console.error("Erro ao buscar piquetes:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-
+    fetchPiquetes();
+  }, []);
+  
   const onRefresh = async () => {
     setRefreshing(true);
+    if (propriedadeSelecionada) {
+      const data = await piqueteService.getAll(propriedadeSelecionada);
+      setPiquetes(data);
+    }
     setRefreshing(false);
   };
 
+    if (loading) {
+    return <ActivityIndicator size="large" color="orange" />;
+  }
 
   return (
     <View style={styles.container}>
@@ -44,7 +70,9 @@ export const PiquetesScreen = () => {
           }
         >
           <View style={styles.content}>
-            <MapLeaflet piqueteCoords={piqueteCoords}/>
+            <MapLeaflet
+              piqueteCoords={piquetes.flatMap(p => p.coords)}
+            />
           </View>
         </ScrollView>
       </MainLayout>
