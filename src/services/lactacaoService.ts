@@ -71,3 +71,49 @@ export const getCiclosLactacao = async (propriedadeId?: number) => {
     };
   }
 };
+
+// Estoque
+export const registrarEstoque = async (payload: {
+  id_propriedade: number;
+  quantidade: number;
+  dt_registro: string;
+  observacao?: string;
+}) => {
+  return await apiFetch("/estoque-leite", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+};
+
+// Coletas
+export const registrarColeta = async (payload: {
+  id_industria: number;
+  quantidade: number;
+  dt_coleta: string;
+  resultado_teste?: boolean;
+  observacao?: string;
+}) => {
+  return await apiFetch("/coletas", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+};
+
+// Industrias
+export const getIndustrias = async () => {
+  return await apiFetch("/industrias");
+};
+
+
+export const registrarLactacao = async (payload: {
+  id_bufala: number;
+  qt_ordenha: number;
+  periodo: string;
+  ocorrencia: string;
+  dt_ordenha: string;
+}) => {
+  return await apiFetch("/lactacao", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+};

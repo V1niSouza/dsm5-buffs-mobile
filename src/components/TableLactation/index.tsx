@@ -7,6 +7,7 @@ import Button from "../Button";
 
 export type AnimalLac = {
   id: string | number;
+  idBufala: number;
   status: boolean;   // true = verde, false = vermelho
   brinco: string;
   raca: string;

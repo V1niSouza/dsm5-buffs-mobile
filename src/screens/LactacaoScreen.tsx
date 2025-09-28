@@ -15,7 +15,11 @@ import { MainLayout } from '../layouts/MainLayout';
 import Bucket from '../../assets/images/bucket.svg';
 import Truck from '../../assets/images/truck-side.svg';
 import SimpleSearch from '../components/SimpleSearch';
-import { getCiclosLactacao } from '../services/lactacaoService';
+import { getCiclosLactacao, getIndustrias } from '../services/lactacaoService';
+import { Modal as CustomModal  } from '../components/Modal';
+import { FormColeta } from '../components/FormColeta';
+import { FormEstoque } from '../components/FormEstoque';
+import { FormLactacao } from '../components/FormLactacao';
 
 export const LactacaoScreen = () => {
   const { wp, hp } = useDimensions();
@@ -25,6 +29,11 @@ export const LactacaoScreen = () => {
   const [totalLactando, setTotalLactando] = useState<number>(0);
   const [dataFormatada, setDataFormatada] = useState<any | null>(null);
   const [quantidadeAtual, setQuantidadeAtual] = useState<any | null>(true);
+  const [modalVisible1, setModalVisible1] = useState(false);
+  const [modalVisible2, setModalVisible2] = useState(false);
+  const [industrias, setIndustrias] = useState<any[]>([]);
+  const [modalLactacaoVisible, setModalLactacaoVisible] = useState(false);
+  const [selectedBufala, setSelectedBufala] = useState<AnimalLac | null>(null);
 
   const fetchCiclos = async () => {
     setRefreshing(true);
@@ -32,11 +41,13 @@ export const LactacaoScreen = () => {
       const { ciclos, totalLactando, dataFormatada, quantidadeAtual } = await getCiclosLactacao();
       const animaisFormatados: AnimalLac[] = ciclos.map(c => ({
         id: c.id_ciclo_lactacao,
+        idBufala: c.id_bufala,           
         status: c.status === "Lactando",
         brinco: c.bufalo?.nome || "Desconhecido",
         raca: c.bufalo?.raca || "Desconhecida",
         mediaProduzida: 0
       }));
+      
       setAnimais(animaisFormatados);
       setAnimaisFiltrados(animaisFormatados);
       setTotalLactando(totalLactando); 
@@ -50,8 +61,19 @@ export const LactacaoScreen = () => {
     setRefreshing(false);
   };
 
+  const fetchIndustrias = async () => {
+    try {
+      const data = await getIndustrias();
+      setIndustrias(data);
+    } catch (err) {
+      console.error("Erro ao buscar indústrias:", err);
+      setIndustrias([]);
+    }
+  };
+
   useEffect(() => {
     fetchCiclos();
+    fetchIndustrias(); // pré-carrega indústrias
   }, []);
 
   const onRefresh = async () => {
@@ -70,14 +92,14 @@ export const LactacaoScreen = () => {
         {/* Botões à direita */}
         <View style={styles.headerButtons}>
           <TouchableOpacity 
-            onPress={() => console.log("Registrar medida do tanque")} 
+            onPress={() => setModalVisible1(true)} 
             style={styles.button}
           >
             <Bucket width={18} height={18} style={{ margin: 4 }} />
           </TouchableOpacity>
 
           <TouchableOpacity 
-            onPress={() => console.log("Registrar retirada")} 
+            onPress={() => setModalVisible2(true)} 
             style={styles.button}
           >
             <Truck width={15} height={15} style={{ margin: 6 }} />
@@ -103,11 +125,45 @@ export const LactacaoScreen = () => {
 
           <TableLactation
             data={animaisFiltrados} // 👈 usa filtrados aqui
-            onVerMais={(animal: AnimalLac) => console.log("Ver mais:", animal)}
+            onVerMais={(animal: AnimalLac) => {
+              setSelectedBufala(animal);
+              setModalLactacaoVisible(true);
+            }}
           />
           </View>
         </ScrollView>
       </MainLayout>
+      <CustomModal visible={modalVisible1} onClose={() => setModalVisible1(false)}>
+        <FormEstoque
+          onSuccess={() => {
+            setModalVisible1(false); // fecha modal
+          }}
+        />
+      </CustomModal>
+
+      <CustomModal visible={modalVisible2} onClose={() => setModalVisible2(false)}>
+        <FormColeta
+          industrias={industrias}
+          onSuccess={() => {
+            setModalVisible2(false); // fecha modal
+          }}
+        />
+      </CustomModal>
+
+    <CustomModal
+      visible={modalLactacaoVisible}
+      onClose={() => setModalLactacaoVisible(false)}
+    >
+      {selectedBufala && (
+        <FormLactacao
+          animais={[{
+            id_bufala: Number(selectedBufala.idBufala),  
+            brinco: selectedBufala.brinco
+          }]} 
+          onSuccess={() => setModalLactacaoVisible(false)}
+        />
+      )}
+    </CustomModal>
     </View>
   );
 };
