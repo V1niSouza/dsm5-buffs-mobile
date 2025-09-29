@@ -5,13 +5,19 @@ import { useDimensions } from '../utils/useDimensions';
 import TableReproduction, { Animal } from '../components/TableReproduction';
 import { colors } from '../styles/colors';
 import Plus from '../../assets/images/plus.svg';
-import SimpleSearch from '../components/SimpleSearch';
 import { getReproducoes } from '../services/reproducaoService';
+import { Modal } from '../components/Modal';
+import { FormReproducaoAtt } from '../components/FormReproductionAtt';
+import DashReproduction from '../components/DashReproducao';
+import { FormReproducaoAdd } from '../components/FormReproductionAdd';
 
 export const ReproducaoScreen = () => {
   const { wp, hp } = useDimensions();
   const [refreshing, setRefreshing] = useState(false);
   const [animais, setAnimais] = useState<Animal[]>([]);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [reproducaoSelecionada, setReproducaoSelecionada] = useState<any>(null);
+  const [modalLactacaoVisible, setModalLactacaoVisible] = useState(false);
 
 
   const fetchReproducoes = async () => {
@@ -44,7 +50,10 @@ export const ReproducaoScreen = () => {
 
         {/* Botão à direita */}
         <View style={styles.headerButtons}>
-          <TouchableOpacity onPress={() => console.log("Registrar cobertura")} style={styles.button}>
+          <TouchableOpacity   onPress={() => {
+            setReproducaoSelecionada(null); 
+            setModalVisible(true);
+          }} style={styles.button}>
             <Plus width={15} height={15} style={{ margin: 6 }} />
           </TouchableOpacity>
         </View>
@@ -54,16 +63,39 @@ export const ReproducaoScreen = () => {
         <ScrollView
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         >
+        <DashReproduction
+          emProcesso={animais.filter(a => a.status === "Em Processo").length}
+          confirmadas={animais.filter(a => a.status === "Confirmada").length}
+          falhas={animais.filter(a => a.status === "Falha").length}
+          ultimaData={animais.length > 0 ? animais[0].dt_evento : "-"}
+        />
           <View style={styles.content}>
             <TableReproduction
               data={animais}
               onVerMais={(animal: Animal) => {
-                console.log("Ver mais sobre:", animal);
+                setReproducaoSelecionada(animal);
+                setModalVisible(true);
               }}
             />
           </View>
         </ScrollView>
       </MainLayout>
+
+      <Modal visible={modalVisible} onClose={() => setModalVisible(false)}>
+        {reproducaoSelecionada ? (
+          <FormReproducaoAtt
+            initialData={reproducaoSelecionada}   
+            onClose={() => setModalVisible(false)}
+            onSuccess={fetchReproducoes}          
+          />
+        ) : (
+          <FormReproducaoAdd
+            onClose={() => setModalVisible(false)}
+            onSuccess={fetchReproducoes}
+          />
+        )}
+      </Modal>
+
     </View>
   );
 };

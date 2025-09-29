@@ -43,7 +43,7 @@ export default function TableReproduction({ data, onVerMais }: Props) {
           <BuffsLogo width={18} height={18} />
         </View>
         <Text style={[styles.listHeaderText, { flex: 1 }]}>B. Bufala</Text>
-        <Text style={[styles.listHeaderText, { flex: 1 }]}>B. Bufalo</Text>
+        <Text style={[styles.listHeaderText, { flex: 1 }]}>Dt. Evento</Text>
         <Text style={[styles.listHeaderText, { flex: 1.5 }]}>Tp. Inseminação</Text>
         <Text style={[styles.listHeaderText, { flex: 1 }]}>Ver Mais</Text>
       </View>
@@ -75,7 +75,7 @@ export default function TableReproduction({ data, onVerMais }: Props) {
               {item.brincoVaca}
             </Text>
             <Text style={[styles.itemText, { flex: 1 }]} numberOfLines={1}>
-              {item.brincoTouro}
+              {item.dt_evento}
             </Text>
             <Text style={[styles.itemText, { flex: 1.5}]} numberOfLines={1}>
               {item.tipoInseminacao}

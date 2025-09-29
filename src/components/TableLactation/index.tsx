@@ -11,7 +11,7 @@ export type AnimalLac = {
   status: boolean;   // true = verde, false = vermelho
   brinco: string;
   raca: string;
-  mediaProduzida: number;
+  nome: string;
 };
 
 type Props = {
@@ -38,8 +38,8 @@ export default function TableLactation({ data, onVerMais }: Props) {
           <BuffsLogo width={18} height={18} />
         </View>
         <Text style={[styles.listHeaderText, { flex: 1 }]}>Brinco</Text>
-        <Text style={[styles.listHeaderText, { flex: 2 }]}>Raça</Text>
-        <Text style={[styles.listHeaderText, { flex: 2 }]}>Med. Produzida</Text>
+        <Text style={[styles.listHeaderText, { flex: 1 }]}>Nome</Text>
+        <Text style={[styles.listHeaderText, { flex: 1 }]}>Raça</Text>
         <Text style={[styles.listHeaderText, { flex: 1 }]}>Ver Mais</Text>
       </View>
 
@@ -62,11 +62,11 @@ export default function TableLactation({ data, onVerMais }: Props) {
             <Text style={[styles.itemText, { flex: 1 }]} numberOfLines={1}>
               {item.brinco}
             </Text>
-            <Text style={[styles.itemText, { flex: 2 }]} numberOfLines={1}>
-              {item.raca}
+            <Text style={[styles.itemText, { flex: 1}]} numberOfLines={1}>
+              {item.nome}
             </Text>
-            <Text style={[styles.itemText, { flex: 2 }]} numberOfLines={1}>
-              {item.mediaProduzida}
+            <Text style={[styles.itemText, { flex: 1 }]} numberOfLines={1}>
+              {item.raca}
             </Text>
 
             {/* Botão Ver Mais */}

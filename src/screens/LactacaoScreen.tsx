@@ -45,9 +45,8 @@ export const LactacaoScreen = () => {
         status: c.status === "Lactando",
         brinco: c.bufalo?.nome || "Desconhecido",
         raca: c.bufalo?.raca || "Desconhecida",
-        mediaProduzida: 0
+        nome: c.bufala.nome
       }));
-      
       setAnimais(animaisFormatados);
       setAnimaisFiltrados(animaisFormatados);
       setTotalLactando(totalLactando); 

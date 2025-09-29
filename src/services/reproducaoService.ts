@@ -62,3 +62,35 @@ export const getReproducoes = async (propriedadeId?: number) => {
     return [];
   }
 };
+
+export const updateReproducao = async (id: number, data: any) => {
+  try {
+    const response = await apiFetch(`/cobertura/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return response;
+  } catch (error) {
+    console.error("Erro ao atualizar reprodução:", error);
+    throw error;
+  }
+};
+
+export const createReproducao = async (data: any) => {
+  try {
+    const response = await apiFetch("/cobertura", {
+      method: "POST",
+      body: JSON.stringify(data),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return response;
+  } catch (error) {
+    console.error("Erro ao criar reprodução:", error);
+    throw error;
+  }
+};
