@@ -9,7 +9,6 @@ export interface Piquete {
 export const piqueteService = {
   async getAll(id: number): Promise<Piquete[]> {
     const response = await apiFetch(`/lotes/propriedade/${id}`);
-    console.log("Retorno getAll:", response);
 
     // Normaliza o formato vindo do backend para o esperado pelo app
     return response.map((item: any) => {
