@@ -9,6 +9,7 @@ import {
   Alert,
 } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
+import YellowButton from "../Button";
 
 interface FormReproducaoAddProps {
   onSuccess?: () => void;
@@ -94,7 +95,7 @@ export function FormReproducaoAdd({ onSuccess, onClose }: FormReproducaoAddProps
         keyboardType="numeric"
       />
 
-      <Button title="Salvar Reprodução" onPress={handleSave} />
+      <YellowButton title="Salvar Reprodução" onPress={handleSave} />
     </ScrollView>
   );
 }

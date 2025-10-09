@@ -13,6 +13,7 @@ import {
 import DropDownPicker from "react-native-dropdown-picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { registrarLactacao } from "../../services/lactacaoService";
+import YellowButton from "../Button";
 
 interface FormLactacaoProps {
   animais: { id_bufala: number,
@@ -124,7 +125,7 @@ const handleSave = async () => {
         />
       )}
 
-      <Button title="Registrar Lactação" onPress={handleSave} />
+      <YellowButton title="Registrar Lactação" onPress={handleSave} />
     </ScrollView>
   );
 }

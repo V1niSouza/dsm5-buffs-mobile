@@ -104,8 +104,8 @@ export const AnimalDetailScreen = () => {
       <TouchableOpacity
         style={styles.deleteButton}
         onPress={() => {
-          setSelectedSanitario(item);       // guarda o item que será excluído
-          setConfirmDeleteSanitarioVisible(true); // abre o modal
+          setSelectedSanitario(item);    
+          setConfirmDeleteSanitarioVisible(true);
         }}
       >
         <Text style={styles.deleteText}>Excluir</Text>
@@ -195,7 +195,7 @@ export const AnimalDetailScreen = () => {
           style={styles.fab}
           onPress={() => setModalVisible(true)}
         >
-          <Text style={{ color: "#fff", fontSize: 28 }}>+</Text>
+          <Text style={{ color: "#000", fontSize: 28 }}>+</Text>
         </TouchableOpacity>
       </MainLayout>
 
@@ -331,10 +331,10 @@ const styles = StyleSheet.create({
   tabText: { 
     fontSize: 14, 
     fontWeight: "600", 
-    color: "#333" 
+    color: "#726f6fff" 
   },
   activeTabText: { 
-    color: "#fff" 
+    color: "#000" 
   },
   card: { 
     backgroundColor: "#fff", 
@@ -354,7 +354,7 @@ const styles = StyleSheet.create({
     position: "absolute", 
     bottom: 20, 
     right: 20, 
-    backgroundColor: "green", 
+    backgroundColor: colors.yellow.dark, 
     width: 56, 
     height: 56, 
     borderRadius: 28, 
@@ -368,11 +368,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   deleteButton: {
-    backgroundColor: "red",
+    backgroundColor: colors.red.base,
     padding: 8,
     borderRadius: 6,
     marginTop: 8,
     alignItems: "center",
+    width: 80,
   },
   deleteText: {
     color: "#fff",

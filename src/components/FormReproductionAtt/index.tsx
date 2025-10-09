@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native";
 import { colors } from "../../styles/colors";
 import { updateReproducao } from "../../services/reproducaoService";
+import YellowButton from "../Button";
 
 interface FormReproducaoAttProps {
   initialData: any;
@@ -49,9 +50,7 @@ export const FormReproducaoAtt = ({ initialData, onClose, onSuccess }: FormRepro
           <Text style={styles.cancelText}>Cancelar</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-          <Text style={styles.saveText}>Salvar</Text>
-        </TouchableOpacity>
+        <YellowButton title="Salvar" onPress={handleSave} />
       </View>
     </View>
   );

@@ -99,56 +99,6 @@ const handleReadTag = async () => {
   return (
     <View style={styles.container}>
       {/* Modal de Scanner */}
-      <Modal
-        animationType="slide"
-        transparent
-        visible={showScannerModal}
-        onRequestClose={handleCloseScanner}
-      >
-        <View style={styles.centeredView}>
-          <View style={styles.modalView}>
-            <Text style={styles.modalTitle}>Leitor de Tags</Text>
-            <Text style={styles.modalSubtitle}>
-              Clique em "Ler Tag" e aproxime o celular da tag.
-            </Text>
-
-            <Text style={styles.statusText}>
-              Status: {isScanning ? "Escaneando..." : "Pronto para ler"}
-            </Text>
-
-            <Pressable
-              style={[styles.modalButton, styles.buttonStart]}
-              onPress={handleReadTag}
-              disabled={isScanning}
-            >
-              <Text style={styles.textStyle}>Ler Tag</Text>
-            </Pressable>
-
-            {scannedTags.length > 0 && (
-              <View style={styles.tagListContainer}>
-                <Text style={styles.tagListTitle}>Tags Lidas:</Text>
-                  <FlatList
-                    data={scannedTags}
-                    keyExtractor={(item) => item}
-                    style={styles.tagList}
-                    renderItem={({ item }) => (
-                      <View style={styles.tagItem}>
-                        <Text style={styles.tagText}>{item}</Text>
-                      </View>
-                    )}
-                  />
-              </View>
-            )}
-
-            <Pressable
-              style={[styles.modalButton, styles.buttonClose]}
-              onPress={handleCloseScanner}
-            >
-              <Text style={styles.textStyle}>Fechar</Text>
-            </Pressable>
-          </View>
-        </View>
-      </Modal>
 
       {/* Header */}
       <View style={styles.header}>
@@ -156,9 +106,6 @@ const handleReadTag = async () => {
           <Text style={styles.header1Text}>Rebanho</Text>
         </View>
         <View style={styles.headerButtons}>
-          <TouchableOpacity onPress={() => setShowScannerModal(true)} style={styles.button}>
-            <Scanner width={18} height={18} style={{ margin: 4 }}/>
-          </TouchableOpacity>
           <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.button}>
             <Plus width={15} height={15} style={{ margin: 6 }}/>
           </TouchableOpacity>

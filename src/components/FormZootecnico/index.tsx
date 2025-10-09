@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, StyleSheet, TouchableOpacity } from "react-native";
 import { colors } from "../../styles/colors";
+import YellowButton from "../Button";
 
 interface FormZootecnicoProps {
   onSubmit: (data: any) => void;
@@ -37,9 +38,7 @@ export const FormZootecnico = ({ onSubmit, onClose }: FormZootecnicoProps) => {
       <TextInput placeholder="Pelagem" value={pelagem} onChangeText={setPelagem} style={styles.input} />
       <TextInput placeholder="Tipo de pesagem" value={tipoPesagem} onChangeText={setTipoPesagem} style={styles.input} />
 
-      <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-        <Text style={styles.buttonText}>Salvar</Text>
-      </TouchableOpacity>
+      <YellowButton title="Atualizar" onPress={handleSubmit} />
     </View>
   );
 };

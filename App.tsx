@@ -20,7 +20,6 @@ import { ReproducaoScreen } from './src/screens/ReproducaoScreen';
 import { PiquetesScreen } from './src/screens/PiquetesScreen';
 import { LoginScreen } from './src/screens/LoginScreen';
 import { SignupScreen } from './src/screens/SignupScreen';
-import { LoadingScreen } from './src/screens/LoadingScreen';
 import { PropriedadeProvider } from './src/context/PropriedadeContext';
 import { AnimalDetailScreen } from './src/screens/AnimalDetailScreen';
 
@@ -31,6 +30,7 @@ import Home from './src/icons/home';
 import Lactation from './src/icons/lactation';
 import GlobeIcon from './src/icons/sex';
 import Fance from './src/icons/fance';
+import { Loading } from './src/components/Loading';
 
 
 export type RootStackParamList = {
@@ -152,11 +152,7 @@ function MainTab() {
 
 // App.tsx (parte relevante)
 function AppContent() {
-  const { userToken, loading } = useAuth();
-
-  if (loading) {
-    return <LoadingScreen />;
-  }
+  const { userToken } = useAuth();
 
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>

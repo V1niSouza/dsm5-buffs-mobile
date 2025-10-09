@@ -14,6 +14,7 @@ import DropDownPicker from "react-native-dropdown-picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import bufaloService from "../../services/bufaloService";
 import { usePropriedade } from "../../context/PropriedadeContext";
+import YellowButton from "../Button";
 
 interface FormBufaloProps {
   onSuccess?: () => void;
@@ -217,7 +218,7 @@ export function FormBufalo({ onSuccess }: FormBufaloProps) {
         />
       </View>
 
-      <Button title="Salvar" onPress={handleSave} />
+      <YellowButton title="Salvar" onPress={handleSave} />
     </ScrollView>
   );
 }

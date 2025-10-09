@@ -13,6 +13,7 @@ import {
 import DropDownPicker from "react-native-dropdown-picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { registrarColeta, getIndustrias } from "../../services/lactacaoService";
+import YellowButton from "../Button";
 
 interface FormColetaProps {
     industrias?: any[];
@@ -136,7 +137,7 @@ export function FormColeta({ industrias: industriasProp = [], onSuccess }: FormC
         multiline
       />
 
-      <Button title="Salvar Coleta" onPress={handleSave} />
+      <YellowButton title="Salvar Coleta" onPress={handleSave} />
     </ScrollView>
   );
 }

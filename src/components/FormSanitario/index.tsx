@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
 import sanitarioService from "../../services/sanitarioService";
+import YellowButton from "../Button";
 
 interface FormSanitarioProps {
   onSubmit: (data: any) => void;
@@ -114,9 +115,7 @@ export const FormSanitario = ({ onSubmit, onClose, idBufalo }: FormSanitarioProp
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-        <Text style={styles.buttonText}>Salvar</Text>
-      </TouchableOpacity>
+      <YellowButton title="Registrar" onPress={handleSubmit} />
     </View>
   );
 };

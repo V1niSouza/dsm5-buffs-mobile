@@ -22,8 +22,7 @@ export const LoginScreen = () => {
 
     try {
       setLoading(true);
-      await login(email, password); // 🔑 chama login do contexto
-      // Não precisa mais chamar navigation.replace → AppContent gerencia a navegação
+      await login(email, password);   
     } catch (err: any) {
       setError(err.message || "Erro ao tentar entrar.");
     } finally {

@@ -13,6 +13,7 @@ import {
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { registrarEstoque } from "../../services/lactacaoService"; 
 import { usePropriedade } from "../../context/PropriedadeContext";
+import YellowButton from "../Button";
 
 interface FormEstoqueProps {
   onSuccess?: () => void;
@@ -98,7 +99,7 @@ export function FormEstoque({ onSuccess }: FormEstoqueProps) {
         value={observacao}
         onChangeText={setObservacao}
       />
-      <Button title="Salvar no Estoque" onPress={handleSave} />
+      <YellowButton title="Salvar no Estoque" onPress={handleSave} />
     </ScrollView>
   );
 }
