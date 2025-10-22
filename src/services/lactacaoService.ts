@@ -1,5 +1,5 @@
 import { apiFetch } from "../lib/apiClient";
-import BufaloService from "./bufaloService"; // ou o caminho correto
+import BufaloService from "./bufaloService"; 
 
 export const getCiclosLactacao = async (propriedadeId?: number) => {
   try {

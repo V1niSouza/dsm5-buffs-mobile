@@ -22,16 +22,6 @@ type Props = {
 };
 
 export default function TableAnimais({ data, onVerMais }: Props) {
-  const itensPorPagina = 15;
-  const [paginaAtual, setPaginaAtual] = useState(0);
-
-  // range da página atual
-  const startIndex = paginaAtual * itensPorPagina;
-  const endIndex = startIndex + itensPorPagina;
-  const dadosPagina = data.slice(startIndex, endIndex);
-
-  const totalPaginas = Math.ceil(data.length / itensPorPagina);
-
   return (
     <View>
       {/* Cabeçalho */}
@@ -48,7 +38,7 @@ export default function TableAnimais({ data, onVerMais }: Props) {
 
       {/* Lista */}
       <FlatList
-        data={dadosPagina}
+        data={data}
         scrollEnabled={false}
         keyExtractor={(item) => String(item.id)}
         renderItem={({ item }) => (
@@ -87,24 +77,6 @@ export default function TableAnimais({ data, onVerMais }: Props) {
           </View>
         )}
       />
-            {/* Paginação */}
-            <View style={styles.pagination}>
-              <Button
-                title="Anterior"
-                onPress={() => setPaginaAtual(paginaAtual - 1)}
-                disabled={paginaAtual === 0}
-              />
-      
-              <Text style={styles.pageInfo}>
-                Página {paginaAtual + 1} de {totalPaginas}
-              </Text>
-      
-              <Button
-                title="Próxima"
-                onPress={() => setPaginaAtual(paginaAtual + 1)}
-                disabled={paginaAtual + 1 >= totalPaginas}
-              />
-            </View>
     </View>
   );
 }
@@ -147,18 +119,5 @@ const styles = StyleSheet.create({
   linkText: {
     color: "#2563EB",
     fontWeight: "600",
-  },
-  pageInfo: {
-    marginHorizontal: 12,
-    fontWeight: "600",
-    color: "#374151",
-    textAlign: "center",
-  },
-  pagination: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 12,
-    gap: 8,
   },
 });

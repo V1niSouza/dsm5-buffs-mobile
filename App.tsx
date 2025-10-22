@@ -19,7 +19,6 @@ import { LactacaoScreen } from './src/screens/LactacaoScreen';
 import { ReproducaoScreen } from './src/screens/ReproducaoScreen';
 import { PiquetesScreen } from './src/screens/PiquetesScreen';
 import { LoginScreen } from './src/screens/LoginScreen';
-import { SignupScreen } from './src/screens/SignupScreen';
 import { PropriedadeProvider } from './src/context/PropriedadeContext';
 import { AnimalDetailScreen } from './src/screens/AnimalDetailScreen';
 
@@ -159,7 +158,6 @@ function AppContent() {
       {!userToken ? (
         <>
           <Stack.Screen name="Login" component={LoginScreen} />
-          <Stack.Screen name="Signup" component={SignupScreen} />
         </>
       ) : (
         <>

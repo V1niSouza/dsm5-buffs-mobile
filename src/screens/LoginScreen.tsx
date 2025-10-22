@@ -62,10 +62,6 @@ export const LoginScreen = () => {
         onPress={handleLogin}
         loading={loading}
       />
-
-      <TouchableOpacity onPress={() => {}}>
-        <Text style={styles.signupLink}>Não tem conta? Cadastre-se</Text>
-      </TouchableOpacity>
     </View>
   );
 };

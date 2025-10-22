@@ -16,24 +16,13 @@ import propriedadeService from "../services/propriedadeService";
 export const HomeScreen = () => {
   const { propriedadeSelecionada } = usePropriedade();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [propriedades, setPropriedades] = useState<any[]>([]); 
+  const [dashboard, setDashboard] = useState<any>(null);
+  const [refreshing, setRefreshing] = useState(false);
+
   const [countsSex, setCountsSex] = useState({ machos: 0, femeas: 0 });
   const [countsMat, setCountsMat] = useState({ bezerros: 0, novilhas: 0, vacas: 0, touros: 0 });
   const [count, setCount] = useState({ bufalosAtivos: 0 });
-  const [propriedades, setPropriedades] = useState<any[]>([]); 
-
-  const [refreshing, setRefreshing] = useState(false);
-
-  const fetchBufalos = async () => {
-    if (!propriedadeSelecionada) return;
-    try {
-      const { raw, countsSex, countsMat, count } = await bufaloService.getBufalos(propriedadeSelecionada);
-      setCountsSex(countsSex);
-      setCountsMat(countsMat);
-      setCount(count);
-    } catch (err) {
-      console.error("Erro ao buscar búfalos:", err);
-    }
-  };
 
   const fetchPropriedades = async () => {
     try {
@@ -48,25 +37,41 @@ export const HomeScreen = () => {
     fetchPropriedades();
   }, []);
 
+
+  const fetchDashboard = async () => {
+    if (!propriedadeSelecionada) return;
+    try {
+      const { dashboard } = await propriedadeService.getDashboardPropriedade(propriedadeSelecionada);
+      setDashboard(dashboard);
+      setCountsSex({ machos: dashboard?.machos, femeas: dashboard?.femeas });
+      setCountsMat({
+        bezerros: dashboard?.bezerros,
+        novilhas: dashboard?.novilhas,
+        vacas: dashboard?.vacas,
+        touros: dashboard?.touros,
+      });
+      setCount({ bufalosAtivos: dashboard?.bufalosAtivos });
+    } catch (err) {
+      console.error("Erro ao buscar búfalos:", err);
+    }
+  };
+
   useEffect(() => {
-    fetchBufalos();
+    fetchDashboard();
   }, [propriedadeSelecionada]);
 
   const onRefresh = async () => {
     setRefreshing(true);
     await Promise.all([
-      fetchBufalos(),
+      fetchDashboard(),
       fetchPropriedades()
     ]);
     setRefreshing(false);
   };
 
-  
-
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-          {/* Texto centralizado */}
           <View style={{alignItems: 'center'}}>
             <BuffsLogo width={90} height={90} />
           </View>

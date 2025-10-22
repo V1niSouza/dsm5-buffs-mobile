@@ -15,6 +15,7 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { FormBufalo } from '../components/FormBufalo';
 import { Modal as CustomModal  } from '../components/Modal';
+import Button from '../components/Button';
 
 type Tag = { id?: string; [key: string]: any };
 
@@ -36,23 +37,30 @@ export const RebanhoScreen = () => {
   const [showScannerModal, setShowScannerModal] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
   const [scannedTags, setScannedTags] = useState<string[]>([]);
-  const tagList: string[] = []; // lista local que vai acumular
-  // Buscar búfalos
-  const fetchBufalos = async () => {
+
+  const [paginaAtual, setPaginaAtual] = useState(1);
+  const [totalPaginas, setTotalPaginas] = useState(1);
+
+
+  const tagList: string[] = [];
+  const fetchBufalos = async (page = 1) => {
     try {
-      const { raw } = await bufaloService.getBufalos();
-      const filtrados = raw
-        .filter((b: any) => b.id_propriedade === propriedadeSelecionada)
-        .map((b: any) => ({
-          id: b.id_bufalo,
-          status: b.status,
-          brinco: b.brinco,
-          nome: b.nome,
-          raca: b.racaNome,
-          sexo: b.sexo === 'M' ? 'Macho' : 'Femêa'
-        }));
-      setAnimais(filtrados);
-      setAnimaisFiltrados(filtrados);
+      if (!propriedadeSelecionada) return;
+      const { bufalos, meta } = await bufaloService.getBufalos(propriedadeSelecionada, page);
+
+      const animaisFormatados = bufalos.map((b: any) => ({
+        id: b.id_bufalo,
+        status: b.status,
+        brinco: b.brinco,
+        nome: b.nome,
+        raca: b.racaNome,
+        sexo: b.sexo === 'M' ? 'Macho' : 'Fêmea',
+      }));
+
+      setAnimais(animaisFormatados);
+      setAnimaisFiltrados(animaisFormatados);
+      setPaginaAtual(meta.page);
+      setTotalPaginas(meta.totalPages);
     } catch (err) {
       console.error("Erro ao buscar búfalos:", err);
     }
@@ -64,7 +72,7 @@ export const RebanhoScreen = () => {
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await fetchBufalos();
+    await fetchBufalos(paginaAtual);
     setRefreshing(false);
   };
 
@@ -125,6 +133,29 @@ const handleReadTag = async () => {
                 navigation.navigate('AnimalDetail', { animal });
               }}
             />
+
+          <View style={styles.pagination}>
+            <Button
+              title="Anterior"
+              onPress={() => {
+                if (paginaAtual > 1) fetchBufalos(paginaAtual - 1);
+              }}
+              disabled={paginaAtual === 1}
+            />
+
+            <Text style={styles.pageInfo}>
+              Página {paginaAtual} de {totalPaginas}
+            </Text>
+
+            <Button
+              title="Próxima"
+              onPress={() => {
+                if (paginaAtual < totalPaginas) fetchBufalos(paginaAtual + 1);
+              }}
+              disabled={paginaAtual === totalPaginas}
+            />
+          </View>
+
           </View>
         </ScrollView>
       </MainLayout>
@@ -255,5 +286,18 @@ const styles = StyleSheet.create({
   tagText: { 
     fontSize: 14, 
     color: colors.black.base 
+  },
+  pageInfo: {
+    marginHorizontal: 12,
+    fontWeight: "600",
+    color: "#374151",
+    textAlign: "center",
+  },
+  pagination: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 12,
+    gap: 8,
   },
 });
