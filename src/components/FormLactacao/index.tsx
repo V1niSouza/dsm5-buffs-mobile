@@ -12,11 +12,11 @@ import {
 } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { registrarLactacao } from "../../services/lactacaoService";
+
 import YellowButton from "../Button";
 
 interface FormLactacaoProps {
-  animais: { id_bufala: number,
+  animais: { id_bufala: string,
     brinco: string }[]; // lista de animais da tela
   onSuccess?: () => void;
 }
@@ -31,12 +31,6 @@ export function FormLactacao({ animais, onSuccess }: FormLactacaoProps) {
 
 const handleSave = async () => {
   try {
-    const idBufalaNum = Math.floor(Number(animais[0].id_bufala)); // força inteiro
-    if (!idBufalaNum || idBufalaNum <= 0) {
-      Alert.alert("Erro", "O ID da búfala é inválido.");
-      return;
-    }
-
     if (!qtOrdenha) {
       Alert.alert("Erro", "Informe a quantidade de ordenha.");
       return;
@@ -47,14 +41,14 @@ const handleSave = async () => {
     }
     
     const payload = {
-      id_bufala: idBufalaNum,
+      id_bufala: animais[0].id_bufala,
       qt_ordenha: parseFloat(qtOrdenha),
       periodo,
       ocorrencia: ocorrencia || "",
       dt_ordenha: dtOrdenha?.toISOString() || new Date().toISOString(),
     };
 
-    await registrarLactacao(payload);
+   // await registrarLactacao(payload);
     Alert.alert("Sucesso", "Lactação registrada com sucesso!");
     onSuccess?.();
   } catch (err) {

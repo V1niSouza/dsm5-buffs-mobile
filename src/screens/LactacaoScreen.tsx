@@ -139,6 +139,7 @@ export const LactacaoScreen = () => {
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
           showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
         >
           {/* Dashboard */}
           <DashLactation
@@ -152,15 +153,12 @@ export const LactacaoScreen = () => {
             data={animaisPaginados}
             keyExtractor={(item) => item.id}
             scrollEnabled={false} 
+            nestedScrollEnabled={true}
             renderItem={({ item }) => (
-              <TouchableOpacity
-                onPress={() => {
+                <CardLactacao animal={item} onPress={() => {
                   setSelectedBufala(item);
                   setModalLactacaoVisible(true);
-                }}
-              >
-                <CardLactacao animal={item} />
-              </TouchableOpacity>
+                }}/>
             )}
             contentContainerStyle={styles.content}
             ListFooterComponent={
@@ -211,7 +209,7 @@ export const LactacaoScreen = () => {
           <FormLactacao
             animais={[
               {
-                id_bufala: Number(selectedBufala.id),
+                id_bufala: selectedBufala.id,
                 brinco: selectedBufala.brinco,
               },
             ]}
