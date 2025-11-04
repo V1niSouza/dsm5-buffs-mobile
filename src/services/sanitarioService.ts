@@ -1,5 +1,18 @@
 import { apiFetch } from "../lib/apiClient";
 
+const fetchMedicamentosMap = async () => {
+  try {
+    const medicamentos = await apiFetch("/medicamentos");
+    const mapMedicamentos: Record<string, string> = {};
+    medicamentos.forEach((m: any) => (mapMedicamentos[m.id_medicacao] = m.medicacao));
+
+    return mapMedicamentos;
+  } catch (err) {
+    console.error("Erro ao buscar mapa de medicamentos:", err);
+    return {};
+  }
+};
+
 export const sanitarioService = {
   add: async (payload: any) => {
     try {
@@ -20,9 +33,25 @@ export const sanitarioService = {
       throw err;
     }
   },
-  getHistorico: async (id_bufalo: number) => {
+getHistorico: async (id_bufalo: string, page: number = 1, limit: number = 10) => {
     try {
-      return await apiFetch(`/dados-sanitarios/bufalo/${id_bufalo}`);
+      const mapMedicamentos = await fetchMedicamentosMap();
+      const result = await apiFetch(`/dados-sanitarios/bufalo/${id_bufalo}?page=${page}&limit=${limit}`);
+      const dadosTratados = result.data.map((registro: any) => {
+
+        const idMedicao = registro.id_medicao;
+        const nomeMedicamento = mapMedicamentos[idMedicao] || 'Medicamento Desconhecido';
+
+        return {
+          ...registro,
+          nome_medicamento: nomeMedicamento, 
+        };
+      });
+      
+      return {
+        ...result,
+        data: dadosTratados,
+      };
     } catch (err) {
       console.error("Erro ao buscar histórico sanitário:", err);
       throw err;

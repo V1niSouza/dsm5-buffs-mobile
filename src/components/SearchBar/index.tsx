@@ -1,180 +1,234 @@
-import React, { useState, useEffect } from "react";
-import { View, TextInput, StyleSheet, TouchableOpacity, ScrollView, Text } from "react-native";
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+  StyleSheet,
+} from "react-native";
 import { colors } from "../../styles/colors";
-import TextTitle from "../TextTitle";
-import SearchIcon from "../../icons/search";
-import { Animal } from "../TableRebanho";
+import YellowButton from "../Button";
 
-interface SearchBarProps {
-  animais: Animal[],
-  onFiltered: (animaisFiltrados: Animal[]) => void,
-}
-
-
-const filterOptions = [
-  "Ativo",
-  "Inativo",
-  "Macho",
-  "Femêa",
-  "Categoria PO",
-  "Categoria PA",
-  "Categoria PC",
-  "Categoria CCG",
-];
-
-
-export default function SearchBar({ animais, onFiltered }: SearchBarProps) {
-  const [search, setSearch] = useState("");
-  const [activeFilters, setActiveFilters] = useState<string[]>([]);
-
-  const toggleFilter = (filter: string) => {
-    if (activeFilters.includes(filter)) {
-      setActiveFilters(activeFilters.filter(f => f !== filter));
-    } else {
-      setActiveFilters([...activeFilters, filter]);
-    }
+export default function FiltroRebanho() {
+  const categorias = ["Sexo", "Raça", "Maturidade", "Status"];
+  const opcoesPorCategoria: Record<string, string[]> = {
+    Sexo: ["Macho", "Fêmea"],
+    Raça: ["Murrah", "Jafarabadi", "Mediterrâneo"],
+    Maturidade: ["Bezerro", "Novilha", "Vaca", "Touro"],
+    Status: ["Ativo", "Inativo"],
   };
 
-  useEffect(() => {
-  const filtered = animais
-    .filter(a => a.brinco.includes(search))
-    .filter(a => {
-      if (!activeFilters.length) return true;
-      return (
-        activeFilters.includes(
-          typeof a.status === "boolean"
-            ? a.status
-              ? "Ativo"
-              : "Inativo"
-            : String(a.status)
-        ) ||
-        activeFilters.includes(
-          typeof a.sexo === "boolean"
-            ? a.sexo
-              ? "Macho"
-              : "Femêa"
-            : String(a.sexo)
-        ) ||
-        activeFilters.includes(a.categoria ?? "")
-      );
-    });
+  const [categoriaAtiva, setCategoriaAtiva] = useState<string | null>(null);
+  const [opcaoSelecionada, setOpcaoSelecionada] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
 
-  onFiltered(filtered);
-  }, [search, activeFilters, animais]);
+  const limparFiltros = () => {
+    setSearch("");
+    setCategoriaAtiva(null);
+    setOpcaoSelecionada(null);
+  };
+
+  const aplicarFiltro = () => {
+    // Aqui futuramente você chama sua rota API
+    console.log({
+      brinco: search,
+      categoria: categoriaAtiva,
+      opcao: opcaoSelecionada,
+    });
+  };
 
   return (
     <View style={styles.container}>
-      {/* Cabeçalho */}
+      {/* Topo */}
       <View style={styles.header}>
-        <TextTitle>Buscar animal por Brinco:</TextTitle>
+        <Text style={styles.title}>Filtrar Rebanho</Text>
+        <YellowButton title="Limpar" onPress={limparFiltros}/>
       </View>
 
-      {/* Barra de pesquisa */}
-      <View style={styles.searchWrapper}>
-        <TextInput
-          style={styles.input}
-          placeholder="Buscar..."
-          value={search}
-          onChangeText={setSearch}
-          placeholderTextColor={colors.gray.base}
-        />
-        <TouchableOpacity style={styles.iconWrapper} onPress={() => console.log("Pesquisar", search)}>
-           <SearchIcon fill={colors.black.base} size={18}/>
-        </TouchableOpacity>
-      </View>
-      <Text style={styles.subtitle}>Filtrar Por:</Text>
-      {/* Carrossel de filtros */}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterScroll}>
-        {filterOptions.map((filter) => {
-          const isActive = activeFilters.includes(filter);
+      {/* Categorias */}
+      <Text style={styles.subtitle}>CATEGORIA DO FILTRO</Text>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.scrollChips}
+      >
+        {categorias.map((cat) => {
+          const ativo = cat === categoriaAtiva;
           return (
             <TouchableOpacity
-              key={filter}
-              style={[styles.filterButton, isActive && styles.filterButtonActive]}
-              onPress={() => toggleFilter(filter)}
+              key={cat}
+              style={[styles.chip, ativo && styles.chipAtivo]}
+              onPress={() =>
+                setCategoriaAtiva(categoriaAtiva === cat ? null : cat)
+              }
             >
-              <Text style={[styles.filterText, isActive && styles.filterTextActive]}>
-                {filter}
+              <Text style={[styles.chipText, ativo && styles.chipTextAtivo]}>
+                {cat}
               </Text>
             </TouchableOpacity>
           );
         })}
       </ScrollView>
+
+      {/* Mostrar o restante só se alguma categoria estiver ativa */}
+      {categoriaAtiva && (
+        <>
+          {/* Campo de busca por Brinco */}
+          <View style={styles.searchWrapper}>
+            <TextInput
+              style={styles.input}
+              placeholder="Buscar por brinco..."
+              placeholderTextColor={colors.gray.base}
+              value={search}
+              onChangeText={setSearch}
+            />
+          </View>
+
+          {/* Opções dinâmicas */}
+          <Text style={styles.subtitle}>
+            OPÇÕES DE {categoriaAtiva.toUpperCase()}
+          </Text>
+          <View style={styles.optionsContainer}>
+            {opcoesPorCategoria[categoriaAtiva].map((opcao) => {
+              const selecionada = opcao === opcaoSelecionada;
+              return (
+                <TouchableOpacity
+                  key={opcao}
+                  style={[
+                    styles.optionButton,
+                    selecionada && styles.optionButtonActive,
+                  ]}
+                  onPress={() =>
+                    setOpcaoSelecionada(
+                      selecionada ? null : opcao
+                    )
+                  }
+                >
+                  <Text
+                    style={[
+                      styles.optionText,
+                      selecionada && styles.optionTextActive,
+                    ]}
+                  >
+                    {opcao}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+
+          {/* Rodapé */}
+          <YellowButton title="Aplicar Filtro" onPress={aplicarFiltro} />
+        </>
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    paddingBottom:16, 
- 
+  container: {
+    flex: 1,
+    backgroundColor: colors.white.base,
+    padding: 16,
   },
-
-  header: { 
-    flexDirection: "row", 
-    justifyContent: "space-between", 
-    alignItems: "center", 
-    marginBottom: 16 
-  },
-
-  searchWrapper: {
+  header: {
     flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
+    marginBottom: 12,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: colors.black.base,
+  },
+  clearText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: colors.yellow.dark,
+  },
+  subtitle: {
+    fontSize: 13,
+    color: colors.gray.base,
+    fontWeight: "600",
+    marginBottom: 8,
+  },
+  scrollChips: {
+    flexGrow: 0,
+    marginBottom: 16,
+  },
+  chip: {
+    width: 120,
+    alignItems: "center",
+    paddingVertical: 6,
+    paddingHorizontal: 2,
+    backgroundColor: "#F0F0F0",
+    borderRadius: 12,
+    marginRight: 8,
+  },
+  chipAtivo: {
+    backgroundColor: colors.yellow.base,
+  },
+  chipText: {
+    color: colors.black.base,
+    fontWeight: "500",
+    fontSize: 16,
+  },
+  chipTextAtivo: {
+    color: colors.brown.base,
+    fontWeight: "700",
+  },
+  searchWrapper: {
     backgroundColor: "#F5F5F5",
     borderRadius: 12,
     paddingHorizontal: 12,
-    height: 50,
+    height: 48,
+    justifyContent: "center",
+    marginBottom: 16,
     borderWidth: 1,
     borderColor: colors.gray.disabled,
-    marginBottom: 12,
-    overflow: "hidden",
   },
-
   input: {
-    flex: 0.9,
     fontSize: 16,
     color: colors.gray.base,
   },
-
-  iconWrapper: {
-    width: '10%',
-    height: '100%',
-    alignItems:'center',
-    justifyContent:'center',
-    marginLeft: 'auto',
-  },
-
-  filterScroll: {
+  optionsContainer: {
     flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    marginBottom: 24,
   },
-
-  filterButton: {
-    paddingVertical: 4,
-    paddingHorizontal: 12,
-    backgroundColor: "#F5F5F5",
-    borderRadius: 20,
-    marginRight: 8,
-    borderWidth: 1,
-    borderColor: "#ccc",
+  optionButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    backgroundColor: "#F0F0F0",
+    borderRadius: 12,
+    flexGrow: 1,
+    alignItems: "center",
+    minWidth: "45%",
   },
-
-  filterButtonActive: {
+  optionButtonActive: {
     backgroundColor: colors.yellow.base,
-    borderColor: colors.yellow.dark,
   },
-
-  filterText: {
-    color: "#333",
-    fontSize: 14,
+  optionText: {
+    color: colors.black.base,
+    fontWeight: "500",
   },
-
-  filterTextActive: {
-    color: "#fff",
-    fontWeight: "bold",
+  optionTextActive: {
+    color: colors.brown.base,
+    fontWeight: "700",
   },
-    subtitle: { 
-    fontSize: 14, 
-    color: colors.gray.base 
+  footerButton: {
+    backgroundColor: colors.yellow.base,
+    borderRadius: 12,
+    height: 52,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  footerButtonText: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: colors.black.base,
   },
 });

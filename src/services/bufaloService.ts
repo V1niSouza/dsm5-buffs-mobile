@@ -1,6 +1,6 @@
 import { apiFetch } from "../lib/apiClient";
 
-export const getBufalos = async (propriedadeId: number, page = 1, limit = 15) => {
+export const getBufalos = async (propriedadeId: number, page = 1, limit = 10) => {
   try {
     // Chamada paginada da nova API
     const result = await apiFetch(`/bufalos/propriedade/${propriedadeId}?page=${page}&limit=${limit}`);
@@ -23,7 +23,7 @@ export const getBufalos = async (propriedadeId: number, page = 1, limit = 15) =>
   }
 };
 
-const getBufaloDetalhes = async (id: number) => {
+const getBufaloDetalhes = async (id: string) => {
   try {
     const bufalo = await apiFetch(`/bufalos/${id}`);
     const racas = await apiFetch("/racas");

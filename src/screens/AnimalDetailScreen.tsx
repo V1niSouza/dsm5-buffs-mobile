@@ -1,382 +1,269 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, RefreshControl, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
-import { useRoute, RouteProp } from '@react-navigation/native';
-import { colors } from '../styles/colors';
-import { Animal } from '../components/TableRebanho';
-import { MainLayout } from '../layouts/MainLayout';
-import bufaloService from '../services/bufaloService';
-import zootecnicoService from '../services/zootecnicoService';
-import sanitarioService from '../services/sanitarioService';
-import { Loading } from '../components/Loading';
-import { Modal } from "../components/Modal";
-import { FormZootecnico } from "../components/FormZootecnico";
-import { FormSanitario } from "../components/FormSanitario";
-import { ConfirmModal } from '../components/ModalDeleteConfirm';
+import React, { useEffect, useState } from "react";
+import { View, FlatList, RefreshControl, ActivityIndicator, StyleSheet, Text, TouchableOpacity } from "react-native";
+import { useRoute, RouteProp, useNavigation } from "@react-navigation/native";
+import { colors } from "../styles/colors";
+import { Tabs } from "../components/Tabs";
+import { AnimalInfoCard } from "../components/AnimalInfoCard";
+import { ZootecnicoCard } from "../components/ZootecnicoCard";
+import { SanitarioCard } from "../components/SanitarioCard";
+import bufaloService from "../services/bufaloService";
+import zootecnicoService from "../services/zootecnicoService";
+import sanitarioService from "../services/sanitarioService";
+import { MainLayout } from "../layouts/MainLayout";
+import Back from '../../assets/images/arrow.svg';
+import BuffsLogo from '../../assets/images/logoBuffs.svg'; 
+import YellowButton from "../components/Button";
+import Button from "../components/Button";
+import { ZootecnicoDetailModal } from "../components/ModalVisualizaçãoZootec";
+import { SanitarioDetailModal } from "../components/ModalVisualizacaoSanit";
+
 
 type RootStackParamList = {
-  AnimalDetail: { animal: Animal };
+  AnimalDetail: { id: string };
 };
 
-type AnimalDetailRouteProp = RouteProp<RootStackParamList, 'AnimalDetail'>;
+type AnimalDetailRouteProp = RouteProp<RootStackParamList, "AnimalDetail">;
 
 export const AnimalDetailScreen = () => {
   const route = useRoute<AnimalDetailRouteProp>();
-  const { animal } = route.params;
-  const [modalVisible, setModalVisible] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
+  const { id } = route.params;
+  const navigation = useNavigation<{ goBack: () => void }>();
+  const [tab, setTab] = useState<"info" | "zootec" | "sanit">("info");
   const [detalhes, setDetalhes] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState<'zootec' | 'sanitario'>('zootec');
+  const [refreshing, setRefreshing] = useState(false);
 
-  const [confirmDeleteZootecVisible, setConfirmDeleteZootecVisible] = useState(false);
-  const [confirmDeleteSanitarioVisible, setConfirmDeleteSanitarioVisible] = useState(false);
+  const PAGE_SIZE = 10;
+  const [pageZootec, setPageZootec] = useState(1);
+  const [totalPagesZootec, setTotalPagesZootec] = useState(1);
+  const [pageSanit, setPageSanit] = useState(1); 
+  const [totalPagesSanit, setTotalPagesSanit] = useState(1); 
 
   const [selectedZootec, setSelectedZootec] = useState<any>(null);
-  const [selectedSanitario, setSelectedSanitario] = useState<any>(null);
+  const [selectedSanit, setSelectedSanit] = useState<any>(null);
 
-  // paginação
-  const PAGE_SIZE = 10;
-  const [page, setPage] = useState(1);
-
-  const onRefresh = async () => {
-    setRefreshing(true);
-    setPage(1);
-    await fetchAllData();
-    setRefreshing(false);
-  };
-
-  const fetchAllData = async () => {
+const fetchData = async (
+    pageZootecToLoad = pageZootec, 
+    pageSanitToLoad = pageSanit
+  ) => {
     setLoading(true);
     try {
-      const base = await bufaloService.getBufaloDetalhes(animal.id);
-      let zoot = await zootecnicoService.getHistorico(animal.id);
-      let sanit = await sanitarioService.getHistorico(animal.id);
+      const base = await bufaloService.getBufaloDetalhes(id);
+      
+      // 1. Fetch Zootécnico (usa a página exata)
+      const zootResp = await zootecnicoService.getHistorico(id, pageZootecToLoad, PAGE_SIZE);
+      setTotalPagesZootec(zootResp.meta?.totalPages ?? 1);
+      
+      // 2. Fetch Sanitário (usa a página exata)
+      const sanitResp = await sanitarioService.getHistorico(id, pageSanitToLoad, PAGE_SIZE);
+      setTotalPagesSanit(sanitResp.meta?.totalPages ?? 1);
 
-      // ordenar do mais recente para o mais antigo
-      zoot = zoot.sort((a: any, b: any) => new Date(b.dt_registro).getTime() - new Date(a.dt_registro).getTime());
-      sanit = sanit.sort((a: any, b: any) => new Date(b.dt_aplicacao).getTime() - new Date(a.dt_aplicacao).getTime());
+      setDetalhes({
+        ...base,
+        dadosZootecnicos: zootResp.data || [],
+        dadosSanitarios: sanitResp.data || [],
+      });
 
-      setDetalhes({ ...base, dadosZootecnicos: zoot, dadosSanitarios: sanit });
     } catch (err) {
-      console.error(err);
+      console.error("Erro ao buscar dados do búfalo:", err);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
+  };
+
+  // Função para mudar a página Zootécnico
+  const changePageZootec = (newPage: number) => {
+    setPageZootec(newPage);
+    fetchData(newPage, pageSanit); // Carrega a nova página de Zootec e mantém Sanitário
+  }
+  
+  // Função para mudar a página Sanitário
+  const changePageSanit = (newPage: number) => {
+    setPageSanit(newPage);
+    fetchData(pageZootec, newPage); // Carrega a nova página de Sanitário e mantém Zootec
+  }
+
+  // Função de Refresh (volta para a primeira página)
+  const onRefresh = async () => {
+    setRefreshing(true);
+    setPageZootec(1);
+    setPageSanit(1);
+    await fetchData(1, 1);
   };
 
   useEffect(() => {
-    fetchAllData();
-  }, [animal.id]);
+    fetchData();
+  }, [id]);
 
-  // Funções de render
-  const renderZootec = ({ item }: any) => (
-    <View style={styles.card}>
-      <Text style={styles.cardTitle}>{item.peso} kg</Text>
-      <Text>{new Date(item.dt_registro).toLocaleDateString()}</Text>
-      <Text>Condição: {item.condicao_corporal}</Text>
-      <Text>Porte: {item.porte_corporal}</Text>
-      <Text>Pelagem: {item.cor_pelagem}</Text>
-      <Text>Pesagem: {item.tipo_pesagem}</Text>
-
-      <TouchableOpacity
-        style={styles.deleteButton}
-        onPress={() => {
-          setSelectedZootec(item);       // guarda o item que será excluído
-          setConfirmDeleteZootecVisible(true); // abre o modal
-        }}
-      >
-        <Text style={styles.deleteText}>Excluir</Text>
-      </TouchableOpacity>
-    </View>
+  const PaginationComponent = ({ 
+    paginaAtual, 
+    totalPaginas, 
+    onPageChange,
+    isLoading
+  }: {
+    paginaAtual: number,
+    totalPaginas: number,
+    onPageChange: (page: number) => void,
+    isLoading: boolean
+  }) => (
+  <View style={styles.pagination}>
+    <Button
+        title="Anterior"
+        onPress={() => onPageChange(paginaAtual - 1)}
+        disabled={paginaAtual === 1 || isLoading}
+      />
+      <Text style={styles.pageInfo}>Página {paginaAtual} de {totalPaginas}</Text>
+      <Button
+        title="Próxima"
+        onPress={() => onPageChange(paginaAtual + 1)}
+        disabled={paginaAtual === totalPaginas || isLoading}
+      />
+  </View>
   );
 
-  const renderSanitario = ({ item }: any) => {
-      console.log("Sanitário item:", item);
-    return (
-    <View style={styles.card}>
-      <Text style={styles.cardTitle}>{item.doenca}</Text>
-      <Text>{new Date(item.dt_aplicacao).toLocaleDateString()}</Text>
-      <Text>Medicação: {item.medicacao?.medicacao}</Text>
-      <Text>Descrição: {item.medicacao?.descricao}</Text>
-      <Text>Dosagem: {item.dosagem} {item.unidade_medida}</Text>
-      <Text>Retorno: {item.necessita_retorno ? 'Sim' : 'Não'}</Text>
-
-      <TouchableOpacity
-        style={styles.deleteButton}
-        onPress={() => {
-          setSelectedSanitario(item);    
-          setConfirmDeleteSanitarioVisible(true);
-        }}
-      >
-        <Text style={styles.deleteText}>Excluir</Text>
-      </TouchableOpacity>
-    </View>
-  );
-  }
-  // paginação
-  const getPaginatedData = () => {
-    if (!detalhes) return [];
-    const data = tab === 'zootec' ? detalhes.dadosZootecnicos : detalhes.dadosSanitarios;
-    return data.slice(0, page * PAGE_SIZE);
-  };
-
-  const loadMore = () => {
-    if (!detalhes) return;
-    const total = tab === 'zootec' ? detalhes.dadosZootecnicos.length : detalhes.dadosSanitarios.length;
-    if (page * PAGE_SIZE < total) {
-      setPage((prev) => prev + 1);
-    }
-  };
-
-  if (loading) {
+  if (loading && !detalhes) {
     return (
       <View style={styles.loadingContainer}>
-        <Loading message='Carregando dados do Bufalo...'/>
+        <BuffsLogo width={230} height={230} />
+        <ActivityIndicator size="large" color={colors.yellow.base} />
       </View>
     );
   }
 
+  const tabOptions = [
+    { key: "info", label: "Informações" },
+    { key: "zootec", label: "Zootécnico" },
+    { key: "sanit", label: "Sanitário" },
+  ];
+
   return (
     <View style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.header1Text}>Prontuário: {animal.nome}</Text>
+        <View style={{ alignItems: 'center', flexDirection: 'row', alignContent: 'center', marginTop: 20, gap: 60 }}>
+          <TouchableOpacity style={styles.headerButton} onPress={() => navigation.goBack()}>
+            <Back width={25} height={25} style={{ margin: 6 }} />
+          </TouchableOpacity>
+          <Text style={styles.header1Text}>Prontuário: {detalhes.brinco}</Text>
+        </View>
       </View>
 
-      <MainLayout>
-        {/* Informações Básicas */}
-        <View style={styles.content}>
-          <Text style={styles.sectionTitle}>Informações Básicas</Text>
-          <Text>Brinco: {detalhes.brinco}</Text>
-          <Text>Raça: {detalhes.racaNome ?? 'Sem raça'}</Text>
-          <Text>Sexo: {detalhes.sexo === "F" ? "Fêmea" : "Macho"}</Text>
-          <Text>Status: {detalhes.status ? 'Ativo' : 'Inativo'}</Text>
-          {!detalhes.status && <Text>Motivo inativo: {detalhes.motivo_inativo}</Text>}
-          <Text>Pai: {detalhes.paiNome}</Text>
-          <Text>Mãe: {detalhes.maeNome}</Text>
-        </View>
-
-        {/* Tabs */}
-        <View style={styles.tabContainer}>
-          <TouchableOpacity
-            style={[styles.tab, tab === 'zootec' && styles.activeTab]}
-            onPress={() => { setTab('zootec'); setPage(1); }}
-          >
-            <Text style={[styles.tabText, tab === 'zootec' && styles.activeTabText]}>
-              Histórico Zootécnico
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.tab, tab === 'sanitario' && styles.activeTab]}
-            onPress={() => { setTab('sanitario'); setPage(1); }}
-          >
-            <Text style={[styles.tabText, tab === 'sanitario' && styles.activeTabText]}>
-              Histórico Sanitário
-            </Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* FlatList */}
-        <FlatList
-          data={getPaginatedData()}
-          keyExtractor={(item, i) => i.toString()}
-          renderItem={tab === 'zootec' ? renderZootec : renderSanitario}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-          onEndReached={loadMore}
-          onEndReachedThreshold={0.2}
-          ListFooterComponent={() =>
-            (page * PAGE_SIZE < (tab === 'zootec' ? detalhes.dadosZootecnicos.length : detalhes.dadosSanitarios.length)) &&
-            <ActivityIndicator style={{ margin: 10 }} />
+      <MainLayout>     
+        <Tabs tabs={tabOptions} activeTab={tab}   onChange={(key: string) => {
+          if (key === "info" || key === "zootec" || key === "sanit") {
+            setTab(key);
           }
-        />
-
-        {/* Botão flutuante */}
-        <TouchableOpacity
-          style={styles.fab}
-          onPress={() => setModalVisible(true)}
-        >
-          <Text style={{ color: "#000", fontSize: 28 }}>+</Text>
-        </TouchableOpacity>
-      </MainLayout>
-
-
-    <Modal visible={modalVisible} onClose={() => setModalVisible(false)}>
-      {tab === "zootec" ? (
-        <FormZootecnico
-          onSubmit={async (data) => {
-            try {
-              await zootecnicoService.add(animal.id, data);
-              await fetchAllData(); // recarregar lista
-            } catch (err) {
-              console.error("Erro ao salvar zootécnico:", err);
-            } finally {
-              setModalVisible(false);
-            }
-          }}
-          onClose={() => setModalVisible(false)}
-        />
-      ) : (
-        <FormSanitario
-          idBufalo={animal.id}
-          onSubmit={async (data) => {
-            try {
-              await sanitarioService.add(data);
-              await fetchAllData(); // recarregar lista
-            } catch (err) {
-              console.error("Erro ao salvar sanitário:", err);
-            } finally {
-              setModalVisible(false);
-            }
-          }}
-          onClose={() => setModalVisible(false)}
-        />
-      )}
-    </Modal>
-
-    <ConfirmModal
-      visible={confirmDeleteZootecVisible}
-      message="Deseja realmente excluir o registro zootécnico?"
-      onCancel={() => setConfirmDeleteZootecVisible(false)}
-      onConfirm={async () => {
-        try {
-          await zootecnicoService.delete(Number(selectedZootec.id_zootec));
-          setDetalhes((prev: any) => ({
-            ...prev,
-            dadosZootecnicos: prev.dadosZootecnicos.filter(
-              (              h: { id_zootec: any; }) => h.id_zootec !== selectedZootec.id_zootec
-            ),
-          }));
-        } catch (err) {
-          console.error("Erro ao excluir:", err);
-        } finally {
-          setConfirmDeleteZootecVisible(false);
-          setSelectedZootec(null);
-        }
-      }}
-    />
-
-    <ConfirmModal
-      visible={confirmDeleteSanitarioVisible}
-      message="Deseja realmente excluir o registro sanitário?"
-      onCancel={() => setConfirmDeleteSanitarioVisible(false)}
-      onConfirm={async () => {
-        try {
-          console.log("ID Sanitário para exclusão:", selectedSanitario.id_sanit);
-          await sanitarioService.delete(Number(selectedSanitario.id_sanit));
-          setDetalhes((prev: any) => ({
-            ...prev,
-            dadosSanitarios: prev.dadosSanitarios.filter(
-              (              h: { id_sanit: any; }) => h.id_sanit !== selectedSanitario.id_sanit
-            ),
-          }));
-        } catch (err) {
-          console.error("Erro ao excluir:", err);
-        } finally {
-          setConfirmDeleteSanitarioVisible(false);
-          setSelectedSanitario(null);
-        }
-      }}
-    />
-
-
+        }} />
+        <View style={styles.cardContainer}>
+          {tab === "info" && <AnimalInfoCard detalhes={detalhes} />}
+          {tab === "zootec" && (
+            <>
+              <FlatList
+                data={detalhes.dadosZootecnicos}
+                keyExtractor={(item) => item.id_zootec.toString()}
+                renderItem={({ item }) => <ZootecnicoCard item={item} onPress={() => setSelectedZootec(item)} />}
+                refreshControl={
+                  <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                }
+                ListEmptyComponent={<Text style={styles.emptyText}>Nenhum registro.</Text>}
+                ListFooterComponent={() =>
+                  detalhes.dadosZootecnicos.length > 0 ? (
+                    <PaginationComponent 
+                      paginaAtual={pageZootec}
+                      totalPaginas={totalPagesZootec}
+                      onPageChange={changePageZootec}
+                      isLoading={loading}
+                />
+                ) : null
+              }
+            />
+            </>
+          )}
+          {tab === "sanit" && (
+              <FlatList
+                data={detalhes.dadosSanitarios}
+                keyExtractor={(item) => item.id_sanit.toString()}
+                renderItem={({ item }) => <SanitarioCard item={item} onPress={() => setSelectedSanit(item)} />}
+                refreshControl={
+                  <RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>
+                }
+                ListEmptyComponent={<Text style={styles.emptyText}>Nenhum registro.</Text>}
+                ListFooterComponent={() =>
+                  detalhes.dadosSanitarios.length > 0 ? (
+                  <PaginationComponent 
+                    paginaAtual={pageSanit}
+                    totalPaginas={totalPagesSanit}
+                    onPageChange={changePageSanit}
+                    isLoading={loading}
+                      />
+                    ) : null
+                }
+              />
+            )}
+        </View>
+        <ZootecnicoDetailModal visible={!!selectedZootec} item={selectedZootec} onClose={() => setSelectedZootec(null)} />
+        <SanitarioDetailModal visible={!!selectedSanit} item={selectedSanit} onClose={() => setSelectedSanit(null)} />    
+      </MainLayout> 
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  container: { 
+    flex: 1, 
+    backgroundColor: colors.gray.disabled 
+  },
+  headerButton: {
+      width: 48,
+      height: 48,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    headerArrow: {
+      fontSize: 28,
+      fontWeight: '300',
+      color: colors.brown.base,
+    },
+  cardContainer: {
+    borderTopWidth: 2, 
+    borderColor: colors.gray.disabled, 
+    paddingTop: 16, 
+    marginTop: 10,
+    flex: 1
+  },
   header: { 
     height: 80, 
     backgroundColor: colors.yellow.base, 
     justifyContent: 'center', 
-    alignItems: 'center'
+    paddingLeft: 16 
   },
   header1Text: { 
     fontSize: 20, 
     fontWeight: "bold", 
-    marginTop: 30, 
     color: colors.brown.base 
   },
-  container: { 
-    flex: 1 
-  },
-  content: { 
-    backgroundColor: "#fff", 
-    borderRadius: 12, 
-    padding: 16, 
-    borderWidth: 1, 
-    margin: 12, 
-    borderColor: colors.gray.disabled 
-  },
-  sectionTitle: { 
-    fontWeight: "bold", 
-    fontSize: 16, 
-    marginBottom: 8 
-  },
-  tabContainer: { 
-    flexDirection: "row", 
-    marginHorizontal: 12, 
-    borderRadius: 12, 
-    overflow: "hidden", 
-    marginBottom: 8 
-  },
-  tab: { 
+  loadingContainer: { 
     flex: 1, 
-    padding: 12, 
-    backgroundColor: "#eee", 
+    justifyContent: "center", 
     alignItems: "center" 
   },
-  activeTab: { 
-    backgroundColor: colors.yellow.base 
+  emptyText: { 
+    textAlign: "center", 
+    color: colors.gray.base, 
+    marginTop: 20 
   },
-  tabText: { 
-    fontSize: 14, 
-    fontWeight: "600", 
-    color: "#726f6fff" 
+  pageInfo: {
+    marginHorizontal: 12,
+    fontWeight: "600",
+    color: "#374151",
+    textAlign: "center",
   },
-  activeTabText: { 
-    color: "#000" 
-  },
-  card: { 
-    backgroundColor: "#fff", 
-    marginHorizontal: 12, 
-    marginVertical: 6, 
-    padding: 12, 
-    borderRadius: 12, 
-    borderWidth: 1, 
-    borderColor: colors.gray.disabled 
-  },
-  cardTitle: { 
-    fontWeight: "bold", 
-    fontSize: 16, 
-    marginBottom: 4 
-  },
-  fab: { 
-    position: "absolute", 
-    bottom: 20, 
-    right: 20, 
-    backgroundColor: colors.yellow.dark, 
-    width: 56, 
-    height: 56, 
-    borderRadius: 28, 
-    justifyContent: "center", 
-    alignItems: "center", 
-    elevation: 4 
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  deleteButton: {
-    backgroundColor: colors.red.base,
-    padding: 8,
-    borderRadius: 6,
-    marginTop: 8,
+  pagination: {
+    flexDirection: "row",
     alignItems: "center",
-    width: 80,
-  },
-  deleteText: {
-    color: "#fff",
-    fontWeight: "bold",
+    justifyContent: "center",
+    marginTop: 12,
+    gap: 8,
+    marginBottom: 40
   },
 });

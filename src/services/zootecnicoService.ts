@@ -1,9 +1,10 @@
 import { apiFetch } from "../lib/apiClient";
 
 export const zootecService = {
-  getHistorico: async (id_bufalo: number) => {
+  getHistorico: async (id_bufalo: string, page: number = 1, limit: number = 10) => {
     try {
-      return await apiFetch(`/dados-zootecnicos/bufalo/${id_bufalo}`);
+      const res = await apiFetch(`/dados-zootecnicos/bufalo/${id_bufalo}?page=${page}&limit=${limit}`);
+      return res;
     } catch (err) {
       console.error("Erro ao buscar histórico zootécnico:", err);
       throw err;

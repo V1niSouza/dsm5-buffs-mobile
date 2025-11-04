@@ -3,7 +3,6 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl, P
 import NfcManager, { NfcTech } from 'react-native-nfc-manager';
 import { MainLayout } from '../layouts/MainLayout';
 import { useDimensions } from '../utils/useDimensions';
-import TableAnimais, { Animal } from '../components/TableRebanho';
 import SearchBar from '../components/SearchBar';
 import { colors } from '../styles/colors';
 import Plus from '../../assets/images/plus.svg';
@@ -16,12 +15,23 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { FormBufalo } from '../components/FormBufalo';
 import { Modal as CustomModal  } from '../components/Modal';
 import Button from '../components/Button';
+import { CardBufalo } from '../components/CardBufaloRebanho';
 
 type Tag = { id?: string; [key: string]: any };
+type Animal = {
+  id: string;
+  id_bufalo: string;
+  nome: string;
+  brinco: string;
+  status: boolean;
+  sexo: "F" | "M";
+  maturidade?: string;
+  raca?: string;
+};
 
 type RootStackParamList = {
   MainTab: undefined;
-  AnimalDetail: { animal: Animal };
+  AnimalDetail: { id: string };
 };
 
 const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -41,7 +51,6 @@ export const RebanhoScreen = () => {
   const [paginaAtual, setPaginaAtual] = useState(1);
   const [totalPaginas, setTotalPaginas] = useState(1);
 
-
   const tagList: string[] = [];
   const fetchBufalos = async (page = 1) => {
     try {
@@ -55,8 +64,8 @@ export const RebanhoScreen = () => {
         nome: b.nome,
         raca: b.racaNome,
         sexo: b.sexo === 'M' ? 'Macho' : 'Fêmea',
+        maturidade: b.nivel_maturidade || 'Desconhecida',
       }));
-
       setAnimais(animaisFormatados);
       setAnimaisFiltrados(animaisFormatados);
       setPaginaAtual(meta.page);
@@ -122,41 +131,60 @@ const handleReadTag = async () => {
 
       {/* Conteúdo principal */}
       <MainLayout>
-        <ScrollView refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }>
-          <View style={styles.content}>
-            <SearchBar animais={animais} onFiltered={setAnimaisFiltrados}/>
-            <TableAnimais
-              data={animaisFiltrados}
-                onVerMais={(animal: Animal) => {
-                navigation.navigate('AnimalDetail', { animal });
-              }}
-            />
-
-          <View style={styles.pagination}>
-            <Button
-              title="Anterior"
-              onPress={() => {
-                if (paginaAtual > 1) fetchBufalos(paginaAtual - 1);
-              }}
-              disabled={paginaAtual === 1}
-            />
-
-            <Text style={styles.pageInfo}>
-              Página {paginaAtual} de {totalPaginas}
-            </Text>
-
-            <Button
-              title="Próxima"
-              onPress={() => {
-                if (paginaAtual < totalPaginas) fetchBufalos(paginaAtual + 1);
-              }}
-              disabled={paginaAtual === totalPaginas}
-            />
-          </View>
-
-          </View>
+        <ScrollView>
+          <FlatList
+            data={animaisFiltrados}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={({ item }) => (
+              <CardBufalo
+                nome={item.nome}
+                brinco={item.brinco}
+                status={item.status}
+                sexo={item.sexo === "F" || item.sexo === "M" ? item.sexo : "F"}
+                maturidade={item.maturidade || "Desconhecida"}
+                categoria={item.raca}
+                onPress={() => navigation.navigate("AnimalDetail", { id: item.id })}
+              />
+            )}
+            nestedScrollEnabled={true}
+            scrollEnabled={false} 
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
+            contentContainerStyle={{
+              backgroundColor: "#fff",
+              borderRadius: 12,
+              paddingVertical: 16,
+              paddingHorizontal: 10,
+              borderWidth: 1,
+              borderColor: colors.gray.disabled,
+              marginBottom: 50,
+            }}
+            ListHeaderComponent={
+              <SearchBar  />
+            }
+            ListFooterComponent={
+              <View style={styles.pagination}>
+                <Button
+                  title="Anterior"
+                  onPress={() => {
+                    if (paginaAtual > 1) fetchBufalos(paginaAtual - 1);
+                  }}
+                  disabled={paginaAtual === 1}
+                />
+                <Text style={styles.pageInfo}>
+                  Página {paginaAtual} de {totalPaginas}
+                </Text>
+                <Button
+                  title="Próxima"
+                  onPress={() => {
+                    if (paginaAtual < totalPaginas) fetchBufalos(paginaAtual + 1);
+                  }}
+                  disabled={paginaAtual === totalPaginas}
+                />
+              </View>
+            }
+          />
         </ScrollView>
       </MainLayout>
 
