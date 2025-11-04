@@ -54,9 +54,9 @@ export const CardReproducao: React.FC<CardReproducaoProps> = ({ reproducao, onPr
       <View style={styles.content}>
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.nome}>{reproducao.brincoBufala || "Sem nome"}</Text>
+          <Text style={styles.nome}>Búfala: {reproducao.brincoBufala || "Sem nome"}</Text>
           {reproducao.brincoTouro && (
-            <Text style={styles.brinco}>Búfalo: {reproducao.brincoTouro}</Text>
+            <Text style={styles.brinco}>Reprodutor: {reproducao.brincoTouro}</Text>
           )}
         </View>
 
