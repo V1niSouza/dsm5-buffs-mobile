@@ -1,4 +1,4 @@
-# Projeto Mobile - [Nome do Projeto]
+# Projeto Mobile - Plataforma de Controle e Acompanhamento da Produção Leiteira e Manejo de Búfalas - BUFFS
 
 Este repositório contém a aplicação mobile do projeto, desenvolvida em **React Native**, com estrutura básica das telas e navegação inicial.
 
