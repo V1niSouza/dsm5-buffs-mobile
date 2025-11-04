@@ -1,13 +1,15 @@
 import { apiFetch } from "../lib/apiClient";
 
 export interface Piquete {
-  id: number;
+  id: string; // agora é string, pois id_lote é UUID
   nome: string;
   coords: { latitude: number; longitude: number }[];
+  grupoNome: string;
+  grupoCor: string;
 }
 
 export const piqueteService = {
-  async getAll(id: number): Promise<Piquete[]> {
+  async getAll(id: string): Promise<Piquete[]> {
     const response = await apiFetch(`/lotes/propriedade/${id}`);
 
     // Normaliza o formato vindo do backend para o esperado pelo app
@@ -23,8 +25,9 @@ export const piqueteService = {
         id: item.id_lote,
         nome: item.nome_lote,
         coords,
+        grupoNome: item.grupo?.nome_grupo ?? "",
+        grupoCor: item.grupo?.color ?? "#000000", // fallback para preto
       } as Piquete;
     });
   },
 };
-

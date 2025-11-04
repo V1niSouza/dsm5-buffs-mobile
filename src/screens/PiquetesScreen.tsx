@@ -20,7 +20,7 @@ export const PiquetesScreen = () => {
     const fetchPiquetes = async () => {
       try {
         if (!propriedadeSelecionada) return; 
-        const data = await piqueteService.getAll(propriedadeSelecionada);
+        const data = await piqueteService.getAll(propriedadeSelecionada.toString());
         setPiquetes(data);
       } catch (error) {
         console.error("Erro ao buscar piquetes:", error);
@@ -35,7 +35,7 @@ export const PiquetesScreen = () => {
   const onRefresh = async () => {
     setRefreshing(true);
     if (propriedadeSelecionada) {
-      const data = await piqueteService.getAll(propriedadeSelecionada);
+      const data = await piqueteService.getAll(propriedadeSelecionada.toString());
       setPiquetes(data);
     }
     setRefreshing(false);
@@ -64,15 +64,33 @@ export const PiquetesScreen = () => {
       </View>
 
       <MainLayout>
-        <ScrollView
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-        >
+        <ScrollView>
           <View style={styles.content}>
             <MapLeaflet
-              piqueteCoords={piquetes.flatMap(p => p.coords)}
+              piquetes={piquetes.map(p => ({
+                ...p,
+                color: p.grupoCor, // renomeando grupoCor para color
+              }))}
             />
+            <TouchableOpacity style={{
+              position: 'absolute',
+              bottom: 60,
+              right: 16,
+              backgroundColor: colors.yellow.base,
+              borderRadius: 24,
+              paddingHorizontal: 16,
+              height: 56,
+              flexDirection: 'row',
+              alignItems: 'center',
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.3,
+              shadowRadius: 4,
+              elevation: 5
+            }}>
+            <Plus width={24} height={24} />
+            <Text style={{ marginLeft: 8, fontWeight: 'bold', color: '#111813' }}>Nova Área</Text>
+          </TouchableOpacity>
           </View>
         </ScrollView>
       </MainLayout>
@@ -115,7 +133,6 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
     paddingHorizontal: 10,
     borderWidth: 1,
-    marginBottom: 50,
     borderColor: colors.gray.disabled,
   },
 });
