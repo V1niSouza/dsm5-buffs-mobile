@@ -12,7 +12,6 @@ import {
 } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { registrarColeta, getIndustrias } from "../../services/lactacaoService";
 import YellowButton from "../Button";
 
 interface FormColetaProps {
@@ -22,7 +21,7 @@ interface FormColetaProps {
 
 export function FormColeta({ industrias: industriasProp = [], onSuccess }: FormColetaProps) {
   const [industrias, setIndustrias] = useState<any[]>(industriasProp);
-  const [idIndustria, setIdIndustria] = useState<number | null>(null);
+  const [idIndustria, setIdIndustria] = useState<string | null>(null);
   const [openIndustria, setOpenIndustria] = useState(false);
 
   const [quantidade, setQuantidade] = useState("");
@@ -30,6 +29,10 @@ export function FormColeta({ industrias: industriasProp = [], onSuccess }: FormC
   const [resultadoTeste, setResultadoTeste] = useState<boolean | null>(null);
   const [dtColeta, setDtColeta] = useState<Date | null>(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
+
+  useEffect(() => {
+    setIndustrias(industriasProp);
+  }, [industriasProp]);
 
   const handleSave = async () => {
     try {
@@ -58,6 +61,7 @@ export function FormColeta({ industrias: industriasProp = [], onSuccess }: FormC
       Alert.alert("Erro", "Não foi possível registrar a coleta.");
     }
   };
+
 
   return (
     <ScrollView style={styles.container}>

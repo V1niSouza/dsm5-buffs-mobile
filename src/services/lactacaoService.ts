@@ -1,119 +1,118 @@
 import { apiFetch } from "../lib/apiClient";
-import BufaloService from "./bufaloService"; 
 
-export const getCiclosLactacao = async (propriedadeId?: number) => {
+export interface CicloLactacao {
+  id_bufalo: string;
+  nome: string;
+  brinco: string;
+  idade_meses: number;
+  raca: string;
+  ciclo_atual: {
+    id_ciclo_lactacao: string;
+    numero_ciclo: number;
+    dt_parto: string;
+    dias_em_lactacao: number;
+    dt_secagem_prevista: string;
+    status: string;
+  };
+  producao_atual: {
+    total_produzido: number;
+    media_diaria: number;
+    ultima_ordenha: {
+      data: string;
+      quantidade: number;
+      periodo: "M" | "T" | "N" | string;
+    } | null;
+  };
+}
+
+export interface EstoqueLeite {
+  id_estoque: string;
+  id_propriedade: string;
+  id_usuario: string;
+  quantidade: number;
+  dt_registro: string;
+  observacao: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Industria {
+  id_industria: string;
+  nome: string;
+  endereco: string;
+  contato?: string;
+}
+
+export const getCiclosLactacao = async (propriedadeId: number) => {
   try {
-    // Busca todos os ciclos
-    const ciclos: any[] = await apiFetch("/ciclos-lactacao");
+    if (!propriedadeId) throw new Error("ID da propriedade é obrigatório.");
 
-    // Filtra apenas os que estão Lactando
-    const ciclosLactando = ciclos.filter(c => c.status === "Lactando");
-
-    // Se você quiser filtrar por propriedade
-    const ciclosFiltrados = propriedadeId
-      ? ciclosLactando.filter(c => c.id_bufala && c.id_bufala) // depois tratamos detalhamento do búfalo
-      : ciclosLactando;
-
-    // Enriquecendo com os dados do búfalo
-    const ciclosEnriquecidos = await Promise.all(
-      ciclosFiltrados.map(async c => {
-        const bufalo = c.id_bufala
-          ? await BufaloService.getBufaloDetalhes(c.id_bufala)
-          : null;
-        return {
-          ...c,
-          bufalo: bufalo ? { nome: bufalo.brinco, raca: bufalo.racaNome } : null
-        };
-      })
+    const ciclos: CicloLactacao[] = await apiFetch(
+      `/lactacao/femeas/em-lactacao/${propriedadeId}`
     );
 
-    const totalLactando = ciclosEnriquecidos.length;
-    const estoque: any[] = await apiFetch("/estoque-leite");
-
-    // Filtra por propriedade se for passado
-    const estoquePropriedade = propriedadeId
-    ? estoque.filter(e => e.id_propriedade === propriedadeId)
-    : estoque;
-
-    // Ordena do mais recente para o mais antigo
-    const estoqueOrdenado = estoquePropriedade.sort(
-    (a, b) => new Date(b.dt_registro).getTime() - new Date(a.dt_registro).getTime()
+    const estoqueResponse: { data: EstoqueLeite[] } = await apiFetch(
+      `/estoque-leite/propriedade/${propriedadeId}`
     );
 
-    // Pega o registro mais recente
-    const estoqueAtual = estoqueOrdenado[0] || null;
+    const estoqueAtual = estoqueResponse?.data?.[0] || null;
 
-    // Quantidade referente a esse registro
-    const quantidadeAtual = estoqueAtual?.quantidade
-    ? parseFloat(estoqueAtual.quantidade.toFixed(2))
-    : 0;
-    console.log(quantidadeAtual)
-
-
-    // Data formatada pt-BR
+    const totalLactando = ciclos.length;
+    const quantidadeAtual = estoqueAtual?.quantidade || 0;
     const dataFormatada = estoqueAtual?.dt_registro
-    ? new Date(estoqueAtual.dt_registro).toLocaleDateString('pt-BR')
-    : "N/D";
+      ? new Date(estoqueAtual.dt_registro).toLocaleDateString("pt-BR")
+      : "N/D";
 
-    // Se não tiver do dia atual, pega o mais recente disponível
+    const ciclosFormatados = ciclos.map((c) => ({
+      id: c.id_bufalo,
+      nome: c.nome,
+      brinco: c.brinco,
+      raca: c.raca,
+      idadeMeses: c.idade_meses,
+      numeroCiclo: c.ciclo_atual.numero_ciclo,
+      diasEmLactacao: c.ciclo_atual.dias_em_lactacao,
+      status: c.ciclo_atual.status,
+      producaoTotal: c.producao_atual.total_produzido,
+      mediaDiaria: c.producao_atual.media_diaria,
+      ultimaOrdenha: c.producao_atual.ultima_ordenha
+        ? {
+            data: new Date(c.producao_atual.ultima_ordenha.data).toLocaleDateString("pt-BR"),
+            quantidade: c.producao_atual.ultima_ordenha.quantidade,
+            periodo: c.producao_atual.ultima_ordenha.periodo,
+          }
+        : null,
+    }));
+
     return {
-      ciclos: ciclosEnriquecidos,
+      ciclos: ciclosFormatados,
       totalLactando,
+      quantidadeAtual,
       dataFormatada,
-      quantidadeAtual
     };
   } catch (error: any) {
     console.error("Erro ao buscar ciclos de lactação:", error);
     return {
       ciclos: [],
       totalLactando: 0,
-      estoqueAtual: null
+      quantidadeAtual: 0,
+      dataFormatada: "N/D",
     };
   }
 };
 
-// Estoque
-export const registrarEstoque = async (payload: {
-  id_propriedade: number;
-  quantidade: number;
-  dt_registro: string;
-  observacao?: string;
-}) => {
-  return await apiFetch("/estoque-leite", {
-    method: "POST",
-    body: JSON.stringify(payload),
-  });
-};
 
-// Coletas
-export const registrarColeta = async (payload: {
-  id_industria: number;
-  quantidade: number;
-  dt_coleta: string;
-  resultado_teste?: boolean;
-  observacao?: string;
-}) => {
-  return await apiFetch("/coletas", {
-    method: "POST",
-    body: JSON.stringify(payload),
-  });
-};
+export const getIndustriasPorPropriedade = async (propriedadeId: number) => {
+  try {
+    if (!propriedadeId) throw new Error("ID da propriedade é obrigatório.");
 
-// Industrias
-export const getIndustrias = async () => {
-  return await apiFetch("/industrias");
-};
-
-
-export const registrarLactacao = async (payload: {
-  id_bufala: number;
-  qt_ordenha: number;
-  periodo: string;
-  ocorrencia: string;
-  dt_ordenha: string;
-}) => {
-  return await apiFetch("/lactacao", {
-    method: "POST",
-    body: JSON.stringify(payload),
-  });
+    const response: { data: Industria[] } = await apiFetch(
+      `/industrias/propriedade/${propriedadeId}`
+    );
+    console.log("Indústrias retornadas pela API:", response);
+    return response || [];
+    
+  } catch (error: any) {
+    console.error("Erro ao buscar indústrias da propriedade:", error);
+    return [];
+  }
 };

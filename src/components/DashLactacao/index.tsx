@@ -1,87 +1,92 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { colors } from "../../styles/colors";
-import TextTitle from "../TextTitle";
 
 interface DashLactationProps {
-  totalArmazenado: number;      // quantidade de leite no estoque
-  vacasLactando: number;        // total de vacas em lactação
-  dataAtualizacao: string;      // data do último registro
+  totalArmazenado: number; // quantidade de leite total produzido
+  vacasLactando: number;   // número de vacas em lactação
+  dataAtualizacao: string; // data da última atualização
 }
-
 
 export default function DashLactation({
   totalArmazenado,
   vacasLactando,
   dataAtualizacao,
 }: DashLactationProps) {
-
   return (
-    <View style={styles.container}>
-      {/* Cabeçalho */}
-      <View style={styles.header}>
-        <TextTitle>Resumo da Produção de Leite</TextTitle>
-        <Text style={styles.subtitle}>Data de atualização: {dataAtualizacao}</Text>
+    <View style={styles.card}>
+      {/* Título */}
+      <Text style={styles.title}>Resumo da Produção de Leite</Text>
+
+      {/* Linha principal */}
+      <View style={styles.row}>
+        {/* Total Produzido */}
+        <View style={styles.infoBox}>
+          <Text style={styles.label}>Total Produzido</Text>
+          <Text style={styles.value}>{totalArmazenado} Litros</Text>
+        </View>
+
+        {/* Vacas em Lactação */}
+        <View style={[styles.infoBox, styles.borderbox]}>
+          <Text style={styles.label}>Vacas em Lactação</Text>
+          <Text style={styles.value}>{vacasLactando} Vacas</Text>
+        </View>
       </View>
 
-      {/* Primeira linha */}
-      <View style={styles.row}>
-        <View style={[styles.item, {borderBottomWidth: 0.2}]}>
-          <Text style={styles.value}>{totalArmazenado} L</Text>
-          <Text style={styles.label}>Total Armazenado</Text>
-        </View>
-        <View style={[styles.item, {borderBottomWidth: 0.2}]}>
-          <Text style={styles.value}>{vacasLactando}</Text>
-          <Text style={styles.label}>Vacas em Lactação</Text>
-        </View>
-      </View>
+      {/* Rodapé */}
+      <Text style={styles.footerText}>
+        Última Atualização: {dataAtualizacao}
+      </Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    paddingVertical: 8,
-    paddingHorizontal: 16,
+  card: {
     backgroundColor: colors.white.base,
     borderRadius: 20,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: colors.gray.disabled,
-    shadowColor: colors.black.base,
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    marginBottom: 16,
+    shadowColor: "#000",
     shadowOpacity: 0.05,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
-    elevation: 1, // deixa abaixo do dropdown
-    zIndex: 1,    // iOS
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 8,
+    elevation: 3,
+    justifyContent: "center",
   },
-  header: {
-    marginBottom: 16,
+  title: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#1A1A1A",
+    marginBottom: 12,
   },
-  subtitle: { 
-    fontSize: 14, 
-    color: colors.gray.base 
+  row: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginBottom: 12,
   },
-  row: { 
-    flexDirection: "row", 
-    justifyContent: "space-around", 
-    marginBottom: 16,
-  },
-  item: { 
-    alignItems: "center", 
+  infoBox: {
     flex: 1,
-    borderRightWidth: 0.2,
-    borderLeftWidth: 0.2,
+  },
+  borderbox: {
+    borderLeftWidth: 2,
     borderColor: colors.gray.disabled,
+    paddingLeft: 20,
   },
-  value: { 
-    fontSize: 20, 
-    fontWeight: "bold", 
-    marginBottom: 4 
+  label: {
+    fontSize: 13,
+    color: colors.gray.base,
+    marginBottom: 4,
   },
-  label: { 
-    fontSize: 12, 
-    color: colors.gray.base 
+  value: {
+    fontSize: 22,
+    fontWeight: "700",
+    color: colors.black.base,
+  },
+  footerText: {
+    fontSize: 11,
+    color: colors.gray.base,
+    textAlign: "right",
   },
 });
