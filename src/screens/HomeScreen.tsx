@@ -96,7 +96,7 @@ export const HomeScreen = () => {
             vacas={countsMat.vacas}
             touros={countsMat.touros}
            />
-          <AlertasPendentes />
+          <AlertasPendentes idPropriedade={propriedadeSelecionada?.toString() ?? null} />
         </ScrollView>
       </MainLayout>
     </View>

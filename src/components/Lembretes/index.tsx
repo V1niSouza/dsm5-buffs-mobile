@@ -1,51 +1,77 @@
-import React, { useState } from "react";
-import { View, Text, FlatList, StyleSheet, TouchableOpacity } from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, ActivityIndicator } from "react-native";
 import { colors } from "../../styles/colors";
 import YellowButton from "../Button";
 import TextTitle from "../TextTitle";
 import CalendarIcon from "../../icons/calendar";
+import { getAlertasPorPropriedade, Alerta as AlertaApi } from "../../services/alertaService";
 
-type Alerta = {
-  id: number;
-  titulo: string;
-  descricao: string;
-  horario: string;
-  local: string;
-  categoria: string;
-  prioridade: "Alta" | "Média" | "Baixa";
-};
+type Alerta = AlertaApi;
 
-export default function AlertasPendentes() {
-  const alertas: Alerta[] = [
-    { id: 1, titulo: "Tratamento antibiótico pendente", descricao: "Búfala #B-0045 precisa receber a segunda dose do antibiótico para mastite", horario: "Hoje", local: "Esperança", categoria: "Tratamento", prioridade: "Alta" },
-    { id: 2, titulo: "Acompanhamento pós-parto", descricao: "Verificar estado geral da búfala que pariu há 3 dias", horario: "Amanhã", local: "Bonança", categoria: "Acompanhamento", prioridade: "Média" },
-    { id: 3, titulo: "Vacinação contra brucelose", descricao: "Lote de bezerras entre 3-8 meses precisam ser vacinadas", horario: "Esta semana", local: "", categoria: "Vacinação", prioridade: "Média" },
-    { id: 4, titulo: "Vacinação contra brucelose", descricao: "Lote de bezerras entre 3-8 meses precisam ser vacinadas", horario: "Esta semana", local: "", categoria: "Vacinação", prioridade: "Média" },
-    { id: 5, titulo: "Vacinação contra brucelose", descricao: "Lote de bezerras entre 3-8 meses precisam ser vacinadas", horario: "Esta semana", local: "", categoria: "Vacinação", prioridade: "Média" },
-  ];
 
-  const itensPorPagina = 3;
-  const [paginaAtual, setPaginaAtual] = useState(0);
+export default function AlertasPendentes({ idPropriedade }: { idPropriedade: string | null } ) {
 
-  const startIndex = paginaAtual * itensPorPagina;
-  const endIndex = startIndex + itensPorPagina;
-  const dadosPagina = alertas.slice(startIndex, endIndex);
+  // Função auxiliar para formatar
+  function formatarDataSimples(dataISO: string) {
+    if (!dataISO) {
+      return '-';
+    }
+    const soData = dataISO.split('T')[0];
+    const partes = soData.split('-');
+    return `${partes[2]}/${partes[1]}/${partes[0]}`;
+  }
 
-  const totalPaginas = Math.ceil(alertas.length / itensPorPagina);
+  const [alertas, setAlertas] = useState<Alerta[]>([]);
+  const [paginaAtual, setPaginaAtual] = useState(1);
+  const [totalPaginas, setTotalPaginas] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [totalAlertas, setTotalAlertas] = useState(0);
+
+  const fetchAlertas = async (page = 1) => {
+    try {
+      setLoading(true);
+      const response = await getAlertasPorPropriedade(idPropriedade, page, 3);
+      setAlertas(response.alertas);
+      setTotalPaginas(response.meta.totalPages);
+      setPaginaAtual(response.meta.page);
+      setTotalAlertas(response.meta.total);
+    } catch (error) {
+      console.error("Erro ao buscar alertas:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!idPropriedade) return;
+
+    // Resetar página para 1 sempre que a propriedade mudar
+    setPaginaAtual(1);
+  }, [idPropriedade]);
+
+  useEffect(() => {
+    if (!idPropriedade) return;
+
+    // Buscar alertas sempre que mudar página ou propriedade
+    fetchAlertas(paginaAtual);
+  }, [idPropriedade, paginaAtual]);
+
 
   const renderItem = ({ item }: { item: Alerta }) => (
     <TouchableOpacity style={styles.alertaContainer}>
       <View style={styles.alertaRow}>
         <View style={styles.alertaInfo}>
-          <Text style={styles.alertaTitulo}>{item.titulo}</Text>
-          <Text style={styles.alertaDescricao}>{item.descricao}</Text>
+          <Text style={styles.alertaTitulo}>{item.motivo}</Text>
+          <Text style={styles.alertaDescricao}>{item.observacao}</Text>
         </View>
       </View>
 
       <View style={styles.alertaFooter}>
-        <Text style={styles.alertaHorario}><CalendarIcon fill={colors.yellow.base} size={15}/> {item.horario}</Text>
+        <Text style={styles.alertaHorario}>
+          <CalendarIcon fill={colors.yellow.base} size={15}/> {formatarDataSimples(item.data_alerta)}
+        </Text>
         <View style={styles.categoriaBox}>
-          <Text style={styles.categoriaText}>{item.categoria}</Text>
+          <Text style={styles.categoriaText}>{item.nicho}</Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -54,38 +80,44 @@ export default function AlertasPendentes() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TextTitle>Alertas Pendentes ({alertas.length})</TextTitle>
+        <TextTitle>Alertas Pendentes ({totalAlertas})</TextTitle>
       </View>
-      <FlatList
-        data={dadosPagina}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={renderItem}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-        scrollEnabled={false} 
-      />
 
-      {/* Paginação usando o YellowButton */}
+      {loading ? (
+        <ActivityIndicator color={colors.yellow.base} size="large" />
+      ) : (
+        <FlatList
+          data={alertas}
+          keyExtractor={(item) => item.id_alerta}
+          renderItem={renderItem}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+          scrollEnabled={false} 
+        />
+      )}
+
       <View style={styles.pagination}>
         <YellowButton
           title="Anterior"
-          onPress={() => setPaginaAtual(paginaAtual - 1)}
-          disabled={paginaAtual === 0}
+          onPress={() => setPaginaAtual((p) => Math.max(p - 1, 1))}
+          disabled={paginaAtual === 1}
         />
         <Text style={styles.pageInfo}>
-          Página {paginaAtual + 1} de {totalPaginas}
+          Página {paginaAtual} de {totalPaginas}
         </Text>
         <YellowButton
           title="Próxima"
-          onPress={() => setPaginaAtual(paginaAtual + 1)}
-          disabled={paginaAtual + 1 >= totalPaginas}
+          onPress={() => setPaginaAtual((p) => Math.min(p + 1, totalPaginas))}
+          disabled={paginaAtual >= totalPaginas}
         />
       </View>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
+// Mantém seus estilos
+const styles = StyleSheet.create({ 
+
   container: { 
     flex: 1, 
     padding: 16,
@@ -111,7 +143,7 @@ const styles = StyleSheet.create({
   },
   alertaContainer: { 
     backgroundColor: colors.white.base,
-    borderRadius: 24,
+    borderRadius: 14,
     padding: 12,
     marginBottom: 12,
     borderWidth: 1,
