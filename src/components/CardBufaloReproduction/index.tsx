@@ -10,7 +10,6 @@ export type CardReproducaoProps = {
 type StatusType = "Em andamento" | "Confirmada" | "Falha";
 
 export const CardReproducao: React.FC<CardReproducaoProps> = ({ reproducao, onPress }) => {
-  // Determina o status válido
   const status: StatusType =
     reproducao.status === "Confirmada"
       ? "Confirmada"
@@ -18,67 +17,73 @@ export const CardReproducao: React.FC<CardReproducaoProps> = ({ reproducao, onPr
       ? "Falha"
       : "Em andamento";
 
-  // Cores do chip
   const statusColors: Record<StatusType, { bg: string; text: string }> = {
-    "Em andamento": { bg: "#FEF3C7", text: "#92400E" },
-    Confirmada: { bg: "#D1FAE5", text: "#065F46" },
-    Falha: { bg: "#FEE2E2", text: "#991B1B" },
+    "Em andamento": { bg: "#FEF3C7", text: colors.yellow.static },
+    Confirmada: { bg: "#D1FAE5", text: colors.green.active },
+    Falha: { bg: "#FEE2E2", text: colors.red.inactive },
+  };
+
+  const barColors: Record<StatusType, string> = {
+    "Em andamento": colors.yellow.static,
+    Confirmada: colors.green.active,
+    Falha: colors.red.inactive,
   };
 
   const color = statusColors[status];
 
-  // Cor da barra lateral
-  const barColors: Record<StatusType, string> = {
-    "Em andamento": "#FBBF24",
-    Confirmada: "#10B981",
-    Falha: "#EF4444",
-  };
+  // Determina o material genético exibido
+  const materialGenetico = !reproducao.brincoTouro
+    ? reproducao.id_semen || reproducao.id_ovulo
+      ? `${(reproducao.id_semen || reproducao.id_ovulo).slice(0, 5)}`
+      : "—"
+    : null;
 
-  
-  // Material genético resumido
-    const materialGenetico =
-    reproducao.id_semen || reproducao.id_ovulo
-        ? `${(reproducao.id_semen || reproducao.id_ovulo).slice(0, 5)} ${
-            reproducao.id_semen 
-        }`
-        : null;
+  // Determina o valor do chip "Concluída"
+  const concluidaValue =
+    status === "Falha"
+      ? "Não, Falha"
+      : reproducao.concluida
+      ? reproducao.tipo_parto
+        ? `Sim, parto: ${reproducao.tipo_parto.toLowerCase()}`
+        : "Sim"
+      : "Não";
 
   return (
     <TouchableOpacity style={styles.cardContainer} onPress={onPress}>
       <View style={[styles.statusBar, { backgroundColor: barColors[status] }]} />
       <View style={styles.content}>
-        {/* Cabeçalho */}
+        {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.nome}>
-            Búfala: <Text style={styles.highlight}>{reproducao.brincoBufala}</Text>
-            {reproducao.brincoTouro && (
-              <> | Búfalo: <Text style={styles.highlight}>{reproducao.brincoTouro}</Text></>
-            )}
-            {materialGenetico && <> / {materialGenetico}</>}
-          </Text>
+          <Text style={styles.nome}>{reproducao.brincoBufala || "Sem nome"}</Text>
+          {reproducao.brincoTouro && (
+            <Text style={styles.brinco}>Búfalo: {reproducao.brincoTouro}</Text>
+          )}
         </View>
 
-        {/* Detalhes */}
-        <View style={styles.details}>
-          <Text style={styles.detailItem}>
-            Data Cruzamento:{" "}
-            <Text style={styles.detailValue}>{reproducao.dataCruzamento || "-"}</Text>
-          </Text>
-          <Text style={styles.detailItem}>
-            Tipo de Reprodução:{" "}
-            <Text style={styles.detailValue}>{reproducao.tipo_inseminacao}</Text>
-          </Text>
-        <Text style={styles.detailItem}>
-        Concluída:{" "}
-        <Text style={styles.detailValue}>
-            {reproducao.concluida
-            ? reproducao.tipo_parto
-                ? `Sim, parto: ${reproducao.tipo_parto.toLowerCase()}`
-                : "Sim"
-            : "Não"}
-        </Text>
-        </Text>
+        {/* Chips */}
+        <View style={styles.chipRow}>
+          <View style={styles.chip}>
+            <Text style={styles.chipLabel}>Inseminação</Text>
+            <Text style={styles.chipValue}>{reproducao.tipo_inseminacao || "—"}</Text>
+          </View>
 
+          <View style={styles.chip}>
+            <Text style={styles.chipLabel}>Data Cruzamento</Text>
+            <Text style={styles.chipValue}>{reproducao.dataCruzamento || "—"}</Text>
+          </View>
+
+          <View style={styles.chip}>
+            <Text style={styles.chipLabel}>Sucesso ? </Text>
+            <Text style={styles.chipValue}>{concluidaValue}</Text>
+          </View>
+
+          {/* Mostra material genético se não houver brincoTouro */}
+          {materialGenetico && (
+            <View style={styles.chip}>
+              <Text style={styles.chipLabel}>Material</Text>
+              <Text style={styles.chipValue}>{materialGenetico}</Text>
+            </View>
+          )}
         </View>
       </View>
     </TouchableOpacity>
@@ -88,16 +93,17 @@ export const CardReproducao: React.FC<CardReproducaoProps> = ({ reproducao, onPr
 const styles = StyleSheet.create({
   cardContainer: {
     flexDirection: "row",
-    position: "relative",
+    alignItems: "flex-start",
     backgroundColor: "#fff",
     borderRadius: 12,
     padding: 12,
-    marginBottom: 10,
     shadowColor: "#000",
     shadowOpacity: 0.05,
     shadowOffset: { width: 0, height: 4 },
     shadowRadius: 8,
     elevation: 2,
+    position: "relative",
+    marginBottom: 10,
   },
   statusBar: {
     position: "absolute",
@@ -113,39 +119,40 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
   },
   header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 6,
+    marginBottom: 8,
   },
   nome: {
     fontSize: 16,
-    fontWeight: "600",
-    color: colors.black.base,
-    flexShrink: 1,
+    fontWeight: "700",
+    color: "#1A1A1A",
   },
-  highlight: {
-    color: colors.black.base,
-  },
-  chip: {
-    borderRadius: 999,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-  },
-  chipText: {
-    fontSize: 12,
-    fontWeight: "600",
-  },
-  details: {
-    marginTop: 4,
-  },
-  detailItem: {
+  brinco: {
     fontSize: 13,
     color: "#6B7280",
-    marginBottom: 2,
+    marginTop: 2,
   },
-  detailValue: {
+  chipRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    marginTop: 6,
+    gap: 6,
+  },
+  chip: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F7F8FA",
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  chipLabel: {
+    fontSize: 12,
     fontWeight: "600",
-    color: "#1A1A1A",
+    color: "#374151",
+    marginRight: 4,
+  },
+  chipValue: {
+    fontSize: 12,
+    color: "#374151",
   },
 });

@@ -32,7 +32,7 @@ export default function DashReproduction({
         </View>
         <View style={[styles.item, { borderBottomWidth: 0.2 }]}>
           <Text style={styles.value}>{confirmadas}</Text>
-          <Text style={styles.label}>Confirmadas</Text>
+          <Text style={styles.label}>Sucesso</Text>
         </View>
         <View style={[styles.item, { borderBottomWidth: 0.2 }]}>
           <Text style={styles.value}>{falhas}</Text>

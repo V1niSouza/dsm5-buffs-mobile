@@ -132,6 +132,9 @@ const handleReadTag = async () => {
       {/* Conteúdo principal */}
       <MainLayout>
         <ScrollView>
+          <View style={styles.containetSearch}>
+            <SearchBar />
+          </View>
           <FlatList
             data={animaisFiltrados}
             keyExtractor={(item) => item.id.toString()}
@@ -160,9 +163,6 @@ const handleReadTag = async () => {
               borderColor: colors.gray.disabled,
               marginBottom: 50,
             }}
-            ListHeaderComponent={
-              <SearchBar  />
-            }
             ListFooterComponent={
               <View style={styles.pagination}>
                 <Button
@@ -204,6 +204,22 @@ const handleReadTag = async () => {
 const styles = StyleSheet.create({
   container: { 
     flex: 1
+   },
+  containetSearch: { 
+    flex: 1, 
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    backgroundColor: colors.white.base,
+    borderRadius: 20,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: colors.gray.disabled,
+    shadowColor: colors.black.base,
+    shadowOpacity: 0.05,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    elevation: 1,
+    zIndex: 1,
    },
   header: { 
     height: 80, 

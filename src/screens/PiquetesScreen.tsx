@@ -52,15 +52,6 @@ export const PiquetesScreen = () => {
         <View style={{ alignItems: 'center' }}>
           <Text style={styles.header1Text}>Lotes/Piquetes</Text>
         </View>
-        {/* Botões à direita */}
-        <View style={styles.headerButtons}>
-          <TouchableOpacity
-            onPress={() => console.log("Registrar novo Piquete")}
-            style={styles.button}
-          >
-            <Plus width={15} height={15} style={{ margin: 6 }} />
-          </TouchableOpacity>
-        </View>
       </View>
 
       <MainLayout>

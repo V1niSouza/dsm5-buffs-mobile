@@ -82,9 +82,9 @@ export const ReproducaoScreen = () => {
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         >
           <DashReproduction
-            emProcesso={0}
-            confirmadas={0}
-            falhas={0}
+            emProcesso={reproducoes.length > 0 ? reproducoes.filter(r => r.status === 'Em andamento').length : 0}
+            confirmadas={reproducoes.length > 0 ? reproducoes.filter(r => r.status === 'Confirmada').length : 0}
+            falhas={reproducoes.length > 0 ? reproducoes.filter(r => r.status === 'Falha').length : 0}
             ultimaData={reproducoes.length > 0 ? reproducoes[0].dt_evento : "-"}
           />
 
