@@ -1,61 +1,66 @@
 import { apiFetch } from "../lib/apiClient";
 
-const fetchBrincoTouro = async (r: any) => {
-  if (r.id_bufalo) {
-    const bufalo = await apiFetch(`/bufalos/${r.id_bufalo}`);
-    return bufalo.brinco;
-  } else if (r.id_semen) {
-    const semen = await apiFetch(`/material-genetico/${r.id_semen}`);
-    return semen.fornecedor;
-  }
-  return "-";
-};
-
-// Função para buscar o brinco da vaca
-const fetchBrincoVaca = async (r: any) => {
-  if (r.id_bufala) {
-    const vaca = await apiFetch(`/bufalos/${r.id_bufala}`); // ou `/vacas/${r.id_vaca}` se existir rota separada
-    return vaca.brinco || "-";
-  }
-  return "-";
-};
-
-export const getReproducoes = async (propriedadeId?: number) => {
-    
+const fetchNomeAnimal = async (id: string) => {
+  if (!id) return "-";
   try {
-    // Busca todas as reproduções
-    const reproducoes: any[] = await apiFetch("/cobertura");
+    const animal = await apiFetch(`/bufalos/${id}`);
+    return animal.nome || id;
+  } catch (error) {
+    console.error(`Erro ao buscar animal ${id}:`, error);
+    return id;
+  }
+};
 
-    // Filtra por propriedade (se necessário)
-    const reproducoesFiltradas = propriedadeId
-      ? reproducoes.filter(r => r.id_propriedade === propriedadeId)
-      : reproducoes;
+const fetchNomeSemenOuOvulo = async (id: string) => {
+  if (!id) return "-";
+  return `${id.slice(0, 5)}`;
+};
 
-    // Mantém apenas os status desejados
-    const reproducoesValidas = reproducoesFiltradas.filter(r =>
-      ["Falha", "Confirmada", "Em Processo"].includes(r.status)
-    );
+export const getReproducoes = async (propriedadeId: string) => {
+  if (!propriedadeId) return [];
 
-    // Ordena por data (mais recente primeiro)
-    const reproducoesOrdenadas = reproducoesValidas.sort(
-      (a, b) => new Date(b.dt_registro).getTime() - new Date(a.dt_registro).getTime()
-    );
+  try {
+    let page = 1;
+    const limit = 10; 
+    let allReproducoes: any[] = [];
+    let hasNextPage = true;
 
-    // Formata cada reprodução
+    while (hasNextPage) {
+      const response: any = await apiFetch(
+        `/cobertura/propriedade/${propriedadeId}?page=${page}&limit=${limit}`
+      );
+
+      const reproducoes: any[] = response.data || [];
+      allReproducoes = allReproducoes.concat(reproducoes);
+
+      hasNextPage = response.meta?.hasNextPage;
+      page++;
+    }
+
     const reproducoesFormatadas = await Promise.all(
-      reproducoesOrdenadas.map(async r => ({
-        id: r.id,
+      allReproducoes.map(async (r) => ({
+        id: r.id_reproducao,
         status: r.status,
         dt_evento: new Date(r.dt_evento).toLocaleDateString("pt-BR"),
-        brincoVaca: await fetchBrincoVaca(r),
-        brincoTouro: await fetchBrincoTouro(r),
-        tipoInseminacao: r.tipo_inseminacao === "Inseminação Artificial"
-        ? "IA"
-        : r.tipo_inseminacao === "Monta Natural"
-        ? "Natural"
-        : "-"
+        tipoInseminacao:
+          r.tipo_inseminacao === "Inseminação Artificial"
+            ? "IA"
+            : r.tipo_inseminacao === "Monta Natural"
+            ? "Natural"
+            : "-",
+        tipoParto: r.tipo_parto || "-",
+        brincoVaca: r.id_bufala ? await fetchNomeAnimal(r.id_bufala) : "-",
+        brincoTouro: r.id_bufalo
+          ? await fetchNomeAnimal(r.id_bufalo)
+          : r.id_semen
+          ? await fetchNomeSemenOuOvulo(r.id_semen)
+          : r.id_ovulo
+          ? await fetchNomeSemenOuOvulo(r.id_ovulo)
+          : "-",
+        primeiraCria: r.primeira_cria || false,
       }))
     );
+
     return reproducoesFormatadas;
   } catch (error: any) {
     console.error("Erro ao buscar reproduções:", error);
@@ -63,7 +68,7 @@ export const getReproducoes = async (propriedadeId?: number) => {
   }
 };
 
-export const updateReproducao = async (id: number, data: any) => {
+export const updateReproducao = async (id: string, data: any) => {
   try {
     const response = await apiFetch(`/cobertura/${id}`, {
       method: "PATCH",
