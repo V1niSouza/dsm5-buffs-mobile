@@ -1,0 +1,102 @@
+import React from "react";
+import { View, Text, TouchableOpacity, StyleSheet, Platform } from "react-native";
+import { colors } from "../../styles/colors";
+import Sanit from "../../../assets/images/termometro.svg";
+
+// Função auxiliar para formatar data
+function formatarDataSimples(dataISO: string) {
+  if (!dataISO) return "-";
+  const soData = dataISO.split("T")[0];
+  const partes = soData.split("-");
+  return `${partes[2]}/${partes[1]}/${partes[0]}`;
+}
+
+export const SanitarioCard = ({ item, onDelete, onPress }: any) => (
+  <TouchableOpacity style={styles.card} onPress={onPress}>
+    <View style={styles.iconContainer}>
+      <Sanit width={20} height={20} />
+    </View>
+
+    {/* Bloco de Texto Principal */}
+    <View style={styles.textContainer}>
+      <Text style={styles.textData}>
+        {item?.dt_aplicacao ? formatarDataSimples(item.dt_aplicacao) : "-"}
+      </Text>
+
+      <Text style={styles.textInfoPrincipal} numberOfLines={1}>
+        {item.doenca ?? "Sem diagnóstico"}
+      </Text>
+
+      <Text style={styles.textInfoSecundaria} numberOfLines={1}>
+        Medicação: {item.nome_medicamento ?? "-"} | Dosagem:{" "}
+        {item.dosagem ? `${item.dosagem} ${item.unidade_medida}` : "-"}
+      </Text>
+
+      <Text style={styles.textInfoSecundaria} numberOfLines={1}>
+        Retorno: {item.necessita_retorno ? "Sim" : "Não"}
+      </Text>
+    </View>
+  </TouchableOpacity>
+);
+
+const styles = StyleSheet.create({
+  card: {
+    backgroundColor: colors.white.base,
+    padding: 16,
+    borderRadius: 8,
+    marginBottom: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 16,
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 3,
+      },
+    }),
+  },
+  iconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: colors.yellow.base,
+    alignItems: "center",
+    justifyContent: "center",
+    flexShrink: 0,
+  },
+  textContainer: {
+    flex: 1,
+    flexDirection: "column",
+    gap: 4,
+  },
+  textData: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: colors.black.base,
+  },
+  textInfoPrincipal: {
+    fontSize: 14,
+    fontWeight: "500",
+    color: colors.black.base,
+  },
+  textInfoSecundaria: {
+    fontSize: 12,
+    fontWeight: "400",
+    color: colors.gray.text,
+  },
+  deleteButton: {
+    flexShrink: 0,
+    padding: 8,
+    marginLeft: 8,
+  },
+  deleteText: {
+    color: "#E53E3E",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+});
