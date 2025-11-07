@@ -7,8 +7,24 @@ import CalendarIcon from "../../icons/calendar";
 import { Tabs } from "../Tabs";
 import { Modal } from "../Modal";
 import { getAlertasPorPropriedade, Alerta as AlertaApi, Filtro, marcarAlertaVisto } from "../../services/alertaService";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { NavigatorScreenParams } from "@react-navigation/native";
+
+type MainTabParamList = {
+  Home: undefined;
+  Rebanho: undefined;
+  Lactação: undefined;
+  Reprodução: undefined;
+  Piquetes: undefined;
+};
 
 type Alerta = AlertaApi;
+type RootStackParamList = {
+  MainTab: NavigatorScreenParams<MainTabParamList>;
+  AnimalDetail: { id: string };
+};
+const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
 export default function AlertasPendentes({ idPropriedade }: { idPropriedade: string | null }) {
 
@@ -18,7 +34,6 @@ export default function AlertasPendentes({ idPropriedade }: { idPropriedade: str
     const [ano, mes, dia] = soData.split("-");
     return `${dia}/${mes}/${ano}`;
   }
-
   const [filtro, setFiltro] = useState<Filtro>("PENDENTES"); 
   const [alertas, setAlertas] = useState<Alerta[]>([]);
   const [paginaAtual, setPaginaAtual] = useState(1);
@@ -81,7 +96,37 @@ export default function AlertasPendentes({ idPropriedade }: { idPropriedade: str
   }, [idPropriedade, paginaAtual, filtro]);
 
   const renderItem = ({ item }: { item: Alerta }) => (
-    <TouchableOpacity style={styles.card}>
+  <TouchableOpacity
+    style={styles.card}
+    onPress={() => {
+
+      // Vai para o prontuário se tiver animal
+      if (item.nicho === "SANITARIO" || item.nicho === "CLINICO") {
+        if (item.animal_id) {
+          navigation.navigate("AnimalDetail", { id: item.animal_id });
+        }
+        return;
+      }
+
+      // Vai para aba Reproduções (Tab)
+      if (item.nicho === "REPRODUCAO") {
+        navigation.navigate("MainTab", {
+          screen: "Reprodução",
+        });
+        return;
+      }
+
+      // Vai para aba Piquetes (Tab)
+      if (item.nicho === "MANEJO") {
+        navigation.navigate("MainTab", {
+          screen: "Piquetes",
+        });
+        return;
+      }
+
+      console.warn("⚠️ Nicho não mapeado:", item.nicho);
+    }}
+  >
       <View
         style={[
           styles.priorityBar,
