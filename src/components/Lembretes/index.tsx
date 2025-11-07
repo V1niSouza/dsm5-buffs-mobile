@@ -4,37 +4,47 @@ import { colors } from "../../styles/colors";
 import YellowButton from "../Button";
 import TextTitle from "../TextTitle";
 import CalendarIcon from "../../icons/calendar";
-import { getAlertasPorPropriedade, Alerta as AlertaApi } from "../../services/alertaService";
+import { Tabs } from "../Tabs";
+import { Modal } from "../Modal";
+import { getAlertasPorPropriedade, Alerta as AlertaApi, Filtro, marcarAlertaVisto } from "../../services/alertaService";
 
 type Alerta = AlertaApi;
 
+export default function AlertasPendentes({ idPropriedade }: { idPropriedade: string | null }) {
 
-export default function AlertasPendentes({ idPropriedade }: { idPropriedade: string | null } ) {
-
-  // Função auxiliar para formatar
   function formatarDataSimples(dataISO: string) {
-    if (!dataISO) {
-      return '-';
-    }
-    const soData = dataISO.split('T')[0];
-    const partes = soData.split('-');
-    return `${partes[2]}/${partes[1]}/${partes[0]}`;
+    if (!dataISO) return "-";
+    const soData = dataISO.split("T")[0];
+    const [ano, mes, dia] = soData.split("-");
+    return `${dia}/${mes}/${ano}`;
   }
 
+  const [filtro, setFiltro] = useState<Filtro>("PENDENTES"); 
   const [alertas, setAlertas] = useState<Alerta[]>([]);
   const [paginaAtual, setPaginaAtual] = useState(1);
   const [totalPaginas, setTotalPaginas] = useState(1);
   const [loading, setLoading] = useState(false);
   const [totalAlertas, setTotalAlertas] = useState(0);
+  const [alertaSelecionado, setAlertaSelecionado] = useState<Alerta | null>(null);
+  const [modalVisible, setModalVisible] = useState(false);
+
 
   const fetchAlertas = async (page = 1) => {
     try {
       setLoading(true);
-      const response = await getAlertasPorPropriedade(idPropriedade, page, 3);
+
+      const response = await getAlertasPorPropriedade(
+        idPropriedade,
+        filtro,
+        page,
+        3
+      );
+
       setAlertas(response.alertas);
       setTotalPaginas(response.meta.totalPages);
       setPaginaAtual(response.meta.page);
       setTotalAlertas(response.meta.total);
+
     } catch (error) {
       console.error("Erro ao buscar alertas:", error);
     } finally {
@@ -42,36 +52,80 @@ export default function AlertasPendentes({ idPropriedade }: { idPropriedade: str
     }
   };
 
-  useEffect(() => {
-    if (!idPropriedade) return;
+  const confirmarVisto = async () => {
+    if (!alertaSelecionado) return;
+    try {
+      await marcarAlertaVisto(alertaSelecionado.id_alerta);
+      setAlertas((prev) =>
+        prev.map((a) =>
+          a.id_alerta === alertaSelecionado.id_alerta ? { ...a, visto: true } : a
+        )
+      );
+    } catch (err) {
+      console.error("Erro ao marcar como visto:", err);
+    } finally {
+      setModalVisible(false);
+      setAlertaSelecionado(null);
+    }
+  };
 
-    // Resetar página para 1 sempre que a propriedade mudar
+
+  // Resetar pagina ao mudar filtro
+  useEffect(() => {
     setPaginaAtual(1);
-  }, [idPropriedade]);
+  }, [filtro]);
 
   useEffect(() => {
     if (!idPropriedade) return;
-
-    // Buscar alertas sempre que mudar página ou propriedade
     fetchAlertas(paginaAtual);
-  }, [idPropriedade, paginaAtual]);
-
+  }, [idPropriedade, paginaAtual, filtro]);
 
   const renderItem = ({ item }: { item: Alerta }) => (
-    <TouchableOpacity style={styles.alertaContainer}>
-      <View style={styles.alertaRow}>
-        <View style={styles.alertaInfo}>
-          <Text style={styles.alertaTitulo}>{item.motivo}</Text>
-          <Text style={styles.alertaDescricao}>{item.observacao}</Text>
-        </View>
-      </View>
+    <TouchableOpacity style={styles.card}>
+      <View
+        style={[
+          styles.priorityBar,
+          item.prioridade === "ALTA"
+            ? { backgroundColor: colors.red.base }
+            : { backgroundColor: colors.yellow.warning }
+        ]}
+      />
 
-      <View style={styles.alertaFooter}>
-        <Text style={styles.alertaHorario}>
-          <CalendarIcon fill={colors.yellow.base} size={15}/> {formatarDataSimples(item.data_alerta)}
-        </Text>
-        <View style={styles.categoriaBox}>
-          <Text style={styles.categoriaText}>{item.nicho}</Text>
+      <View style={styles.cardContent}>
+        <Text style={styles.cardTitle}>{item.motivo}</Text>
+        <Text style={styles.cardDescription}>{item.observacao}</Text>
+
+        <View style={styles.cardFooter}>
+          <View style={styles.tag}>
+            <Text style={styles.tagText}>{item.nicho}</Text>
+          </View>
+
+          <View style={styles.dateRow}>
+            <CalendarIcon fill={colors.brown.base} size={14} />
+            <Text style={styles.dateText}>
+              {formatarDataSimples(item.data_alerta)}
+            </Text>
+          </View>
+        </View>
+
+        <View style={styles.resolveRow}>
+          <TouchableOpacity
+            style={[
+              styles.resolveButton,
+              item.visto && { backgroundColor: colors.gray.base },
+            ]}
+            onPress={() => {
+              if (!item.visto) {
+                setAlertaSelecionado(item);
+                setModalVisible(true);
+              }
+            }}
+            disabled={item.visto}
+          >
+            <Text style={styles.resolveButtonText}>
+              {item.visto ? "Já visto" : "Marcar como visto"}
+            </Text>
+          </TouchableOpacity>
         </View>
       </View>
     </TouchableOpacity>
@@ -79,8 +133,50 @@ export default function AlertasPendentes({ idPropriedade }: { idPropriedade: str
 
   return (
     <View style={styles.container}>
+
+      <Modal visible={modalVisible} onClose={() => setModalVisible(false)}>
+        <View style={{
+          backgroundColor: "white",
+          padding: 20,
+          borderRadius: 14,
+          gap: 20
+        }}>
+          <Text style={{ fontSize: 16, fontWeight: "600", textAlign: "center" }}>
+            Confirmar resolução do alerta?
+          </Text>
+
+          <Text style={{ textAlign: "center", color: colors.gray.base }}>
+            {alertaSelecionado?.motivo}
+          </Text>
+
+          <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 10 }}>
+            <TouchableOpacity
+              onPress={() => setModalVisible(false)}
+              style={{ padding: 10 }}
+            >
+              <Text style={{ fontWeight: "600" }}>Cancelar</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={confirmarVisto}
+              style={{ backgroundColor: colors.yellow.base, padding: 10, borderRadius: 8 }}
+            >
+              <Text style={{ fontWeight: "700", color: colors.brown.base }}>Confirmar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
       <View style={styles.header}>
-        <TextTitle>Alertas Pendentes ({totalAlertas})</TextTitle>
+        <TextTitle>Alertas ({totalAlertas})</TextTitle>
+      <Tabs
+        tabs={[
+          { key: "TODOS", label: "Todas" },
+          { key: "PENDENTES", label: "Não vistas" },
+        ]}
+        activeTab={filtro}
+        onChange={(key) => setFiltro(key as Filtro)}
+      />
       </View>
 
       {loading ? (
@@ -92,7 +188,7 @@ export default function AlertasPendentes({ idPropriedade }: { idPropriedade: str
           renderItem={renderItem}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
-          scrollEnabled={false} 
+          scrollEnabled={false}
         />
       )}
 
@@ -102,9 +198,7 @@ export default function AlertasPendentes({ idPropriedade }: { idPropriedade: str
           onPress={() => setPaginaAtual((p) => Math.max(p - 1, 1))}
           disabled={paginaAtual === 1}
         />
-        <Text style={styles.pageInfo}>
-          Página {paginaAtual} de {totalPaginas}
-        </Text>
+        <Text style={styles.pageInfo}>Página {paginaAtual} de {totalPaginas}</Text>
         <YellowButton
           title="Próxima"
           onPress={() => setPaginaAtual((p) => Math.min(p + 1, totalPaginas))}
@@ -115,84 +209,88 @@ export default function AlertasPendentes({ idPropriedade }: { idPropriedade: str
   );
 }
 
-// Mantém seus estilos
-const styles = StyleSheet.create({ 
-
-  container: { 
-    flex: 1, 
+const styles = StyleSheet.create({
+  // (seus estilos continuam IGUAIS)
+  container: {
+    flex: 1,
     padding: 16,
     backgroundColor: colors.white.base,
     marginBottom: 12,
-    borderRadius: 24,
+    borderRadius: 20,
     borderWidth: 1,
     borderColor: colors.gray.disabled,
-    shadowColor: colors.black.base,
-    shadowOpacity: 0.05,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
     elevation: 2,
   },
-  header: { 
-    flexDirection: "row", 
-    justifyContent: "space-between", 
-    alignItems: "center", 
-    marginBottom: 16 
-  },
-  scrollContent: { 
-    paddingBottom: 8 
-  },
-  alertaContainer: { 
+  scrollContent: { paddingBottom: 8 },
+  header: { marginBottom: 16 },
+  card: {
+    flexDirection: "row",
     backgroundColor: colors.white.base,
     borderRadius: 14,
-    padding: 12,
-    marginBottom: 12,
+    marginBottom: 14,
     borderWidth: 1,
     borderColor: colors.gray.disabled,
-    shadowColor: colors.black.base,
-    shadowOpacity: 0.05,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
-    elevation: 2,
+    overflow: "hidden",
+    elevation: 1,
   },
-  alertaRow: { 
+  priorityBar: { 
+    width: 5 
+  },
+  cardContent: { 
+    flex: 1, 
+    padding: 14 
+  },
+  cardTitle: { 
+    fontSize: 15, 
+    fontWeight: "700", 
+    color: colors.black.base, 
+    marginBottom: 6 
+  },
+  cardDescription: { 
+    fontSize: 13, 
+    color: colors.gray.base 
+  },
+  cardFooter: { 
+    marginTop: 12, 
     flexDirection: "row", 
     justifyContent: "space-between", 
-    alignItems: "flex-start", 
-    marginBottom: 8 
+    alignItems: "center" 
   },
-  alertaInfo: { 
-    flex: 1, 
-    paddingRight: 8 
+  tag: {
+    backgroundColor: colors.yellow.base,
+    paddingVertical: 4, 
+    paddingHorizontal: 10, 
+    borderRadius: 10 
   },
-  alertaTitulo: { 
-    fontWeight: "bold", 
-    fontSize: 14, 
-    marginBottom: 4 
+  tagText: { 
+    fontSize: 11, 
+    fontWeight: "600", 
+    color: colors.brown.base 
   },
-  alertaDescricao: { 
-    fontSize: 12, 
-    color: colors.gray.base 
-  },
-  alertaFooter: { 
+  dateRow: { 
     flexDirection: "row", 
     alignItems: "center", 
-    flexWrap: "wrap", 
-    gap: 8 
+    gap: 4 
   },
-  alertaHorario: { 
+  dateText: { 
     fontSize: 12, 
-    color: colors.gray.base, 
-    marginRight: 8 
+    color: colors.brown.base 
   },
-  categoriaBox: { 
-    backgroundColor: colors.gray.claro, 
-    borderRadius: 6, 
-    paddingVertical: 2, 
-    paddingHorizontal: 6 
+  resolveRow: { 
+    marginTop: 12, 
+    flexDirection: "row", 
+    justifyContent: "flex-end" 
   },
-  categoriaText: { 
-    fontSize: 12, 
-    color: colors.gray.base 
+  resolveButton: { 
+    backgroundColor: "#22c55e", 
+    paddingVertical: 6, 
+    paddingHorizontal: 14,
+    borderRadius: 8 
+  },
+  resolveButtonText: { 
+    color: "white", 
+    fontWeight: "600", 
+    fontSize: 13 
   },
   pagination: { 
     flexDirection: "row", 

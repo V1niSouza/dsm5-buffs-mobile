@@ -23,7 +23,7 @@ export const getBufalos = async (propriedadeId: number, page = 1, limit = 10) =>
   }
 };
 
-const getBufaloDetalhes = async (id: string) => {
+export const getBufaloDetalhes = async (id: string) => {
   try {
     const bufalo = await apiFetch(`/bufalos/${id}`);
     const racas = await apiFetch("/racas");
