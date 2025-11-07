@@ -180,7 +180,10 @@ export default function AlertasPendentes({ idPropriedade }: { idPropriedade: str
       </View>
 
       {loading ? (
-        <ActivityIndicator color={colors.yellow.base} size="large" />
+        <View style={styles.loading}>
+          <Text>Carregando Alertas...</Text>
+          <ActivityIndicator color={colors.yellow.base} size="large" />
+        </View>
       ) : (
         <FlatList
           data={alertas}
@@ -301,4 +304,8 @@ const styles = StyleSheet.create({
   pageInfo: { 
     fontWeight: "600" 
   },
+  loading: {
+    alignItems: "center",
+    justifyContent: "center",
+  }
 });

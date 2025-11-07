@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl, Pressable, Modal, FlatList} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl, Pressable, Modal, FlatList, ActivityIndicator} from 'react-native';
 import NfcManager, { NfcTech } from 'react-native-nfc-manager';
 import { MainLayout } from '../layouts/MainLayout';
 import { useDimensions } from '../utils/useDimensions';
@@ -16,6 +16,7 @@ import { FormBufalo } from '../components/FormBufalo';
 import { Modal as CustomModal  } from '../components/Modal';
 import Button from '../components/Button';
 import { CardBufalo } from '../components/CardBufaloRebanho';
+import AgroCore from '../icons/agroCore';
 
 type Tag = { id?: string; [key: string]: any };
 type Animal = {
@@ -47,7 +48,7 @@ export const RebanhoScreen = () => {
   const [showScannerModal, setShowScannerModal] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
   const [scannedTags, setScannedTags] = useState<string[]>([]);
-
+  const [loading, setLoading] = useState(true);
   const [paginaAtual, setPaginaAtual] = useState(1);
   const [totalPaginas, setTotalPaginas] = useState(1);
 
@@ -55,6 +56,7 @@ export const RebanhoScreen = () => {
   const fetchBufalos = async (page = 1) => {
     try {
       if (!propriedadeSelecionada) return;
+      setLoading(true);
       const { bufalos, meta } = await bufaloService.getBufalos(propriedadeSelecionada, page);
 
       const animaisFormatados = bufalos.map((b: any) => ({
@@ -75,43 +77,60 @@ export const RebanhoScreen = () => {
     }
   };
 
-  useEffect(() => {
-    if (propriedadeSelecionada) fetchBufalos();
-  }, [propriedadeSelecionada]);
-
   const onRefresh = async () => {
     setRefreshing(true);
     await fetchBufalos(paginaAtual);
     setRefreshing(false);
   };
 
-const handleReadTag = async () => {
-  try {
-    setIsScanning(true);
-    await NfcManager.start();
-    await NfcManager.requestTechnology(NfcTech.NfcA);
+  const handleReadTag = async () => {
+    try {
+      setIsScanning(true);
+      await NfcManager.start();
+      await NfcManager.requestTechnology(NfcTech.NfcA);
 
-    const tag = await NfcManager.getTag();
-    if (!tag) return;
+      const tag = await NfcManager.getTag();
+      if (!tag) return;
 
-    // Convertendo ID corretamente
-    const tagId = tag.id?.toUpperCase() || '';
-    if (tagId && !tagList.includes(tagId)) {
-      tagList.push(tagId);
-      setScannedTags([...tagList]); // atualiza estado para renderizar
+      const tagId = tag.id?.toUpperCase() || '';
+      if (tagId && !tagList.includes(tagId)) {
+        tagList.push(tagId);
+        setScannedTags([...tagList]); 
+      }
+
+      console.log("Tag lida:", tagId);
+
+    } catch (err) {
+      console.warn("Erro ao ler a tag:", err);
+    } finally {
+      setIsScanning(false);
+      await NfcManager.cancelTechnologyRequest();
     }
-
-    console.log("Tag lida:", tagId);
-
-  } catch (err) {
-    console.warn("Erro ao ler a tag:", err);
-  } finally {
-    setIsScanning(false);
-    await NfcManager.cancelTechnologyRequest();
-  }
-};
+  };
 
   const handleCloseScanner = () => setShowScannerModal(false);
+
+  useEffect(() => {
+    const loadInitialData = async () => {
+      setLoading(true);
+      if (propriedadeSelecionada) {
+        await fetchBufalos();
+      }
+      setLoading(false);
+    };
+    loadInitialData();
+  }, [propriedadeSelecionada]);
+
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <AgroCore width={200} height={200} />
+        <Text>Carregando animais...</Text>
+        <ActivityIndicator size="large" color={colors.yellow.static} />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -343,5 +362,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginTop: 12,
     gap: 8,
+  },
+  loadingContainer: { 
+    flex: 1, 
+    justifyContent: "center", 
+    alignItems: "center" 
   },
 });

@@ -16,7 +16,7 @@ const fetchNomeSemenOuOvulo = async (id: string) => {
   return `${id.slice(0, 5)}`;
 };
 
-export const getReproducoes = async (propriedadeId: string) => {
+export const getReproducoes = async (propriedadeId: number) => {
   if (!propriedadeId) return [];
 
   try {

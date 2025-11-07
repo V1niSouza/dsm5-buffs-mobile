@@ -7,6 +7,7 @@ import Plus from '../../assets/images/plus.svg';
 import { MapLeaflet } from '../components/Mapa';
 import { piqueteService, Piquete } from "../services/piqueteService";
 import { usePropriedade } from "../context/PropriedadeContext";
+import AgroCore from '../icons/agroCore';
 
 export const PiquetesScreen = () => {
   const { wp, hp } = useDimensions();
@@ -41,8 +42,14 @@ export const PiquetesScreen = () => {
     setRefreshing(false);
   };
 
-    if (loading) {
-    return <ActivityIndicator size="large" color="orange" />;
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <AgroCore width={200} height={200} />
+        <Text>Carregando demarcações...</Text>
+        <ActivityIndicator size="large" color={colors.yellow.static} />
+      </View>
+    );
   }
 
   return (
@@ -60,7 +67,7 @@ export const PiquetesScreen = () => {
             <MapLeaflet
               piquetes={piquetes.map(p => ({
                 ...p,
-                color: p.grupoCor, // renomeando grupoCor para color
+                color: p.grupoCor, 
               }))}
             />
             <TouchableOpacity style={{
@@ -125,5 +132,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderWidth: 1,
     borderColor: colors.gray.disabled,
+  },
+  loadingContainer: { 
+    flex: 1, 
+    justifyContent: "center", 
+    alignItems: "center" 
   },
 });

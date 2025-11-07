@@ -11,7 +11,7 @@ import zootecnicoService from "../services/zootecnicoService";
 import sanitarioService from "../services/sanitarioService";
 import { MainLayout } from "../layouts/MainLayout";
 import Back from '../../assets/images/arrow.svg';
-import BuffsLogo from '../../assets/images/logoBuffs.svg'; 
+import AgroCore from '../../src/icons/agroCore'; 
 import YellowButton from "../components/Button";
 import Button from "../components/Button";
 import { ZootecnicoDetailModal } from "../components/ModalVisualizaçãoZootec";
@@ -125,8 +125,9 @@ const fetchData = async (
   if (loading && !detalhes) {
     return (
       <View style={styles.loadingContainer}>
-        <BuffsLogo width={230} height={230} />
-        <ActivityIndicator size="large" color={colors.yellow.base} />
+        <AgroCore width={200} height={200} />
+        <Text>Carregando Prontuário do Animal...</Text>
+        <ActivityIndicator size="large" color={colors.yellow.static} />
       </View>
     );
   }
