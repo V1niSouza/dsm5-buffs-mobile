@@ -98,14 +98,53 @@ export const deleteBufalo = async (id: number) => {
 export const getRacas = async () => {
   try {
     const racas = await apiFetch("/racas");
-    return racas; // já é a lista de raças
-    console.log(racas);
+    return racas; 
   } catch (err) {
     console.error("Erro ao buscar raças:", err);
     throw err;
   }
 };
 
+export const filtrarBufalos = async (
+  propriedadeId: number,
+  filtros: {
+    brinco?: string;
+    sexo?: string;
+    nivel_maturidade?: string;
+    status?: boolean;
+    id_raca?: string;
+  },
+  page = 1,
+  limit = 10
+) => {
+  try {
+    const params = new URLSearchParams();
+
+    if (filtros?.brinco) params.append("brinco", filtros.brinco);
+    if (filtros?.sexo) params.append("sexo", filtros.sexo);
+    if (filtros?.nivel_maturidade) params.append("nivel_maturidade", filtros.nivel_maturidade);
+    if (filtros?.status !== undefined) params.append("status", String(filtros.status));
+    if (filtros?.id_raca) params.append("id_raca", filtros.id_raca);
+
+    params.append("page", String(page));
+    params.append("limit", String(limit));
+
+    const result = await apiFetch(
+      `/bufalos/filtro/propriedade/${propriedadeId}/avancado?${params.toString()}`
+    );
+    const bufalos = result.data.map((b: any) => ({
+      ...b,
+      racaNome: b.raca?.nome || "Desconhecida",
+    }));
+
+    return { bufalos, meta: result.meta };
+  } catch (error) {
+    console.error("Erro ao filtrar búfalos:", error);
+    return { bufalos: [], meta: { page: 1, totalPages: 1 } };
+  }
+};
 
 
-export default { getBufalos, getBufaloDetalhes, createBufalo, updateBufalo, deleteBufalo, getRacas };
+
+
+export default { getBufalos, getBufaloDetalhes, createBufalo, updateBufalo, deleteBufalo, getRacas, filtrarBufalos };

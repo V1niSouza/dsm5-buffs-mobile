@@ -17,8 +17,10 @@ import { Modal as CustomModal  } from '../components/Modal';
 import Button from '../components/Button';
 import { CardBufalo } from '../components/CardBufaloRebanho';
 import AgroCore from '../icons/agroCore';
+import FiltroRebanho from '../components/SearchBar';
 
 type Tag = { id?: string; [key: string]: any };
+
 type Animal = {
   id: string;
   id_bufalo: string;
@@ -33,6 +35,14 @@ type Animal = {
 type RootStackParamList = {
   MainTab: undefined;
   AnimalDetail: { id: string };
+};
+
+type Filtros = {
+  brinco?: string;
+  sexo?: "M" | "F";
+  nivel_maturidade?: "B" | "N" | "V" | "T";
+  status?: boolean;
+  id_raca?: string;
 };
 
 const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -51,22 +61,27 @@ export const RebanhoScreen = () => {
   const [loading, setLoading] = useState(true);
   const [paginaAtual, setPaginaAtual] = useState(1);
   const [totalPaginas, setTotalPaginas] = useState(1);
+  const [filtros, setFiltros] = useState<Filtros>({});
 
   const tagList: string[] = [];
-  const fetchBufalos = async (page = 1) => {
+  const fetchBufalosFiltrados = async (filtrosAplicados: any = {}, page = 1) => {
     try {
       if (!propriedadeSelecionada) return;
       setLoading(true);
-      const { bufalos, meta } = await bufaloService.getBufalos(propriedadeSelecionada, page);
 
+      const { bufalos, meta } = await bufaloService.filtrarBufalos(
+        propriedadeSelecionada,
+        filtrosAplicados,
+        page
+      );
       const animaisFormatados = bufalos.map((b: any) => ({
         id: b.id_bufalo,
         status: b.status,
         brinco: b.brinco,
         nome: b.nome,
-        raca: b.racaNome,
-        sexo: b.sexo === 'M' ? 'Macho' : 'Fêmea',
-        maturidade: b.nivel_maturidade || 'Desconhecida',
+        raca: b.raca?.nome ?? "Sem raça definida",
+        sexo: b.sexo,
+        maturidade: b.nivel_maturidade,
       }));
       setAnimais(animaisFormatados);
       setAnimaisFiltrados(animaisFormatados);
@@ -74,12 +89,14 @@ export const RebanhoScreen = () => {
       setTotalPaginas(meta.totalPages);
     } catch (err) {
       console.error("Erro ao buscar búfalos:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await fetchBufalos(paginaAtual);
+    await fetchBufalosFiltrados(paginaAtual);
     setRefreshing(false);
   };
 
@@ -114,7 +131,7 @@ export const RebanhoScreen = () => {
     const loadInitialData = async () => {
       setLoading(true);
       if (propriedadeSelecionada) {
-        await fetchBufalos();
+        await fetchBufalosFiltrados();
       }
       setLoading(false);
     };
@@ -122,6 +139,10 @@ export const RebanhoScreen = () => {
   }, [propriedadeSelecionada]);
 
 
+  useEffect(() => {
+    fetchBufalosFiltrados(filtros, 1); 
+  }, [filtros]);
+  
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -148,21 +169,24 @@ export const RebanhoScreen = () => {
         </View>
       </View>
 
-      {/* Conteúdo principal */}
       <MainLayout>
         <ScrollView>
           <View style={styles.containetSearch}>
-            <SearchBar />
+            <FiltroRebanho onFiltrar={(f) => {
+                setFiltros(f);
+                fetchBufalosFiltrados(f);
+              }}
+              filtros={filtros}  />
           </View>
           <FlatList
             data={animaisFiltrados}
-            keyExtractor={(item) => item.id.toString()}
+            keyExtractor={(item, index) => String(item.id || item.id_bufalo || index)}
             renderItem={({ item }) => (
               <CardBufalo
                 nome={item.nome}
                 brinco={item.brinco}
                 status={item.status}
-                sexo={item.sexo === "F" || item.sexo === "M" ? item.sexo : "F"}
+                sexo={item.sexo}
                 maturidade={item.maturidade || "Desconhecida"}
                 categoria={item.raca}
                 onPress={() => navigation.navigate("AnimalDetail", { id: item.id })}
@@ -187,7 +211,7 @@ export const RebanhoScreen = () => {
                 <Button
                   title="Anterior"
                   onPress={() => {
-                    if (paginaAtual > 1) fetchBufalos(paginaAtual - 1);
+                    if (paginaAtual > 1) fetchBufalosFiltrados(filtros, paginaAtual - 1);
                   }}
                   disabled={paginaAtual === 1}
                 />
@@ -197,7 +221,7 @@ export const RebanhoScreen = () => {
                 <Button
                   title="Próxima"
                   onPress={() => {
-                    if (paginaAtual < totalPaginas) fetchBufalos(paginaAtual + 1);
+                    if (paginaAtual < totalPaginas) fetchBufalosFiltrados(filtros, paginaAtual + 1);
                   }}
                   disabled={paginaAtual === totalPaginas}
                 />
@@ -206,16 +230,14 @@ export const RebanhoScreen = () => {
           />
         </ScrollView>
       </MainLayout>
-
       <CustomModal visible={modalVisible} onClose={() => setModalVisible(false)}>
         <FormBufalo
           onSuccess={() => {
-            fetchBufalos(); // recarrega a lista
-            setModalVisible(false); // fecha modal
+            fetchBufalosFiltrados(); 
+            setModalVisible(false); 
           }}
         />
       </CustomModal>
-
     </View>
   );
 };
