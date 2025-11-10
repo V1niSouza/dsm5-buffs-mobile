@@ -73,7 +73,7 @@ export const updateBufalo = async (id: number, data: any) => {
   try {
     const bufalo = await apiFetch(`/bufalos/${id}`, {
       method: "PATCH",
-      body: JSON.stringify(data),
+      body: JSON.stringify(data)
     });
     return bufalo;
   } catch (err) {

@@ -18,11 +18,15 @@ export const colors = {
         disabled: "#E5E7EB"
     },
     green:{
-        active: "#9DFFBE"
+        active: "#9DFFBE",
+        text: "#065F46",
+        extra: "#10B981"
     },
     red:{
         base: "#df2a2aff",
-        inactive: '#ffe3e3'
+        inactive: '#ffe3e3',
+        extra: '#EF4444',
+        text: '#B91C1C'
     },
     brown:{
         base: "#43310B"
