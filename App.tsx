@@ -29,7 +29,6 @@ import Home from './src/icons/home';
 import Lactation from './src/icons/lactation';
 import GlobeIcon from './src/icons/sex';
 import Fance from './src/icons/fance';
-import { Loading } from './src/components/Loading';
 import { NfcScannerScreen } from './src/screens/NfcScannerScreen';
 
 

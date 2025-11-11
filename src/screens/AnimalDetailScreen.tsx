@@ -72,19 +72,16 @@ const fetchData = async (
     }
   };
 
-  // Função para mudar a página Zootécnico
   const changePageZootec = (newPage: number) => {
     setPageZootec(newPage);
-    fetchData(newPage, pageSanit); // Carrega a nova página de Zootec e mantém Sanitário
+    fetchData(newPage, pageSanit);
   }
   
-  // Função para mudar a página Sanitário
   const changePageSanit = (newPage: number) => {
     setPageSanit(newPage);
-    fetchData(pageZootec, newPage); // Carrega a nova página de Sanitário e mantém Zootec
+    fetchData(pageZootec, newPage); 
   }
 
-  // Função de Refresh (volta para a primeira página)
   const onRefresh = async () => {
     setRefreshing(true);
     setPageZootec(1);

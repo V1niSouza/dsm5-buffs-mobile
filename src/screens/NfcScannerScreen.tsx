@@ -1,12 +1,10 @@
-// NfcScannerScreen.tsx
-
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import NfcManager, { NfcTech } from 'react-native-nfc-manager';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import Button from '../components/Button'; // Componente de botão
-import { colors } from '../styles/colors'; // Cores do projeto
+import Button from '../components/Button'; 
+import { colors } from '../styles/colors'; 
 
 type RootStackParamList = {
   RebanhoScreen: { lidas?: string[] };
@@ -14,46 +12,36 @@ type RootStackParamList = {
 };
 
 export const NfcScannerScreen = () => {
-    // 🔑 Navegação para retornar à tela RebanhoScreen
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
     
     const [lidas, setLidas] = useState<string[]>([]);
     const [statusText, setStatusText] = useState("Iniciando o scanner...");
     
-    // Referência síncrona para controlar o ciclo de leitura
     const isScanningRef = useRef(false);
 
-    // FUNÇÃO DE PARADA E RETORNO DE DADOS
     const finalizarScanner = () => {
         isScanningRef.current = false;
         
         try {
-            // Cancela a requisição pendente para liberar o leitor
             NfcManager.cancelTechnologyRequest();
         } catch (e) {
             console.log("Erro ao limpar requisição NFC:", e);
         }
-        
-        // Retorna à tela anterior (RebanhoScreen) passando a lista de tags
-        navigation.navigate('RebanhoScreen', { lidas: lidas }); 
+            navigation.goBack(); 
     };
 
-    // FUNÇÃO RECURSIVA DE LEITURA (A lógica NFC que funciona)
     const lerProximaTag = async () => {
         if (!isScanningRef.current) return; 
 
         try {
             setStatusText("Aproxime o brinco do leitor...");
             
-            // 1. Requisita a tecnologia (Bloqueia o app)
             await NfcManager.requestTechnology(NfcTech.NfcA);
             const tag = await NfcManager.getTag();
             
             if (tag?.id) {
                 const tagId = tag.id.toUpperCase();
                 console.log(`✅ TAG CAPTURADA: ${tagId}`);
-                
-                // Atualiza o estado lidas, o que GARANTE A RE-RENDERIZAÇÃO COMPLETA da tela
                 setLidas((prev) => {
                     if (!prev.includes(tagId)) {
                         return [...prev, tagId];
@@ -61,11 +49,7 @@ export const NfcScannerScreen = () => {
                     return prev;
                 });
             }
-            
-            // 2. Libera o leitor
             await NfcManager.cancelTechnologyRequest();
-            
-            // 3. Reinicia o ciclo (Recursão)
             if (isScanningRef.current) {
                  lerProximaTag(); 
             }
@@ -89,7 +73,6 @@ export const NfcScannerScreen = () => {
         }
     };
 
-    // EFEITO DE MONTAGEM E DESMONTAGEM (Substitui iniciar/pararScanner)
     useEffect(() => {
         const initNFC = async () => {
             isScanningRef.current = true;
@@ -117,13 +100,11 @@ export const NfcScannerScreen = () => {
 
         initNFC();
 
-        // 🚨 Função de limpeza: Garante que o NFC seja liberado ao fechar a tela
         return () => {
             isScanningRef.current = false;
             try {
                 NfcManager.cancelTechnologyRequest();
             } catch (e) {
-                // Limpeza silenciosa
             }
         };
     }, []); 
@@ -140,7 +121,6 @@ export const NfcScannerScreen = () => {
 
                 <View style={styles.tagListContainer}>
                     <Text style={styles.listTitle}>Microchips Lidos ({lidas.length}):</Text>
-                    {/* A lista agora renderiza perfeitamente, pois o componente é uma tela primária */}
                     <ScrollView style={styles.tagList} contentContainerStyle={{ paddingBottom: 10 }}>
                         {lidas.length === 0 && isScanningRef.current ? (
                             <Text style={styles.emptyText}>Aproxime a primeira tag...</Text>

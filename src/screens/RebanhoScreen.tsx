@@ -1,11 +1,5 @@
-// RebanhoScreen.tsx (Código Atualizado)
-
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl, FlatList, ActivityIndicator} from 'react-native';
-// ❌ REMOVER: import NfcManager, { NfcTech } from 'react-native-nfc-manager';
-// ❌ REMOVER: import * as RNFCM from 'react-native-nfc-manager'; 
-
-// 🔑 ADICIONAR: Importação dos hooks de rota para receber dados
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
@@ -23,7 +17,6 @@ import { CardBufalo } from '../components/CardBufaloRebanho';
 import AgroCore from '../icons/agroCore';
 import FiltroRebanho from '../components/SearchBar';
 
-// type Tag = { id?: string; [key: string]: any }; // ❌ REMOVER
 
 type Animal = {
   id: string;
@@ -44,16 +37,14 @@ type Filtros = {
   id_raca?: string;
 };
 
-// 🔑 ATUALIZAÇÃO: Define a rota para receber o parâmetro 'lidas'
 type RootStackParamList = {
   MainTab: undefined;
   AnimalDetail: { id: string };
   RebanhoScreen: { lidas?: string[] }; 
-  NfcScannerScreen: undefined; // Adiciona a nova tela de scanner
+  NfcScannerScreen: undefined;
 };
 
 const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-// 🔑 NOVO HOOK: Para acessar os parâmetros retornados da NfcScannerScreen
 const route = useRoute<RouteProp<RootStackParamList, 'RebanhoScreen'>>();
 
 
@@ -64,14 +55,6 @@ export const RebanhoScreen = () => {
   const [animaisFiltrados, setAnimaisFiltrados] = useState<Animal[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-  
-  // ❌ REMOVER ESTADOS NFC ANTIGOS
-  // const [showScannerModal, setShowScannerModal] = useState(false);
-  // const [isScanning, setIsScanning] = useState(false);
-  // const [lidas, setLidas] = useState<string[]>([]);
-  // const isScanningRef = useRef(false);
-
-  // 🔑 NOVO ESTADO: Armazena tags recebidas da NfcScannerScreen
   const [tagsRecebidas, setTagsRecebidas] = useState<string[]>([]); 
 
   const [loading, setLoading] = useState(true);
@@ -115,13 +98,6 @@ export const RebanhoScreen = () => {
     setRefreshing(false);
   };
 
-// ❌ REMOVER FUNÇÕES NFC ANTIGAS: pararScanner, lerProximaTag, iniciarCicloLeitura
-// -------------------------------------------------------------
-// FUNÇÕES NFC ANTIGAS (REMOVIDAS)
-// -------------------------------------------------------------
-
-  // const handleCloseScanner = () => pararScanner(); // ❌ REMOVER
-
   useEffect(() => {
     const loadInitialData = async () => {
       setLoading(true);
@@ -138,22 +114,15 @@ export const RebanhoScreen = () => {
     fetchBufalosFiltrados(filtros, 1); 
   }, [filtros]);
 
-
-  // 🔑 NOVO EFEITO: Captura e processa as tags lidas ao retornar da NfcScannerScreen
   useEffect(() => {
     if (route.params?.lidas && route.params.lidas.length > 0) {
         setTagsRecebidas(route.params.lidas);
         
-        // 🚨 LÓGICA DE PROCESSAMENTO AQUI:
         console.log("Tags lidas recebidas. Processando busca de animais...");
-        // Exemplo: fetchBufalosPorTags(route.params.lidas);
-        
-        // Limpa o parâmetro da rota para evitar que o useEffect seja disparado novamente
         navigation.setParams({ lidas: undefined });
     }
   }, [route.params?.lidas]); 
   
-  // 🔑 NOVA FUNÇÃO: Navega para a tela de scanner
   const iniciarScanner = () => {
     navigation.navigate('NfcScannerScreen');
   };
@@ -192,11 +161,9 @@ export const RebanhoScreen = () => {
               filtros={filtros}  />
           </View>
           
-          {/* Exibe tags lidas para debug/confirmação */}
           {tagsRecebidas.length > 0 && (
              <View style={styles.tagConfirmationBox}>
                  <Text style={styles.tagConfirmationText}>✅ {tagsRecebidas.length} Tags lidas e prontas para processamento.</Text>
-                 {/* <Text>{tagsRecebidas.join(', ')}</Text> */}
              </View>
           )}
 
@@ -242,7 +209,6 @@ export const RebanhoScreen = () => {
               </View>
             }
           />
-          {/* 🔑 BOTÃO AGORA CHAMA A NAVEGAÇÃO PARA A NOVA TELA */}
           <TouchableOpacity onPress={iniciarScanner} style={styles.button}>
             <Scanner width={18} height={18} style={{ margin: 6 }} />
           </TouchableOpacity>
@@ -257,14 +223,12 @@ export const RebanhoScreen = () => {
         />
       </CustomModal>
 
-{/* ❌ REMOVER O MODAL NFC INTEIRO */}
 
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  // ... (Estilos existentes)
   container: { 
     flex: 1
    },
@@ -336,7 +300,7 @@ const styles = StyleSheet.create({
     alignItems: "center" 
   },
   tagConfirmationBox: {
-    backgroundColor: colors.green.active + '10', // Um verde suave
+    backgroundColor: colors.green.active, 
     borderColor: colors.green.active,
     borderWidth: 1,
     borderRadius: 8,
@@ -348,9 +312,3 @@ const styles = StyleSheet.create({
     color: colors.green.active,
   }
 });
-
-function alert(arg0: string) {
-  // Mantido para evitar erro de referência, mas a nova tela usa setStatusText
-  // Em uma aplicação real, você deve implementar o Alert real do React Native aqui.
-  console.warn(arg0);
-}
