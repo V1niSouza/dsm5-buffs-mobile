@@ -1,17 +1,21 @@
+// RebanhoScreen.tsx (Código Atualizado)
+
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl, Pressable, Modal, FlatList, ActivityIndicator} from 'react-native';
-import NfcManager, { NfcTech } from 'react-native-nfc-manager';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl, FlatList, ActivityIndicator} from 'react-native';
+// ❌ REMOVER: import NfcManager, { NfcTech } from 'react-native-nfc-manager';
+// ❌ REMOVER: import * as RNFCM from 'react-native-nfc-manager'; 
+
+// 🔑 ADICIONAR: Importação dos hooks de rota para receber dados
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
 import { MainLayout } from '../layouts/MainLayout';
 import { useDimensions } from '../utils/useDimensions';
-import SearchBar from '../components/SearchBar';
 import { colors } from '../styles/colors';
 import Plus from '../../assets/images/plus.svg';
 import Scanner from '../../assets/images/qr-scan.svg';
 import { usePropriedade } from '../context/PropriedadeContext';
 import bufaloService from '../services/bufaloService';
-
-import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { FormBufalo } from '../components/FormBufalo';
 import { Modal as CustomModal  } from '../components/Modal';
 import Button from '../components/Button';
@@ -19,7 +23,7 @@ import { CardBufalo } from '../components/CardBufaloRebanho';
 import AgroCore from '../icons/agroCore';
 import FiltroRebanho from '../components/SearchBar';
 
-type Tag = { id?: string; [key: string]: any };
+// type Tag = { id?: string; [key: string]: any }; // ❌ REMOVER
 
 type Animal = {
   id: string;
@@ -32,11 +36,6 @@ type Animal = {
   raca?: string;
 };
 
-type RootStackParamList = {
-  MainTab: undefined;
-  AnimalDetail: { id: string };
-};
-
 type Filtros = {
   brinco?: string;
   sexo?: "M" | "F";
@@ -45,7 +44,17 @@ type Filtros = {
   id_raca?: string;
 };
 
+// 🔑 ATUALIZAÇÃO: Define a rota para receber o parâmetro 'lidas'
+type RootStackParamList = {
+  MainTab: undefined;
+  AnimalDetail: { id: string };
+  RebanhoScreen: { lidas?: string[] }; 
+  NfcScannerScreen: undefined; // Adiciona a nova tela de scanner
+};
+
 const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+// 🔑 NOVO HOOK: Para acessar os parâmetros retornados da NfcScannerScreen
+const route = useRoute<RouteProp<RootStackParamList, 'RebanhoScreen'>>();
 
 
 export const RebanhoScreen = () => {
@@ -55,15 +64,21 @@ export const RebanhoScreen = () => {
   const [animaisFiltrados, setAnimaisFiltrados] = useState<Animal[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-  const [showScannerModal, setShowScannerModal] = useState(false);
-  const [isScanning, setIsScanning] = useState(false);
-  const [scannedTags, setScannedTags] = useState<string[]>([]);
+  
+  // ❌ REMOVER ESTADOS NFC ANTIGOS
+  // const [showScannerModal, setShowScannerModal] = useState(false);
+  // const [isScanning, setIsScanning] = useState(false);
+  // const [lidas, setLidas] = useState<string[]>([]);
+  // const isScanningRef = useRef(false);
+
+  // 🔑 NOVO ESTADO: Armazena tags recebidas da NfcScannerScreen
+  const [tagsRecebidas, setTagsRecebidas] = useState<string[]>([]); 
+
   const [loading, setLoading] = useState(true);
   const [paginaAtual, setPaginaAtual] = useState(1);
   const [totalPaginas, setTotalPaginas] = useState(1);
   const [filtros, setFiltros] = useState<Filtros>({});
 
-  const tagList: string[] = [];
   const fetchBufalosFiltrados = async (filtrosAplicados: any = {}, page = 1) => {
     try {
       if (!propriedadeSelecionada) return;
@@ -100,32 +115,12 @@ export const RebanhoScreen = () => {
     setRefreshing(false);
   };
 
-  const handleReadTag = async () => {
-    try {
-      setIsScanning(true);
-      await NfcManager.start();
-      await NfcManager.requestTechnology(NfcTech.NfcA);
+// ❌ REMOVER FUNÇÕES NFC ANTIGAS: pararScanner, lerProximaTag, iniciarCicloLeitura
+// -------------------------------------------------------------
+// FUNÇÕES NFC ANTIGAS (REMOVIDAS)
+// -------------------------------------------------------------
 
-      const tag = await NfcManager.getTag();
-      if (!tag) return;
-
-      const tagId = tag.id?.toUpperCase() || '';
-      if (tagId && !tagList.includes(tagId)) {
-        tagList.push(tagId);
-        setScannedTags([...tagList]); 
-      }
-
-      console.log("Tag lida:", tagId);
-
-    } catch (err) {
-      console.warn("Erro ao ler a tag:", err);
-    } finally {
-      setIsScanning(false);
-      await NfcManager.cancelTechnologyRequest();
-    }
-  };
-
-  const handleCloseScanner = () => setShowScannerModal(false);
+  // const handleCloseScanner = () => pararScanner(); // ❌ REMOVER
 
   useEffect(() => {
     const loadInitialData = async () => {
@@ -142,6 +137,26 @@ export const RebanhoScreen = () => {
   useEffect(() => {
     fetchBufalosFiltrados(filtros, 1); 
   }, [filtros]);
+
+
+  // 🔑 NOVO EFEITO: Captura e processa as tags lidas ao retornar da NfcScannerScreen
+  useEffect(() => {
+    if (route.params?.lidas && route.params.lidas.length > 0) {
+        setTagsRecebidas(route.params.lidas);
+        
+        // 🚨 LÓGICA DE PROCESSAMENTO AQUI:
+        console.log("Tags lidas recebidas. Processando busca de animais...");
+        // Exemplo: fetchBufalosPorTags(route.params.lidas);
+        
+        // Limpa o parâmetro da rota para evitar que o useEffect seja disparado novamente
+        navigation.setParams({ lidas: undefined });
+    }
+  }, [route.params?.lidas]); 
+  
+  // 🔑 NOVA FUNÇÃO: Navega para a tela de scanner
+  const iniciarScanner = () => {
+    navigation.navigate('NfcScannerScreen');
+  };
   
   if (loading) {
     return (
@@ -155,8 +170,6 @@ export const RebanhoScreen = () => {
 
   return (
     <View style={styles.container}>
-      {/* Modal de Scanner */}
-
       {/* Header */}
       <View style={styles.header}>
         <View style={{ alignItems: 'center' }}>
@@ -178,6 +191,15 @@ export const RebanhoScreen = () => {
               }}
               filtros={filtros}  />
           </View>
+          
+          {/* Exibe tags lidas para debug/confirmação */}
+          {tagsRecebidas.length > 0 && (
+             <View style={styles.tagConfirmationBox}>
+                 <Text style={styles.tagConfirmationText}>✅ {tagsRecebidas.length} Tags lidas e prontas para processamento.</Text>
+                 {/* <Text>{tagsRecebidas.join(', ')}</Text> */}
+             </View>
+          )}
+
           <FlatList
             data={animaisFiltrados}
             keyExtractor={(item, index) => String(item.id || item.id_bufalo || index)}
@@ -197,15 +219,7 @@ export const RebanhoScreen = () => {
             refreshControl={
               <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
             }
-            contentContainerStyle={{
-              backgroundColor: "#fff",
-              borderRadius: 12,
-              paddingVertical: 16,
-              paddingHorizontal: 10,
-              borderWidth: 1,
-              borderColor: colors.gray.disabled,
-              marginBottom: 50,
-            }}
+            contentContainerStyle={styles.contentContainer}
             ListFooterComponent={
               <View style={styles.pagination}>
                 <Button
@@ -228,6 +242,10 @@ export const RebanhoScreen = () => {
               </View>
             }
           />
+          {/* 🔑 BOTÃO AGORA CHAMA A NAVEGAÇÃO PARA A NOVA TELA */}
+          <TouchableOpacity onPress={iniciarScanner} style={styles.button}>
+            <Scanner width={18} height={18} style={{ margin: 6 }} />
+          </TouchableOpacity>
         </ScrollView>
       </MainLayout>
       <CustomModal visible={modalVisible} onClose={() => setModalVisible(false)}>
@@ -238,11 +256,15 @@ export const RebanhoScreen = () => {
           }}
         />
       </CustomModal>
+
+{/* ❌ REMOVER O MODAL NFC INTEIRO */}
+
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  // ... (Estilos existentes)
   container: { 
     flex: 1
    },
@@ -286,91 +308,14 @@ const styles = StyleSheet.create({
     backgroundColor: colors.yellow.dark, 
     borderRadius: 50 
   },
-  content: { 
+  contentContainer: { 
     backgroundColor: "#fff", 
     borderRadius: 12, 
-    paddingTop: 16, 
-    paddingBottom: 16, 
+    paddingVertical: 16, 
     paddingHorizontal: 10, 
     borderWidth: 1, 
     marginBottom: 50, 
     borderColor: colors.gray.disabled 
-  },
-  centeredView: { 
-    flex: 1, 
-    justifyContent: 'center', 
-    alignItems: 'center', 
-    backgroundColor: 'rgba(0, 0, 0, 0.5)' 
-  },
-  modalView: { 
-    margin: 20, 
-    backgroundColor: 'white', 
-    borderRadius: 20, 
-    padding: 35, 
-    alignItems: 'center', 
-    width: '80%' 
-  },
-  modalTitle: { 
-    fontSize: 22, 
-    fontWeight: 'bold', 
-    marginBottom: 10, 
-    color: colors.brown.base 
-  },
-  modalSubtitle: { 
-    fontSize: 16, 
-    marginBottom: 20, 
-    textAlign: 'center' 
-  },
-  statusText: { 
-    fontSize: 16, 
-    fontStyle: 'italic',
-    marginBottom: 15 
-  },
-  modalButton: { 
-    borderRadius: 10, 
-    padding: 10, 
-    elevation: 2, 
-    marginHorizontal: 5,
-    marginVertical: 5 
-  },
-  buttonStart: { 
-    backgroundColor: colors.green.active 
-  },
-  buttonClose: { 
-    backgroundColor: colors.gray.base, 
-    marginTop: 20 
-  },
-  textStyle: { 
-    color: 'white', 
-    fontWeight: 'bold', 
-    textAlign: 'center' 
-  },
-  tagListContainer: { 
-    width: '100%', 
-    maxHeight: 150, 
-    borderWidth: 1, 
-    borderColor: colors.gray.disabled, 
-    borderRadius: 10, 
-    padding: 10, 
-    marginTop: 15 
-  },
-  tagListTitle: { 
-    fontSize: 16, 
-    fontWeight: 'bold', 
-    marginBottom: 5, 
-    color: colors.brown.base 
-  },
-  tagList: { 
-    flex: 1
-  },
-  tagItem: { 
-    paddingVertical: 5, 
-    borderBottomWidth: 0.5, 
-    borderBottomColor: colors.gray.disabled 
-  },
-  tagText: { 
-    fontSize: 14, 
-    color: colors.black.base 
   },
   pageInfo: {
     marginHorizontal: 12,
@@ -390,4 +335,22 @@ const styles = StyleSheet.create({
     justifyContent: "center", 
     alignItems: "center" 
   },
+  tagConfirmationBox: {
+    backgroundColor: colors.green.active + '10', // Um verde suave
+    borderColor: colors.green.active,
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 10,
+  },
+  tagConfirmationText: {
+    fontWeight: 'bold',
+    color: colors.green.active,
+  }
 });
+
+function alert(arg0: string) {
+  // Mantido para evitar erro de referência, mas a nova tela usa setStatusText
+  // Em uma aplicação real, você deve implementar o Alert real do React Native aqui.
+  console.warn(arg0);
+}

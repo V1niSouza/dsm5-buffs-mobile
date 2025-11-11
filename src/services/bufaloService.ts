@@ -144,7 +144,17 @@ export const filtrarBufalos = async (
   }
 };
 
+export const getBufaloPorMicrochip = async (microchip: string) => {
+  try {
+    const bufalo = await apiFetch(`/bufalos/microchip/${microchip}`);
+    return bufalo;
+  } catch (err) {
+    console.error(`Erro ao buscar búfalo pelo microchip ${microchip}:`, err);
+    throw err;
+  }
+};
 
 
 
-export default { getBufalos, getBufaloDetalhes, createBufalo, updateBufalo, deleteBufalo, getRacas, filtrarBufalos };
+
+export default { getBufalos, getBufaloDetalhes, createBufalo, updateBufalo, deleteBufalo, getRacas, filtrarBufalos, getBufaloPorMicrochip };

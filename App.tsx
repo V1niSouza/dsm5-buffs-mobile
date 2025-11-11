@@ -30,6 +30,7 @@ import Lactation from './src/icons/lactation';
 import GlobeIcon from './src/icons/sex';
 import Fance from './src/icons/fance';
 import { Loading } from './src/components/Loading';
+import { NfcScannerScreen } from './src/screens/NfcScannerScreen';
 
 
 export type RootStackParamList = {
@@ -38,6 +39,7 @@ export type RootStackParamList = {
   AnimalDetail: undefined;
   MainTab: undefined;
   CompleteProfile: undefined;
+  NfcScannerScreen: undefined;
 };
 
 const Tab = createBottomTabNavigator();
@@ -163,6 +165,9 @@ function AppContent() {
         <>
         <Stack.Screen name="MainTab" component={MainTab} />
         <Stack.Screen name="AnimalDetail" component={AnimalDetailScreen} />
+        <Stack.Screen name="NfcScannerScreen" component={NfcScannerScreen} 
+  options={{ title: 'Scanner NFC' }} // Opcional: define um título
+/>
         </>
       )}
     </Stack.Navigator>
