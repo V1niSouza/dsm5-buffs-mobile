@@ -12,16 +12,13 @@ import sanitarioService from "../services/sanitarioService";
 import { MainLayout } from "../layouts/MainLayout";
 import Back from '../../assets/images/arrow.svg';
 import AgroCore from '../../src/icons/agroCore'; 
-import YellowButton from "../components/Button";
 import Button from "../components/Button";
 import { SanitarioDetailModal } from "../components/ModalVisualizacaoSanit";
-import { ZootecnicoBottomSheet } from "../components/ZootecnicoBottomSheet";
-
+import { ZootecnicoBottomSheet } from "../components/ZootecnicoBottomSheet"; 
 
 type RootStackParamList = {
   AnimalDetail: { id: string };
 };
-
 type AnimalDetailRouteProp = RouteProp<RootStackParamList, "AnimalDetail">;
 
 export const AnimalDetailScreen = () => {
@@ -42,7 +39,7 @@ export const AnimalDetailScreen = () => {
   const [selectedZootec, setSelectedZootec] = useState<any>(null);
   const [selectedSanit, setSelectedSanit] = useState<any>(null);
 
-const fetchData = async (
+  const fetchData = async (
     pageZootecToLoad = pageZootec, 
     pageSanitToLoad = pageSanit
   ) => {
@@ -50,11 +47,9 @@ const fetchData = async (
     try {
       const base = await bufaloService.getBufaloDetalhes(id);
       
-      // 1. Fetch Zootécnico (usa a página exata)
       const zootResp = await zootecnicoService.getHistorico(id, pageZootecToLoad, PAGE_SIZE);
       setTotalPagesZootec(zootResp.meta?.totalPages ?? 1);
       
-      // 2. Fetch Sanitário (usa a página exata)
       const sanitResp = await sanitarioService.getHistorico(id, pageSanitToLoad, PAGE_SIZE);
       setTotalPagesSanit(sanitResp.meta?.totalPages ?? 1);
 
@@ -93,6 +88,22 @@ const fetchData = async (
     fetchData();
   }, [id]);
 
+  // Função que será passada para o BottomSheet para salvar os dados
+  const handleSaveZootecnico = (data: any) => {
+    console.log("Salvando alterações do registro Zootec:", data);
+    // 1. Chamar o serviço de atualização
+    // Ex: zootecnicoService.update(data);
+
+    // 2. Fechar o BottomSheet
+    setSelectedZootec(null); 
+    
+    // 3. Recarregar a lista (opcional, dependendo da necessidade)
+    // fetchData(pageZootec, pageSanit); 
+  };
+
+
+  // --- Componentes Auxiliares ---
+
   const PaginationComponent = ({ 
     paginaAtual, 
     totalPaginas, 
@@ -104,19 +115,19 @@ const fetchData = async (
     onPageChange: (page: number) => void,
     isLoading: boolean
   }) => (
-  <View style={styles.pagination}>
-    <Button
-        title="Anterior"
-        onPress={() => onPageChange(paginaAtual - 1)}
-        disabled={paginaAtual === 1 || isLoading}
-      />
-      <Text style={styles.pageInfo}>Página {paginaAtual} de {totalPaginas}</Text>
+    <View style={styles.pagination}>
       <Button
-        title="Próxima"
-        onPress={() => onPageChange(paginaAtual + 1)}
-        disabled={paginaAtual === totalPaginas || isLoading}
-      />
-  </View>
+          title="Anterior"
+          onPress={() => onPageChange(paginaAtual - 1)}
+          disabled={paginaAtual === 1 || isLoading}
+        />
+        <Text style={styles.pageInfo}>Página {paginaAtual} de {totalPaginas}</Text>
+        <Button
+          title="Próxima"
+          onPress={() => onPageChange(paginaAtual + 1)}
+          disabled={paginaAtual === totalPaginas || isLoading}
+        />
+    </View>
   );
 
   if (loading && !detalhes) {
@@ -142,52 +153,61 @@ const fetchData = async (
           <TouchableOpacity style={styles.headerButton} onPress={() => navigation.goBack()}>
             <Back width={25} height={25} style={{ margin: 6 }} />
           </TouchableOpacity>
-          <Text style={styles.header1Text}>Prontuário: {detalhes.brinco}</Text>
+          <Text style={styles.header1Text}>Prontuário: {detalhes?.brinco || 'N/A'}</Text>
         </View>
       </View>
 
       <MainLayout>     
-        <Tabs tabs={tabOptions} activeTab={tab}   onChange={(key: string) => {
-          if (key === "info" || key === "zootec" || key === "sanit") {
-            setTab(key);
-          }
-        }} />
+        <Tabs 
+          tabs={tabOptions} 
+          activeTab={tab}   
+          onChange={(key: string) => {
+            if (key === "info" || key === "zootec" || key === "sanit") {
+              setTab(key);
+            }
+          }} 
+        />
         <View style={styles.cardContainer}>
-          {tab === "info" && <AnimalInfoCard detalhes={detalhes} />}
+          
+          {tab === "info" && detalhes && <AnimalInfoCard detalhes={detalhes} />}
+          
           {tab === "zootec" && (
-            <>
-              <FlatList
-                data={detalhes.dadosZootecnicos}
-                keyExtractor={(item) => item.id_zootec.toString()}
-                renderItem={({ item }) => <ZootecnicoCard item={item} onPress={() => setSelectedZootec(item)} />}
-                refreshControl={
-                  <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-                }
-                ListEmptyComponent={<Text style={styles.emptyText}>Nenhum registro.</Text>}
-                ListFooterComponent={() =>
-                  detalhes.dadosZootecnicos.length > 0 ? (
-                    <PaginationComponent 
-                      paginaAtual={pageZootec}
-                      totalPaginas={totalPagesZootec}
-                      onPageChange={changePageZootec}
-                      isLoading={loading}
-                />
+            <FlatList
+              data={detalhes?.dadosZootecnicos || []}
+              keyExtractor={(item) => item.id_zootec.toString()}
+              renderItem={({ item }) => (
+                <ZootecnicoCard item={item} onPress={() => setSelectedZootec(item)} />
+              )}
+              refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+              }
+              ListEmptyComponent={<Text style={styles.emptyText}>Nenhum registro Zootécnico encontrado.</Text>}
+              ListFooterComponent={() =>
+                (detalhes?.dadosZootecnicos.length > 0) && totalPagesZootec > 0 ? (
+                  <PaginationComponent 
+                    paginaAtual={pageZootec}
+                    totalPaginas={totalPagesZootec}
+                    onPageChange={changePageZootec}
+                    isLoading={loading}
+                  />
                 ) : null
               }
             />
-            </>
           )}
+          
           {tab === "sanit" && (
               <FlatList
-                data={detalhes.dadosSanitarios}
+                data={detalhes?.dadosSanitarios || []}
                 keyExtractor={(item) => item.id_sanit.toString()}
-                renderItem={({ item }) => <SanitarioCard item={item} onPress={() => setSelectedSanit(item)} />}
+                renderItem={({ item }) => (
+                  <SanitarioCard item={item} onPress={() => setSelectedSanit(item)} />
+                )}
                 refreshControl={
                   <RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>
                 }
-                ListEmptyComponent={<Text style={styles.emptyText}>Nenhum registro.</Text>}
+                ListEmptyComponent={<Text style={styles.emptyText}>Nenhum registro Sanitário encontrado.</Text>}
                 ListFooterComponent={() =>
-                  detalhes.dadosSanitarios.length > 0 ? (
+                  (detalhes?.dadosSanitarios.length > 0) && totalPagesSanit > 0 ? (
                   <PaginationComponent 
                     paginaAtual={pageSanit}
                     totalPaginas={totalPagesSanit}
@@ -199,8 +219,24 @@ const fetchData = async (
               />
             )}
         </View>
-        <ZootecnicoBottomSheet visible={!!selectedZootec} item={selectedZootec} onClose={() => setSelectedZootec(null)} />
-        <SanitarioDetailModal visible={!!selectedSanit} item={selectedSanit} onClose={() => setSelectedSanit(null)} />    
+        
+        {/* Renderização do BottomSheet com a correção de boas práticas */}
+        {!!selectedZootec && (
+            <ZootecnicoBottomSheet 
+                // A chave força a remontagem quando um NOVO item é selecionado, 
+                // garantindo que o index={0} seja respeitado na montagem.
+                key={selectedZootec.id_zootec}
+                item={selectedZootec} 
+                onClose={() => setSelectedZootec(null)} 
+                onEditSave={handleSaveZootecnico}
+            />
+        )}
+        
+        <SanitarioDetailModal 
+          visible={!!selectedSanit} 
+          item={selectedSanit} 
+          onClose={() => setSelectedSanit(null)} 
+        />    
       </MainLayout> 
     </View>
   );
