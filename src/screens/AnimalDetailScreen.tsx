@@ -14,8 +14,8 @@ import Back from '../../assets/images/arrow.svg';
 import AgroCore from '../../src/icons/agroCore'; 
 import YellowButton from "../components/Button";
 import Button from "../components/Button";
-import { ZootecnicoDetailModal } from "../components/ModalVisualizaçãoZootec";
 import { SanitarioDetailModal } from "../components/ModalVisualizacaoSanit";
+import { ZootecnicoBottomSheet } from "../components/ZootecnicoBottomSheet";
 
 
 type RootStackParamList = {
@@ -199,7 +199,7 @@ const fetchData = async (
               />
             )}
         </View>
-        <ZootecnicoDetailModal visible={!!selectedZootec} item={selectedZootec} onClose={() => setSelectedZootec(null)} />
+        <ZootecnicoBottomSheet visible={!!selectedZootec} item={selectedZootec} onClose={() => setSelectedZootec(null)} />
         <SanitarioDetailModal visible={!!selectedSanit} item={selectedSanit} onClose={() => setSelectedSanit(null)} />    
       </MainLayout> 
     </View>

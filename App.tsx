@@ -1,3 +1,5 @@
+import 'react-native-reanimated';
+import 'react-native-gesture-handler';
 import { AuthProvider, useAuth } from './src/context/AuthContext'
 
 // App.tsx
@@ -7,6 +9,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 // Layout
 import { MainLayout } from './src/layouts/MainLayout';
@@ -178,15 +181,17 @@ export default function App() {
   const isDarkMode = useColorScheme() === 'dark';
 
   return (
-    <SafeAreaProvider>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-          <AuthProvider>
-            <PropriedadeProvider>
-              <NavigationContainer>
-                <AppContent />
-              </NavigationContainer>
-            </PropriedadeProvider>
-          </AuthProvider>
-    </SafeAreaProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
+        <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+            <AuthProvider>
+              <PropriedadeProvider>
+                <NavigationContainer>
+                  <AppContent />
+                </NavigationContainer>
+              </PropriedadeProvider>
+            </AuthProvider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }
