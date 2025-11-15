@@ -1,10 +1,9 @@
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import { View, Text, StyleSheet, TextInput, TouchableOpacity } from "react-native";
-import BottomSheet, { BottomSheetScrollView } from "@gorhom/bottom-sheet";
+import BottomSheet, { BottomSheetScrollView, BottomSheetBackdrop } from "@gorhom/bottom-sheet";
 import { colors } from "../../styles/colors";
 import Pen from "../../../assets/images/pen.svg";
 
-// Definição de Tipos para melhor clareza
 interface ZootecnicoItem {
     id_zootec: string;
     tipo_pesagem?: string;
@@ -16,33 +15,24 @@ interface ZootecnicoItem {
     porte_corporal?: string;
     retorno?: boolean;
     dt_retorno?: string;
-    // Adicione outros campos necessários aqui
 }
 
 interface ZootecnicoBottomSheetProps {
     item: ZootecnicoItem;
-    // onEditSave é a função para salvar os dados editados
     onEditSave: (data: ZootecnicoItem) => void;
-    // onClose é chamado quando o usuário arrasta para fechar ou a ação é concluída
     onClose: () => void;
 }
 
 export const ZootecnicoBottomSheet: React.FC<ZootecnicoBottomSheetProps> = ({ item, onEditSave, onClose }) => {
-    // Não precisamos checar "if (!item) return null" aqui, pois o componente pai faz isso (visible={!!item}).
 
     const sheetRef = useRef<BottomSheet>(null);
-    // Snap points definidos para a abertura imediata no primeiro ponto
-    const snapPoints = useMemo(() => ["50%", "90%"], []);
-    
+    const snapPoints = useMemo(() => ["70%", "90%"], []);
     const [isEditing, setIsEditing] = useState(false);
-    // Inicializa o estado com o item recebido
     const [formData, setFormData] = useState<ZootecnicoItem>({ ...item });
 
-    // O BottomSheet deve abrir automaticamente no índice 0 ao ser montado.
-    // O index={0} garante a abertura imediata.
+
 
     const handleSheetChange = useCallback((index: number) => {
-        // Se o BottomSheet for fechado (index === -1), chama o onClose do pai.
         if (index === -1) {
             onClose();
         }
@@ -55,15 +45,14 @@ export const ZootecnicoBottomSheet: React.FC<ZootecnicoBottomSheetProps> = ({ it
     const toggleEdit = () => {
         if (isEditing) {
             console.log("Salvar alterações:", formData);
-            onEditSave(formData); // Chama a função de salvamento do pai
+            onEditSave(formData); 
         }
         setIsEditing(!isEditing);
     };
     
     const handleDelete = () => {
         console.log("Excluir registro:", item.id_zootec);
-        // Implemente a lógica de exclusão e chame onClose() após a exclusão
-        // onClose(); 
+ 
     };
 
     const formatDate = (dateString?: string) => {
@@ -72,221 +61,363 @@ export const ZootecnicoBottomSheet: React.FC<ZootecnicoBottomSheetProps> = ({ it
         return parts.join("/");
     };
 
-    return (
-        <BottomSheet
-            ref={sheetRef}
-            // 🚨 Index inicial: 0. Garante que ele apareça na montagem.
-            index={0}
-            snapPoints={snapPoints}
-            // Fecha o estado pai quando arrastado para baixo
-            onChange={handleSheetChange}
-            backgroundStyle={{ backgroundColor: "#F8F7F5", borderRadius: 24 }}
-            handleIndicatorStyle={{ backgroundColor: colors.yellow.base }}
-            // Adicionado para evitar que o componente desapareça se o index for < 0
-            enablePanDownToClose={true} 
+return (
+  <BottomSheet
+    ref={sheetRef}
+    index={0}
+    snapPoints={snapPoints}
+    onChange={handleSheetChange}
+    backgroundStyle={{ backgroundColor: "#F8F7F5", borderRadius: 24 }}
+    handleIndicatorStyle={{ backgroundColor: "#D1D5DB", height: 4, width: 36 }}
+    enablePanDownToClose={true}
+        backdropComponent={(props) => (
+        <BottomSheetBackdrop
+        {...props}
+        disappearsOnIndex={-1}
+        appearsOnIndex={0}
+        pressBehavior="none"
+        />
+    )}
+  >
+    <BottomSheetScrollView contentContainerStyle={styles.container}>
+      
+      {/* Header */}
+      <View style={styles.header}>
+        <View style={{ width: 40 }} />
+        <Text style={styles.headerTitle}>Detalhes do Evento</Text>
+      </View>
+
+      {/* Card Principal */}
+      <View style={styles.mainCard}>
+        <View style={styles.cardRow}>
+          <View>
+            <Text style={styles.cardTitle}>
+              Registro {String(formData.tipo_pesagem ?? "")}
+            </Text>
+            <Text style={styles.cardSubtitle}>
+              Data do Registro: {formatDate(formData?.dt_registro)}
+            </Text>
+          </View>
+        </View>
+      </View>
+
+      {/* Título da seção */}
+      <Text style={styles.sectionTitle}>Detalhes do Animal</Text>
+
+      {/* Lista */}
+{/* Lista */}
+<View style={styles.listContainer}>
+    
+    {/* Peso */}
+    <View style={styles.listItem}>
+      <Text style={styles.listIcon}>⚖️</Text>
+      <Text style={styles.listLabel}>Peso</Text>
+
+      {!isEditing ? (
+        <Text style={styles.listValue}>{String(formData.peso ?? "-")}</Text>
+      ) : (
+        <TextInput
+          style={[styles.listValue, styles.inputEditable]}
+          keyboardType="numeric"
+          value={String(formData.peso ?? "")}
+          onChangeText={(t) => handleChange("peso", t)}
+        />
+      )}
+    </View>
+
+    {/* Condição Corporal (ECC) — RADIO BOX */}
+    <View style={styles.listItem}>
+      <Text style={styles.listIcon}>🙂</Text>
+      <Text style={styles.listLabel}>Condição Corporal (ECC)</Text>
+
+      {!isEditing ? (
+        <Text style={styles.listValue}>
+          {String(formData.condicao_corporal ?? "-")}
+        </Text>
+      ) : (
+        <View style={{ flexDirection: "row", gap: 12 }}>
+          {[1, 2, 3, 4, 5].map((n) => (
+            <TouchableOpacity
+              key={n}
+              onPress={() => handleChange("condicao_corporal", String(n))}
+              style={styles.radioItem}
+            >
+              <View style={styles.radioCircle}>
+                {String(formData.condicao_corporal) === String(n) && (
+                  <View style={styles.radioSelected} />
+                )}
+              </View>
+              <Text style={styles.radioLabel}>{n}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      )}
+    </View>
+
+    {/* Pelagem */}
+    <View style={styles.listItem}>
+      <Text style={styles.listIcon}>🎨</Text>
+      <Text style={styles.listLabel}>Pelagem</Text>
+
+      {!isEditing ? (
+        <Text style={styles.listValue}>{formData.cor_pelagem ?? "-"}</Text>
+      ) : (
+        <TextInput
+          style={[styles.listValue, styles.inputEditable]}
+          value={formData.cor_pelagem ?? ""}
+          onChangeText={(t) => handleChange("cor_pelagem", t)}
+        />
+      )}
+    </View>
+
+    {/* Formato Chifre */}
+    <View style={styles.listItem}>
+      <Text style={styles.listIcon}>🐮</Text>
+      <Text style={styles.listLabel}>Chifre</Text>
+
+      {!isEditing ? (
+        <Text style={styles.listValue}>{formData.formato_chifre ?? "-"}</Text>
+      ) : (
+        <TextInput
+          style={[styles.listValue, styles.inputEditable]}
+          value={formData.formato_chifre ?? ""}
+          onChangeText={(t) => handleChange("formato_chifre", t)}
+        />
+      )}
+    </View>
+
+    {/* Porte Corporal */}
+    <View style={[styles.listItem, styles.listItemLast]}>
+      <Text style={styles.listIcon}>📏</Text>
+      <Text style={styles.listLabel}>Porte</Text>
+
+      {!isEditing ? (
+        <Text style={styles.listValue}>{formData.porte_corporal ?? "-"}</Text>
+      ) : (
+        <TextInput
+          style={[styles.listValue, styles.inputEditable]}
+          value={formData.porte_corporal ?? ""}
+          onChangeText={(t) => handleChange("porte_corporal", t)}
+        />
+      )}
+    </View>
+</View>
+
+
+      {/* Campo Destaque: Data de retorno */}
+      {Boolean(formData.retorno) && (
+        <View style={styles.highlightBox}>
+          <Text style={styles.highlightTitle}>Data de Retorno</Text>
+          <Text style={styles.highlightValue}>
+            {String(formData.dt_retorno ?? "-")}
+          </Text>
+        </View>
+      )}
+
+      {/* Footer */}
+      <View style={styles.footer}>
+        {!isEditing && (
+          <TouchableOpacity
+            style={[styles.footerBtn, styles.deleteBtn]}
+            onPress={handleDelete}
+          >
+            <Text style={styles.deleteText}>Excluir</Text>
+          </TouchableOpacity>
+        )}
+
+        <TouchableOpacity
+          style={[styles.footerBtn, styles.editBtn]}
+          onPress={toggleEdit}
         >
-            <BottomSheetScrollView contentContainerStyle={styles.content}>
-                <View style={styles.header}>
-                    <Text style={styles.headerTitle}>Detalhes do Evento</Text>
-                    <View style={{ width: 24 }} />
-                </View>
+          <Text style={styles.editText}>
+            {isEditing ? "Salvar Alterações" : "Editar"}
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </BottomSheetScrollView>
+  </BottomSheet>
+)};
 
-                <View style={styles.card}>
-                    <View style={styles.centerBlock}>
-                        <Text style={styles.label}>
-                            Registro {String(formData.tipo_pesagem ?? "")}
-                        </Text>
-                        <Text style={styles.date}>
-                            {formatDate(formData?.dt_registro)}
-                        </Text>
-                    </View>
-
-                    {/* Linhas de dados */}
-                    <View style={styles.row}>
-                        <View style={styles.col}>
-                            <Text style={styles.label}>Peso (Kg)</Text>
-                            <TextInput
-                                style={[styles.value, isEditing && styles.inputEditable]}
-                                editable={isEditing}
-                                keyboardType="numeric"
-                                // Use String() para garantir que o valor seja uma string (obrigatório para TextInput)
-                                value={String(formData.peso ?? "")} 
-                                onChangeText={(t) => handleChange("peso", t)}
-                            />
-                        </View>
-                        <View style={styles.col}>
-                            <Text style={styles.label}>Condição Corporal</Text>
-                            <TextInput
-                                style={[styles.value, isEditing && styles.inputEditable]}
-                                editable={isEditing}
-                                keyboardType="numeric"
-                                value={String(formData.condicao_corporal ?? "")}
-                                onChangeText={(t) => handleChange("condicao_corporal", t)}
-                            />
-                        </View>
-                    </View>
-
-                    <View style={styles.row}>
-                        <View style={styles.col}>
-                            <Text style={styles.label}>Cor Pelagem</Text>
-                            <TextInput
-                                style={[styles.value, isEditing && styles.inputEditable]}
-                                editable={isEditing}
-                                value={formData.cor_pelagem ?? ""}
-                                onChangeText={(t) => handleChange("cor_pelagem", t)}
-                            />
-                        </View>
-                        <View style={styles.col}>
-                            <Text style={styles.label}>Formato Chifre</Text>
-                            <TextInput
-                                style={[styles.value, isEditing && styles.inputEditable]}
-                                editable={isEditing}
-                                value={formData.formato_chifre ?? ""}
-                                onChangeText={(t) => handleChange("formato_chifre", t)}
-                            />
-                        </View>
-                        <View style={styles.col}>
-                            <Text style={styles.label}>Porte Corporal</Text>
-                            <TextInput
-                                style={[styles.value, isEditing && styles.inputEditable]}
-                                editable={isEditing}
-                                value={formData.porte_corporal ?? ""}
-                                onChangeText={(t) => handleChange("porte_corporal", t)}
-                            />
-                        </View>
-                    </View>
-
-                    {Boolean(formData.retorno) && (
-                        <View style={styles.infoBlock}>
-                            <Text style={styles.label}>Data de Retorno</Text>
-                            {/* Assumindo que dt_retorno já está formatado, ou aplique formatDate */}
-                            <Text style={styles.value}>
-                                {String(formData.dt_retorno ?? "-")}
-                            </Text>
-                        </View>
-                    )}
-                </View>
-
-                {/* Rodapé */}
-                <View style={styles.footer}>
-                    <TouchableOpacity
-                        style={[styles.button, styles.editButton]}
-                        onPress={toggleEdit}
-                    >
-                        <Pen width={25} height={25} />
-                        <Text style={styles.editText}>
-                            {isEditing ? "Salvar Alterações" : "Editar Registro"}
-                        </Text>
-                    </TouchableOpacity>
-                    {!isEditing && (
-                        <TouchableOpacity 
-                            style={[styles.button, styles.deleteButton]}
-                            onPress={handleDelete} // Nova ação de delete
-                        >
-                            <Text style={styles.deleteText}>Excluir Registro</Text>
-                        </TouchableOpacity>
-                    )}
-                </View>
-            </BottomSheetScrollView>
-        </BottomSheet>
-    );
-};
-
-// ... Styles (mantidos do original para o design)
 const styles = StyleSheet.create({
-    content: {
-        padding: 16,
-        gap: 16,
-    },
-    title: {
-        fontSize: 20,
-        fontWeight: "700",
-        color: colors.brown.base,
-        marginBottom: 12,
-    },
-    row: { marginBottom: 12, flexDirection: "row", justifyContent: 'space-between' },
-    label: { fontSize: 12, color: "#6B7280" },
-    value: { fontSize: 16, color: "#111" },
-    inputEditable: {
-        borderBottomWidth: 1,
-        borderColor: colors.yellow.base,
-        paddingVertical: 2, 
-    },
-    button: {
-        flexDirection: "row",
-        justifyContent: "center",
-        alignItems: "center",
-        height: 48,
-        borderRadius: 24,
-    },
-    editButton: {
-        backgroundColor: colors.yellow.base,
-    },
-    deleteButton: {
-        borderWidth: 1,
-        borderColor: "#EF4444",
-    },
-    editText: {
-        fontWeight: "700",
-        fontSize: 16,
-        color: colors.brown.base,
-        marginLeft: 6,
-    },
-    deleteText: {
-        fontWeight: "700",
-        fontSize: 16,
-        color: "#EF4444",
-    },
-    overlay: {
-        flex: 1,
-        backgroundColor: "rgba(0,0,0,0.5)",
-        justifyContent: "center",
-    },
-    modal: {
-        backgroundColor: "#F8F7F5",
-        borderTopLeftRadius: 24,
-        borderTopRightRadius: 24,
-        maxHeight: "95%",
-    },
-    header: {
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between",
-        padding: 16,
-    },
-    headerTitle: {
-        fontSize: 18,
-        fontWeight: "700",
-        color: "#1A202C",
-    },
-    backButton: {
-        width: 36,
-        height: 36,
-        justifyContent: "center",
-        alignItems: "center",
-    },
-    card: {
-        backgroundColor: "#fff",
-        borderRadius: 16,
-        padding: 16,
-        shadowColor: "#000",
-        shadowOpacity: 0.05,
-        shadowOffset: { width: 0, height: 2 },
-        shadowRadius: 6,
-        elevation: 2,
-        marginBottom: 16,
-    },
-    centerBlock: { alignItems: "center", marginBottom: 8 },
-    date: { fontSize: 22, fontWeight: "700", color: colors.yellow.dark },
-    col: { 
-        flex: 1, 
-        marginHorizontal: 4, 
-    }, 
-    infoBlock: { marginBottom: 8 },
-    footer: {
-        padding: 16,
-        borderTopWidth: 1,
-        borderColor: "#E5E7EB",
-        gap: 12,
-    }
+  container: {
+    paddingBottom: 32,
+    backgroundColor: colors.gray.claro,
+  },
+
+  handleWrapper: {
+    alignItems: "center",
+    paddingTop: 8,
+  },
+  handle: {
+    width: 40,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: "#D1D5DB",
+  },
+
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingBottom: 8,
+  },
+  headerTitle: {
+    flex: 1,
+    textAlign: "center",
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#111827",
+  },
+  mainCard: {
+    backgroundColor: "#FFF",
+    borderRadius: 16,
+    padding: 16,
+    marginHorizontal: 16,
+    marginBottom: 12,
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    elevation: 2,
+    alignItems: "center"
+  },
+  cardRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#111827",
+  },
+  cardSubtitle: {
+    fontSize: 14,
+    color: "#6B7280",
+  },
+
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#111827",
+    paddingHorizontal: 16,
+    marginTop: 8,
+    marginBottom: 4,
+  },
+
+  listContainer: {
+    backgroundColor: "#FFF",
+    borderRadius: 16,
+    marginHorizontal: 16,
+    overflow: "hidden",
+  },
+  listItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 16,
+    paddingHorizontal: 12,
+    borderTopWidth: 1,
+    borderColor: "#E5E7EB",
+  },
+  listItemLast: {
+    borderBottomWidth: 1,
+  },
+  listIcon: {
+    marginRight: 12,
+    fontSize: 20,
+    color: "#6B7280",
+  },
+  listLabel: {
+    flex: 1,
+    fontSize: 14,
+    color: "#6B7280",
+  },
+  listValue: {
+    fontSize: 14,
+    color: "#111827",
+    textAlign: "right",
+    minWidth: 60,
+  },
+
+  inputEditable: {
+    borderBottomWidth: 1,
+    borderColor: "#FAC638",
+    paddingBottom: 2,
+  },
+
+  highlightBox: {
+    marginTop: 12,
+    marginHorizontal: 16,
+    padding: 12,
+    borderRadius: 12,
+    backgroundColor: "rgba(250,198,56,0.25)",
+  },
+  highlightTitle: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: "#A16207",
+  },
+  highlightValue: {
+    fontSize: 14,
+    color: "#78350F",
+  },
+
+  footer: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    gap: 12,
+    padding: 16,
+    borderTopWidth: 1,
+    borderColor: "#E5E7EB",
+    marginTop: 16,
+  },
+  footerBtn: {
+    paddingHorizontal: 16,
+    height: 40,
+    borderRadius: 8,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  editBtn: {
+    backgroundColor: "#FAC638",
+  },
+  deleteBtn: {
+    borderWidth: 1,
+    borderColor: "#DC2626",
+  },
+  deleteText: {
+    color: "#DC2626",
+    fontWeight: "700",
+  },
+  editText: {
+    fontWeight: "700",
+    color: "#111827",
+  },
+radioItem: {
+  flexDirection: "row",
+  alignItems: "center",
+},
+
+radioCircle: {
+  width: 20,
+  height: 20,
+  borderRadius: 10,
+  borderWidth: 2,
+  borderColor: "#FAC638",
+  alignItems: "center",
+  justifyContent: "center",
+  marginRight: 6,
+},
+
+radioSelected: {
+  width: 10,
+  height: 10,
+  borderRadius: 5,
+  backgroundColor: "#FAC638",
+},
+
+radioLabel: {
+  fontSize: 14,
+  color: "#111827",
+},
+
 });
