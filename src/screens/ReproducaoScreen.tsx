@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, RefreshControl, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, RefreshControl, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { MainLayout } from '../layouts/MainLayout';
 import { colors } from '../styles/colors';
 import Plus from '../../assets/images/plus.svg';
@@ -10,25 +10,29 @@ import { FormReproducaoAdd } from '../components/FormReproductionAdd';
 import DashReproduction from '../components/DashReproducao';
 import { CardReproducao } from '../components/CardBufaloReproduction';
 import Button from '../components/Button';
+import AgroCore from '../icons/agroCore';
+import { usePropriedade } from '../context/PropriedadeContext';
 
 export const ReproducaoScreen = () => {
+  const { propriedadeSelecionada } = usePropriedade();
   const [refreshing, setRefreshing] = useState(false);
   const [reproducoes, setReproducoes] = useState<any[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [reproducaoSelecionada, setReproducaoSelecionada] = useState<any>(null);
-
-  // Paginação
+  const [loading, setLoading] = useState(true);
   const [paginaAtual, setPaginaAtual] = useState(1);
   const [totalPaginas, setTotalPaginas] = useState(1);
   const itensPorPagina = 10;
 
   const fetchReproducoes = async () => {
+    if (!propriedadeSelecionada) return;
+    setLoading(true);
     setRefreshing(true);
     try {
-      const data = await getReproducoes('e7625c27-da8d-4ffa-a514-0c191b1fb1e3');
+      const data = await getReproducoes(propriedadeSelecionada);
       setReproducoes(data);
       setTotalPaginas(Math.ceil(data.length / itensPorPagina));
-      setPaginaAtual(1); // resetar página sempre que atualizar dados
+      setPaginaAtual(1); 
     } catch (error) {
       console.error(error);
       setReproducoes([]);
@@ -37,10 +41,6 @@ export const ReproducaoScreen = () => {
     }
     setRefreshing(false);
   };
-
-  useEffect(() => {
-    fetchReproducoes();
-  }, []);
 
   const onRefresh = async () => {
     await fetchReproducoes();
@@ -51,12 +51,31 @@ export const ReproducaoScreen = () => {
     setModalVisible(true);
   };
 
-  // Lista paginada
   const reproducoesPaginadas = reproducoes.slice(
     (paginaAtual - 1) * itensPorPagina,
     paginaAtual * itensPorPagina
   );
 
+  useEffect(() => {
+      const fetchData = async () => {
+        setLoading(true);
+        await fetchReproducoes();
+        setLoading(false);
+      }
+      fetchData();
+  }, []);
+
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <AgroCore width={200} height={200} />
+        <Text>Carregando reproduções...</Text>
+        <ActivityIndicator size="large" color={colors.yellow.static} />
+      </View>
+    );
+  }
+  
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -195,5 +214,10 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#374151",
     textAlign: "center",
+  },
+  loadingContainer: { 
+    flex: 1, 
+    justifyContent: "center", 
+    alignItems: "center" 
   },
 });

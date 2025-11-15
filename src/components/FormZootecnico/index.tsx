@@ -31,7 +31,6 @@ export const FormZootecnico = ({ onSubmit, onClose }: FormZootecnicoProps) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Novo Registro Zootécnico</Text>
-
       <TextInput placeholder="Peso (kg)" value={peso} onChangeText={setPeso} style={styles.input} keyboardType="numeric" />
       <TextInput placeholder="Condição corporal" value={condicao} onChangeText={setCondicao} style={styles.input} />
       <TextInput placeholder="Porte corporal" value={porte} onChangeText={setPorte} style={styles.input} />

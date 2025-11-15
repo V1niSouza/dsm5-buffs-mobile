@@ -7,6 +7,7 @@ import {
   RefreshControl,
   ScrollView,
   FlatList,
+  ActivityIndicator,
 } from "react-native";
 import { useDimensions } from "../utils/useDimensions";
 import { colors } from "../styles/colors";
@@ -24,6 +25,7 @@ import { usePropriedade } from "../context/PropriedadeContext";
 import { getIndustriasPorPropriedade } from "../services/lactacaoService";
 
 import Button from "../components/Button";
+import AgroCore from "../icons/agroCore";
 
 export interface AnimalLac {
   id: string;
@@ -50,13 +52,14 @@ export const LactacaoScreen = () => {
   const [industrias, setIndustrias] = useState<any[]>([]);
   const [modalLactacaoVisible, setModalLactacaoVisible] = useState(false);
   const [selectedBufala, setSelectedBufala] = useState<AnimalLac | null>(null);
-  // paginação
+  const [loading, setLoading] = useState(true);
   const [paginaAtual, setPaginaAtual] = useState(1);
   const [totalPaginas, setTotalPaginas] = useState(1);
   const itensPorPagina = 10;
 
   const fetchCiclos = async () => {
     if (!propriedadeSelecionada) return;
+    setLoading(true);
     setRefreshing(true);
     try {
       const { ciclos, totalLactando, dataFormatada, quantidadeAtual } =
@@ -91,25 +94,36 @@ export const LactacaoScreen = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!propriedadeSelecionada) return;
-      await fetchCiclos();
-      };
+      setLoading(true);
+      if (propriedadeSelecionada){
+        await fetchCiclos();
+      }
+      setLoading(false);
+    };
     fetchData();
   }, [propriedadeSelecionada]);
 
-    const onRefresh = async () => {
-      await fetchCiclos();
-    };
+  const onRefresh = async () => {
+    await fetchCiclos();
+  };
 
-  // fatia a lista de acordo com a página atual
   const animaisPaginados = animais.slice(
     (paginaAtual - 1) * itensPorPagina,
     paginaAtual * itensPorPagina
   );
 
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <AgroCore width={200} height={200} />
+        <Text>Carregando lactações...</Text>
+        <ActivityIndicator size="large" color={colors.yellow.static} />
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
         <View style={{ alignItems: "center" }}>
           <Text style={styles.header1Text}>Lactação</Text>
@@ -269,5 +283,10 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#374151",
     textAlign: "center",
+  },
+  loadingContainer: { 
+    flex: 1, 
+    justifyContent: "center", 
+    alignItems: "center" 
   },
 });

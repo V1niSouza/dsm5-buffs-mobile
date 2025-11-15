@@ -1,5 +1,5 @@
 import React, { useState, useEffect} from "react";
-import { View, ScrollView, StyleSheet, RefreshControl } from "react-native";
+import { View, ScrollView, StyleSheet, RefreshControl, Text, ActivityIndicator } from "react-native";
 import Propriedades from "../components/Dropdown";
 import AlertasPendentes from "../components/Lembretes";
 import DashPropriedade from "../components/DashPropriedade";
@@ -11,6 +11,7 @@ import { UserMenu } from "../components/UserMenu";
 import { usePropriedade } from "../context/PropriedadeContext";
 import bufaloService from "../services/bufaloService";
 import propriedadeService from "../services/propriedadeService";
+import AgroCore from "../icons/agroCore";
 
 
 export const HomeScreen = () => {
@@ -19,7 +20,7 @@ export const HomeScreen = () => {
   const [propriedades, setPropriedades] = useState<any[]>([]); 
   const [dashboard, setDashboard] = useState<any>(null);
   const [refreshing, setRefreshing] = useState(false);
-
+  const [loading, setLoading] = useState(true);
   const [countsSex, setCountsSex] = useState({ machos: 0, femeas: 0 });
   const [countsMat, setCountsMat] = useState({ bezerros: 0, novilhas: 0, vacas: 0, touros: 0 });
   const [count, setCount] = useState({ bufalosAtivos: 0 });
@@ -32,11 +33,6 @@ export const HomeScreen = () => {
       console.error("Erro ao buscar propriedades:", err);
     }
   };
-
-  useEffect(() => {
-    fetchPropriedades();
-  }, []);
-
 
   const fetchDashboard = async () => {
     if (!propriedadeSelecionada) return;
@@ -54,21 +50,26 @@ export const HomeScreen = () => {
     } catch (err) {
       console.error("Erro ao buscar búfalos:", err);
     }
-  };
-
-  useEffect(() => {
-    fetchDashboard();
-  }, [propriedadeSelecionada]);
-
+  }; 
+  
   const onRefresh = async () => {
     setRefreshing(true);
-    await Promise.all([
-      fetchDashboard(),
-      fetchPropriedades()
-    ]);
+    await fetchDashboard(),
     setRefreshing(false);
   };
+  
+  useEffect(() => {
+    const loadInitialData = async () => {
+      setLoading(true);
+      await fetchPropriedades();
+      await fetchDashboard();
+      setLoading(false);
+    };
 
+    loadInitialData();
+  }, [propriedadeSelecionada]);
+
+  
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -87,16 +88,25 @@ export const HomeScreen = () => {
           }
           >
           <Propriedades dropdownOpen={dropdownOpen} setDropdownOpen={setDropdownOpen} prop={propriedades}/>
-          <DashPropriedade
-            total={count.bufalosAtivos}
-            machos={countsSex.machos}
-            femeas={countsSex.femeas}
-            bezerros={countsMat.bezerros}
-            novilhas={countsMat.novilhas}
-            vacas={countsMat.vacas}
-            touros={countsMat.touros}
-           />
-          <AlertasPendentes idPropriedade={propriedadeSelecionada?.toString() ?? null} />
+          {loading || !dashboard ? (
+            <View style={styles.loading}>
+              <Text>Carregando informações da propriedade...</Text>
+              <ActivityIndicator size="large" color={colors.yellow.static} style={{ marginTop: 20 }} />
+            </View>
+          ) : (
+            <>
+            <DashPropriedade
+              total={count.bufalosAtivos}
+              machos={countsSex.machos}
+              femeas={countsSex.femeas}
+              bezerros={countsMat.bezerros}
+              novilhas={countsMat.novilhas}
+              vacas={countsMat.vacas}
+              touros={countsMat.touros}
+            />
+            <AlertasPendentes idPropriedade={propriedadeSelecionada?.toString() ?? null} />
+            </>
+          )}
         </ScrollView>
       </MainLayout>
     </View>
@@ -116,15 +126,25 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     borderColor: colors.yellow.dark
   },
+  loadingContainer: { 
+    flex: 1, 
+    justifyContent: "center", 
+    alignItems: "center" 
+  },
   headerButtons: {
     marginTop: 30,
     flexDirection: "row",
     position: "absolute",
-    right: 20, // fixa os botões à direita
-    gap: 20, // espaço entre eles
+    right: 20,
+    gap: 20, 
   },
   button: {
     backgroundColor: colors.yellow.dark,
     borderRadius: 50,
   },
+  loading: {
+    marginTop: 40,
+    alignItems: "center",
+    justifyContent: "center",
+  }
 });

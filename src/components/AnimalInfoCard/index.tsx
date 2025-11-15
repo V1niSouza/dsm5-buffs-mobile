@@ -1,7 +1,8 @@
-import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import React, { useState } from "react";
+import { View, Text, StyleSheet, Switch, TouchableOpacity } from "react-native";
 import { colors } from "../../styles/colors";
-
+import { ConfirmarAlteracaoStatusModal } from "../ModalAlterarStatus";
+import bufaloService from "../../services/bufaloService";
 
 export const AnimalInfoCard = ({ detalhes }: { detalhes: any }) => {
 
@@ -22,84 +23,124 @@ export const AnimalInfoCard = ({ detalhes }: { detalhes: any }) => {
     V: "Vaca",
   };
   const maturidadeTexto = maturidadeMap[detalhes.nivel_maturidade] || detalhes.nivel_maturidade;
+  const[isEnabled, setIsEnabled] = useState(Boolean(detalhes?.status));
+  const [modalVisible, setModalVisible] = useState(false);
+  const [novoStatus, setNovoStatus] = useState<boolean | null>(null);
+
+  
+  
+  const toggleSwitch = () => {
+    const valorPretendido = !isEnabled;
+    setNovoStatus(valorPretendido);
+    setModalVisible(true);
+  };
+  
+  const confirmarAlteracaoStatus = async () => {
+    if (novoStatus === null) return;
+    try {
+      await bufaloService.updateBufalo(detalhes.id_bufalo, { status: novoStatus });
+      setIsEnabled(novoStatus);
+      detalhes.status = novoStatus;
+    } catch (error) {
+      console.log("Erro ao alterar status:", error);
+    } finally {
+      setModalVisible(false);
+    }
+  };
+
+  const cancelarAlteracao = () => {
+    setModalVisible(false);
+  };
 
   return (
-    <View style={styles.infoCard}>
-      {/* Header com nome, categoria e status */}
-      <View style={styles.infoHeader}>
-        <View>
-          <View style={styles.nameRow}>
-            <Text style={styles.nameText}>{detalhes?.nome ?? 'Sem Nome'}</Text>
-            {detalhes?.categoria && (
-              <View style={styles.categoryBadge}>
-                <Text style={styles.categoryText}>{detalhes.categoria}</Text>
-              </View>
-            )}
+    <>
+      <View style={styles.infoCard}>
+        {/* Header com nome, categoria e status */}
+        <View style={styles.infoHeader}>
+          <View>
+            <View style={styles.nameRow}>
+              <Text style={styles.nameText}>{detalhes?.nome ?? 'Sem Nome'}</Text>
+              {detalhes?.categoria && (
+                <View style={styles.categoryBadge}>
+                  <Text style={styles.categoryText}>{detalhes.categoria}</Text>
+                </View>
+              )}
+            </View>
+            <Text style={styles.brincoText}>Brinco: Nº {detalhes?.brinco ?? '-'}</Text>
           </View>
-          <Text style={styles.brincoText}>Brinco: Nº {detalhes?.brinco ?? '-'}</Text>
-        </View>
 
-        <View style={[
-            styles.statusBadge,
-            { backgroundColor: detalhes?.status ? '#D1FAE5' : '#FEE2E2' },
-          ]}>
           <View style={[
+            styles.statusBadge,
+            { backgroundColor: detalhes?.status ? colors.green.active : colors.red.inactive },
+          ]}>
+            <View style={[
               styles.statusDot,
-              { backgroundColor: detalhes?.status ? '#10B981' : '#EF4444' },
-            ]} 
-          />
-          <Text style={[
+              { backgroundColor: detalhes?.status ? colors.green.extra : colors.red.extra },
+            ]} />
+            <Text style={[
               styles.statusText,
-              { color: detalhes?.status ? '#065F46' : '#B91C1C' },
+              { color: detalhes?.status ? colors.green.text : colors.red.text },
             ]}>
-            {detalhes?.status ? 'Ativo' : 'Inativo'}
-          </Text>
+              {detalhes?.status ? 'Ativo' : 'Inativo'}
+            </Text>
+            <Switch
+              trackColor={{ false: colors.gray.claro, true: colors.gray.claro }}
+              thumbColor={isEnabled ? colors.green.extra : colors.red.extra}
+              onValueChange={toggleSwitch}
+              value={isEnabled} />
+          </View>
+        </View>
+        <View style={styles.infoGrid}>
+          <View style={styles.Row}>
+            <View style={styles.infoItem}>
+              <Text style={styles.infoLabel}>Nascimento</Text>
+              <Text style={styles.infoValue}>{detalhes?.dt_nascimento ? detalhes.dt_nascimento.split('T')[0].split('-').reverse().join('/') : '-'}</Text>
+            </View>
+            <View style={styles.infoItem}>
+              <Text style={styles.infoLabel}>Maturidade</Text>
+              <Text style={styles.infoValue}>{maturidadeTexto ?? '-'}</Text>
+            </View>
+          </View>
+          <View style={styles.Row}>
+            <View style={styles.infoItem}>
+              <Text style={styles.infoLabel}>Sexo</Text>
+              <Text style={styles.infoValue}>{detalhes?.sexo === 'F' ? 'Fêmea' : 'Macho'}</Text>
+            </View>
+            <View style={styles.infoItem}>
+              <Text style={styles.infoLabel}>Origem</Text>
+              <Text style={styles.infoValue}>{detalhes?.origem ?? '-'}</Text>
+            </View>
+          </View>
+          <View style={styles.Row}>
+            <View style={styles.infoItem}>
+              <Text style={styles.infoLabel}>Raça</Text>
+              <Text style={styles.infoValue}>{detalhes?.racaNome ?? '-'}</Text>
+            </View>
+            <View style={styles.infoItem}>
+              <Text style={styles.infoLabel}>Grupo</Text>
+              <Text style={styles.infoValue}>{detalhes?.grupo ?? '-'}</Text>
+            </View>
+          </View>
+          <View style={styles.Row}>
+            <View style={styles.infoItem}>
+              <Text style={styles.infoLabel}>Pai</Text>
+              <Text style={styles.infoValue}>{detalhes?.paiNome ?? '-'}</Text>
+            </View>
+            <View style={styles.infoItem}>
+              <Text style={styles.infoLabel}>Mãe</Text>
+              <Text style={styles.infoValue}>{detalhes?.maeNome ?? '-'}</Text>
+            </View>
+          </View>
         </View>
       </View>
-      <View style={styles.infoGrid}>
-        <View style={styles.Row}>
-          <View style={styles.infoItem}>
-            <Text style={styles.infoLabel}>Nascimento</Text>
-            <Text style={styles.infoValue}>{detalhes?.dt_nascimento ? detalhes.dt_nascimento.split('T')[0].split('-').reverse().join('/') : '-'}</Text>
-          </View>
-          <View style={styles.infoItem}>
-            <Text style={styles.infoLabel}>Maturidade</Text>
-            <Text style={styles.infoValue}>{maturidadeTexto ?? '-'}</Text>
-          </View>
-        </View>
-        <View style={styles.Row}>
-          <View style={styles.infoItem}>
-            <Text style={styles.infoLabel}>Sexo</Text>
-            <Text style={styles.infoValue}>{detalhes?.sexo === 'F' ? 'Fêmea' : 'Macho'}</Text>
-          </View>
-          <View style={styles.infoItem}>
-            <Text style={styles.infoLabel}>Origem</Text>
-            <Text style={styles.infoValue}>{detalhes?.origem ?? '-'}</Text>
-          </View>
-        </View>
-        <View style={styles.Row}>
-          <View style={styles.infoItem}>
-            <Text style={styles.infoLabel}>Raça</Text>
-            <Text style={styles.infoValue}>{detalhes?.racaNome ?? '-'}</Text>
-          </View>
-          <View style={styles.infoItem}>
-            <Text style={styles.infoLabel}>Grupo</Text>
-            <Text style={styles.infoValue}>{detalhes?.grupo ?? '-'}</Text>
-          </View>
-        </View>
-        <View style={styles.Row}>
-          <View style={styles.infoItem}>
-            <Text style={styles.infoLabel}>Pai</Text>
-            <Text style={styles.infoValue}>{detalhes?.paiNome ?? '-'}</Text>
-          </View>
-          <View style={styles.infoItem}>
-            <Text style={styles.infoLabel}>Mãe</Text>
-            <Text style={styles.infoValue}>{detalhes?.maeNome ?? '-'}</Text>
-          </View>
-        </View>
-      </View>
-    </View>
 
+      <ConfirmarAlteracaoStatusModal
+        visible={modalVisible}
+        novoStatus={novoStatus ?? false}
+        onClose={cancelarAlteracao}
+        onConfirm={confirmarAlteracaoStatus}
+      />
+    </>
   );
 };
 

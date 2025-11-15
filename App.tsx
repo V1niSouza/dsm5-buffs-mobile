@@ -1,3 +1,5 @@
+import 'react-native-reanimated';
+import 'react-native-gesture-handler';
 import { AuthProvider, useAuth } from './src/context/AuthContext'
 
 // App.tsx
@@ -7,6 +9,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 // Layout
 import { MainLayout } from './src/layouts/MainLayout';
@@ -29,7 +32,7 @@ import Home from './src/icons/home';
 import Lactation from './src/icons/lactation';
 import GlobeIcon from './src/icons/sex';
 import Fance from './src/icons/fance';
-import { Loading } from './src/components/Loading';
+import { NfcScannerScreen } from './src/screens/NfcScannerScreen';
 
 
 export type RootStackParamList = {
@@ -38,6 +41,7 @@ export type RootStackParamList = {
   AnimalDetail: undefined;
   MainTab: undefined;
   CompleteProfile: undefined;
+  NfcScannerScreen: undefined;
 };
 
 const Tab = createBottomTabNavigator();
@@ -163,6 +167,9 @@ function AppContent() {
         <>
         <Stack.Screen name="MainTab" component={MainTab} />
         <Stack.Screen name="AnimalDetail" component={AnimalDetailScreen} />
+        <Stack.Screen name="NfcScannerScreen" component={NfcScannerScreen} 
+  options={{ title: 'Scanner NFC' }} // Opcional: define um título
+/>
         </>
       )}
     </Stack.Navigator>
@@ -174,15 +181,17 @@ export default function App() {
   const isDarkMode = useColorScheme() === 'dark';
 
   return (
-    <SafeAreaProvider>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-          <AuthProvider>
-            <PropriedadeProvider>
-              <NavigationContainer>
-                <AppContent />
-              </NavigationContainer>
-            </PropriedadeProvider>
-          </AuthProvider>
-    </SafeAreaProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
+        <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+            <AuthProvider>
+              <PropriedadeProvider>
+                <NavigationContainer>
+                  <AppContent />
+                </NavigationContainer>
+              </PropriedadeProvider>
+            </AuthProvider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }

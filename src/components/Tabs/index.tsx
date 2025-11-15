@@ -43,9 +43,9 @@ export const Tabs: React.FC<TabsProps> = ({ tabs, activeTab, onChange }) => {
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
-    borderRadius: 10,
-    marginHorizontal: 10,
-    backgroundColor: colors.gray.disabled,
+    borderTopStartRadius: 10,
+    borderTopEndRadius: 10,
+    backgroundColor: colors.gray.claro,
     marginTop: 10,
   },
   tabButton: {
