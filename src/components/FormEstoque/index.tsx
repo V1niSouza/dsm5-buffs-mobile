@@ -10,7 +10,6 @@ import {
   StyleSheet,
   Alert,
 } from "react-native";
-import DateTimePicker from "@react-native-community/datetimepicker";
 import { registrarEstoque } from "../../services/lactacaoService"; 
 import { usePropriedade } from "../../context/PropriedadeContext";
 import YellowButton from "../Button";
@@ -80,17 +79,7 @@ export function FormEstoque({ onSuccess }: FormEstoqueProps) {
             : "Selecione a Data"}
         </Text>
       </TouchableOpacity>
-      {showDatePicker && (
-        <DateTimePicker
-          value={dtRegistro || new Date()}
-          mode="date"
-          display={Platform.OS === "ios" ? "spinner" : "default"}
-          onChange={(event, date) => {
-            if (date) setDtRegistro(date);
-            setShowDatePicker(Platform.OS === "ios");
-          }}
-        />
-      )}
+
 
       <Text style={styles.sectionTitle}>Observação</Text>
       <TextInput

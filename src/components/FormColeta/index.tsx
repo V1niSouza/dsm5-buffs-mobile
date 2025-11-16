@@ -11,7 +11,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
-import DateTimePicker from "@react-native-community/datetimepicker";
+
 import YellowButton from "../Button";
 
 interface FormColetaProps {
@@ -120,17 +120,7 @@ export function FormColeta({ industrias: industriasProp = [], onSuccess }: FormC
           {dtColeta ? dtColeta.toISOString().split("T")[0] : "Selecione a data"}
         </Text>
       </TouchableOpacity>
-      {showDatePicker && (
-        <DateTimePicker
-          value={dtColeta || new Date()}
-          mode="date"
-          display={Platform.OS === "ios" ? "spinner" : "default"}
-          onChange={(event, date) => {
-            if (date) setDtColeta(date);
-            setShowDatePicker(Platform.OS === "ios");
-          }}
-        />
-      )}
+
 
       <Text style={styles.sectionTitle}>Observação</Text>
       <TextInput

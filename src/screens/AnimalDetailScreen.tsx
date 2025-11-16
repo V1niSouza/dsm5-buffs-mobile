@@ -13,8 +13,8 @@ import { MainLayout } from "../layouts/MainLayout";
 import Back from '../../assets/images/arrow.svg';
 import AgroCore from '../../src/icons/agroCore'; 
 import Button from "../components/Button";
-import { SanitarioDetailModal } from "../components/ModalVisualizacaoSanit";
 import { ZootecnicoBottomSheet } from "../components/ZootecnicoBottomSheet"; 
+import { SanitarioBottomSheet } from "../components/SanitarioBottomSheet";
 
 type RootStackParamList = {
   AnimalDetail: { id: string };
@@ -101,6 +101,18 @@ export const AnimalDetailScreen = () => {
     // fetchData(pageZootec, pageSanit); 
   };
 
+    // Função que será passada para o BottomSheet para salvar os dados
+  const handleSaveSanitario = (data: any) => {
+    console.log("Salvando alterações do registro Sanit:", data);
+    // 1. Chamar o serviço de atualização
+    // Ex: zootecnicoService.update(data);
+
+    // 2. Fechar o BottomSheet
+    setSelectedSanit(null); 
+    
+    // 3. Recarregar a lista (opcional, dependendo da necessidade)
+    // fetchData(pageZootec, pageSanit); 
+  };
 
   // --- Componentes Auxiliares ---
 
@@ -232,11 +244,14 @@ export const AnimalDetailScreen = () => {
             />
         )}
         
-        <SanitarioDetailModal 
-          visible={!!selectedSanit} 
-          item={selectedSanit} 
-          onClose={() => setSelectedSanit(null)} 
+        {!!selectedSanit && (
+        <SanitarioBottomSheet 
+              key={selectedSanit.id_sanit}
+              item={selectedSanit} 
+              onClose={() => setSelectedSanit(null)} 
+              onEditSave={handleSaveSanitario}
         />    
+        )}
       </MainLayout> 
     </View>
   );

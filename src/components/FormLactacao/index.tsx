@@ -11,7 +11,6 @@ import {
   TouchableOpacity,
 } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
-import DateTimePicker from "@react-native-community/datetimepicker";
 
 import YellowButton from "../Button";
 
@@ -107,17 +106,7 @@ const handleSave = async () => {
           {dtOrdenha ? dtOrdenha.toISOString().split("T")[0] : "Selecione a data"}
         </Text>
       </TouchableOpacity>
-      {showDatePicker && (
-        <DateTimePicker
-          value={dtOrdenha || new Date()}
-          mode="date"
-          display={Platform.OS === "ios" ? "spinner" : "default"}
-          onChange={(event, date) => {
-            if (date) setDtOrdenha(date);
-            setShowDatePicker(Platform.OS === "ios");
-          }}
-        />
-      )}
+
 
       <YellowButton title="Registrar Lactação" onPress={handleSave} />
     </ScrollView>
