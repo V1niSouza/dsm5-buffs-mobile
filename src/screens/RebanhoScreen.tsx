@@ -16,6 +16,7 @@ import Button from '../components/Button';
 import { CardBufalo } from '../components/CardBufaloRebanho';
 import AgroCore from '../icons/agroCore';
 import FiltroRebanho from '../components/SearchBar';
+import { CadastrarBufaloForm } from '../components/CriaBufaloBottomSheet';
 
 
 type Animal = {
@@ -44,11 +45,10 @@ type RootStackParamList = {
   NfcScannerScreen: undefined;
 };
 
-const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-const route = useRoute<RouteProp<RootStackParamList, 'RebanhoScreen'>>();
-
 
 export const RebanhoScreen = () => {
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const route = useRoute<RouteProp<RootStackParamList, 'RebanhoScreen'>>();
   const { wp, hp } = useDimensions();
   const { propriedadeSelecionada } = usePropriedade();
   const [animais, setAnimais] = useState<Animal[]>([]);
@@ -61,6 +61,7 @@ export const RebanhoScreen = () => {
   const [paginaAtual, setPaginaAtual] = useState(1);
   const [totalPaginas, setTotalPaginas] = useState(1);
   const [filtros, setFiltros] = useState<Filtros>({});
+  const [selectedZootec, setSelectedZootec] = useState<any>(null);
 
   const fetchBufalosFiltrados = async (filtrosAplicados: any = {}, page = 1) => {
     try {
@@ -126,6 +127,19 @@ export const RebanhoScreen = () => {
   const iniciarScanner = () => {
     navigation.navigate('NfcScannerScreen');
   };
+
+    // Função que será passada para o BottomSheet para salvar os dados
+  const handleSaveZootecnico = (data: any) => {
+    console.log("Salvando alterações do registro Zootec:", data);
+    // 1. Chamar o serviço de atualização
+    // Ex: zootecnicoService.update(data);
+
+    // 2. Fechar o BottomSheet
+    setSelectedZootec(null); 
+    
+    // 3. Recarregar a lista (opcional, dependendo da necessidade)
+    // fetchData(pageZootec, pageSanit); 
+  };
   
   if (loading) {
     return (
@@ -145,7 +159,7 @@ export const RebanhoScreen = () => {
           <Text style={styles.header1Text}>Rebanho</Text>
         </View>
         <View style={styles.headerButtons}>
-          <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.button}>
+          <TouchableOpacity onPress={() => setSelectedZootec(true)} style={styles.button}>
             <Plus width={15} height={15} style={{ margin: 6 }}/>
           </TouchableOpacity>
         </View>
@@ -214,14 +228,15 @@ export const RebanhoScreen = () => {
           </TouchableOpacity>
         </ScrollView>
       </MainLayout>
-      <CustomModal visible={modalVisible} onClose={() => setModalVisible(false)}>
-        <FormBufalo
-          onSuccess={() => {
-            fetchBufalosFiltrados(); 
-            setModalVisible(false); 
-          }}
-        />
-      </CustomModal>
+
+        {!!selectedZootec && (
+            <CadastrarBufaloForm 
+                // A chave força a remontagem quando um NOVO item é selecionado, 
+                // garantindo que o index={0} seja respeitado na montagem.
+                key={selectedZootec.id_zootec}
+                onClose={() => setSelectedZootec(null)} 
+            />
+        )}
 
 
     </View>

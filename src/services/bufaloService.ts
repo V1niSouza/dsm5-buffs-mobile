@@ -154,7 +154,29 @@ export const getBufaloPorMicrochip = async (microchip: string) => {
   }
 };
 
+export const getBufaloByBrincoAndSexo = async (
+  propriedadeId: number,
+  brinco: string,
+  sexo: "M" | "F"
+) => {
+  try {
+    const params = new URLSearchParams();
+    params.append("brinco", brinco);
+    params.append("sexo", sexo);
+    params.append("limit", "1");
+    params.append("page", "1");
+
+    const result = await apiFetch(
+      `/bufalos/filtro/propriedade/${propriedadeId}/avancado?${params.toString()}`
+    );
+    const dataList = result.data || result.bufalos || result;
+    return dataList && dataList.length > 0 ? dataList[0] : null;
+  } catch (error) {
+    console.error(`Erro ao buscar búfalo (Brinco: ${brinco}, Sexo: ${sexo}):`, error);
+    return null; 
+  }
+};
 
 
 
-export default { getBufalos, getBufaloDetalhes, createBufalo, updateBufalo, deleteBufalo, getRacas, filtrarBufalos, getBufaloPorMicrochip };
+export default { getBufalos, getBufaloDetalhes, createBufalo, updateBufalo, deleteBufalo, getRacas, filtrarBufalos, getBufaloPorMicrochip, getBufaloByBrincoAndSexo };

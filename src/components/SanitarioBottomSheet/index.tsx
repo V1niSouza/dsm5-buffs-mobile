@@ -28,7 +28,6 @@ interface SanitarioBottomSheetProps {
 }
 
 export const SanitarioBottomSheet: React.FC<SanitarioBottomSheetProps> = ({ item, onEditSave, onClose }) => {
-    console.log(item)
     const sheetRef = useRef<BottomSheet>(null);
     const snapPoints = useMemo(() => ["70%", "90%"], []);
     const [isEditing, setIsEditing] = useState(false);
