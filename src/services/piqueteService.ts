@@ -6,6 +6,7 @@ export interface Piquete {
   coords: { latitude: number; longitude: number }[];
   grupoNome: string;
   grupoCor: string;
+  color: string;
 }
 
 export const piqueteService = {

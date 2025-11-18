@@ -8,14 +8,17 @@ import { MapLeaflet } from '../components/Mapa';
 import { piqueteService, Piquete } from "../services/piqueteService";
 import { usePropriedade } from "../context/PropriedadeContext";
 import AgroCore from '../icons/agroCore';
+import { DemarcacaoPiqueteSheet } from '../components/DemarcacaoPiqueteSheet'; 
+import { useGpsLocation } from '../hooks/useLocation';
+
 
 export const PiquetesScreen = () => {
   const { wp, hp } = useDimensions();
   const [piquetes, setPiquetes] = useState<Piquete[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [piqueteCoords, setPiqueteCoords] = useState([ { latitude: -24.497, longitude: -47.842 }, { latitude: -24.496, longitude: -47.841 }, { latitude: -24.495, longitude: -47.843 }, ]);
-  
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const { location: currentLocation, loading: gpsLoading, error: gpsError } = useGpsLocation();
   const { propriedadeSelecionada } = usePropriedade();
   useEffect(() => {
     const fetchPiquetes = async () => {
@@ -40,6 +43,15 @@ export const PiquetesScreen = () => {
       setPiquetes(data);
     }
     setRefreshing(false);
+  };
+
+  const handleOpenSheet = () => {
+    setIsSheetOpen(true);
+  };
+
+const handleCloseSheet = () => {
+    setIsSheetOpen(false);
+    onRefresh(); 
   };
 
   if (loading) {
@@ -67,30 +79,32 @@ export const PiquetesScreen = () => {
             <MapLeaflet
               piquetes={piquetes.map(p => ({
                 ...p,
-                color: p.grupoCor, 
-              }))}
-            />
-            <TouchableOpacity style={{
-              position: 'absolute',
-              bottom: 60,
-              right: 16,
-              backgroundColor: colors.yellow.base,
-              borderRadius: 24,
-              paddingHorizontal: 16,
-              height: 56,
-              flexDirection: 'row',
-              alignItems: 'center',
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.3,
-              shadowRadius: 4,
-              elevation: 5
-            }}>
+                color: p.grupoCor,
+              }))} currentLocation={currentLocation}            />
+<TouchableOpacity 
+                onPress={handleOpenSheet} // Chamando a função para abrir
+                style={{
+                  position: 'absolute',
+                  bottom: 60,
+                  right: 16,
+                  backgroundColor: colors.yellow.base,
+                  borderRadius: 24,
+                  paddingHorizontal: 16,
+                  height: 56,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  shadowColor: "#000",
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.3,
+                  shadowRadius: 4,
+                  elevation: 5
+              }}>
             <Plus width={24} height={24} />
             <Text style={{ marginLeft: 8, fontWeight: 'bold', color: '#111813' }}>Nova Área</Text>
           </TouchableOpacity>
           </View>
         </ScrollView>
+        {isSheetOpen && <DemarcacaoPiqueteSheet onClose={handleCloseSheet} />}
       </MainLayout>
     </View>
   );
