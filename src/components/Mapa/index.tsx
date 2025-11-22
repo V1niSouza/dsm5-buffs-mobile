@@ -47,6 +47,8 @@ export const MapLeaflet: React.FC<MapLeafletProps> = ({ piquetes, currentLocatio
             <script>
             const piquetes = [${piquetesJS}];
             const map = L.map('map');
+            let accuracyCircle = null;
+            let accuracy = 10;
             let currentMarker = null;
 
             let allCoords = [];
@@ -59,24 +61,26 @@ export const MapLeaflet: React.FC<MapLeafletProps> = ({ piquetes, currentLocatio
             const fallbackZoom = 4;
             let isViewSet = false; 
             
-            const myIcon = L.icon({
-                iconUrl: "${CUSTOM_MARKER_ICON_BASE64}",  
-                iconSize: [32, 26],  
-                iconAnchor: [20, 32],  
-                popupAnchor: [0, -32]  
-            }); 
-
             window.updateCurrentLocation = function(lat, lng) {
                 const newLatLng = L.latLng(lat, lng);
 
                 if (currentMarker) {
                     currentMarker.setLatLng(newLatLng);
+                    if (accuracyCircle) accuracyCircle.setLatLng(newLatLng).setRadius(accuracy);
                 } else {
-                    currentMarker = L.marker(newLatLng, { icon: myIcon })
-                        .addTo(map)
-                        .bindPopup("Você está aqui")
-                        .openPopup();
-                    
+                    accuracyCircle = L.circle(newLatLng, {
+                        radius: accuracy,      // metros de precisão
+                        color: '#30f',
+                        fillColor: '#30f',
+                        fillOpacity: 0.2,
+                        weight: 1
+                    }).addTo(map);
+                    currentMarker = L.circleMarker(newLatLng, {
+                        radius: 8,
+                        color: '#3388ff',
+                        fillColor: '#3388ff',
+                        fillOpacity: 1
+                    }).addTo(map);
                     map.setView(newLatLng, 16); 
                 }
             }
