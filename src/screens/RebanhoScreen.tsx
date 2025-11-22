@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl, FlatList, ActivityIndicator} from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { FloatingAction } from 'react-native-floating-action';
 
 import { MainLayout } from '../layouts/MainLayout';
 import { useDimensions } from '../utils/useDimensions';
@@ -17,7 +18,6 @@ import { CardBufalo } from '../components/CardBufaloRebanho';
 import AgroCore from '../icons/agroCore';
 import FiltroRebanho from '../components/SearchBar';
 import { CadastrarBufaloForm } from '../components/CriaBufaloBottomSheet';
-
 
 type Animal = {
   id: string;
@@ -133,12 +133,35 @@ export const RebanhoScreen = () => {
     console.log("Salvando alterações do registro Zootec:", data);
     // 1. Chamar o serviço de atualização
     // Ex: zootecnicoService.update(data);
-
     // 2. Fechar o BottomSheet
     setSelectedZootec(null); 
     
     // 3. Recarregar a lista (opcional, dependendo da necessidade)
     // fetchData(pageZootec, pageSanit); 
+  };
+
+  const actions = [
+    {
+      text: "Novo Animal",
+      icon: <Plus width={24} height={24} fill="white" />, // Use seu SVG aqui
+      name: "NovoAnimal",
+      position: 1,
+      color: colors.yellow.base,
+    },
+    {
+      text: "Scanner NFC",
+      icon: <Scanner width={24} height={24} fill="white" />, // Use seu SVG aqui
+      name: "NfcScanner",
+      position: 2,
+      color: colors.yellow.base,
+    },
+  ];
+  const handleActionPress = (name: string | undefined) => {
+    if (name === "NovoAnimal") {
+      setSelectedZootec(true);
+    } else if (name === "NfcScanner") {
+      navigation.navigate('NfcScannerScreen');
+    }
   };
   
   if (loading) {
@@ -223,11 +246,22 @@ export const RebanhoScreen = () => {
               </View>
             }
           />
+
           <TouchableOpacity onPress={iniciarScanner} style={styles.button}>
             <Scanner width={18} height={18} style={{ margin: 6 }} />
           </TouchableOpacity>
         </ScrollView>
       </MainLayout>
+      <FloatingAction
+        actions={actions}
+        onPressItem={handleActionPress}
+        buttonSize={60}
+        color={colors.yellow.dark} // Cor de fundo do botão principal
+        floatingIcon={<Plus width={24} height={24} fill="white" />} // Seu SVG para o ícone de '+'
+        
+        // Posição (opcional, pois o padrão é canto inferior direito)
+        position="right" 
+      />
 
         {!!selectedZootec && (
             <CadastrarBufaloForm 
@@ -325,5 +359,17 @@ const styles = StyleSheet.create({
   tagConfirmationText: {
     fontWeight: 'bold',
     color: colors.green.active,
-  }
+  },
+    fabMain: {
+    position: 'absolute',
+    right: 16,
+    bottom: 16,
+    backgroundColor: colors.yellow.base,
+  },
+
+  fabChild: {
+    position: 'absolute',
+    right: 16,
+    backgroundColor: colors.yellow.dark,
+  },
 });

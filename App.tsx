@@ -186,9 +186,9 @@ export default function App() {
         <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
             <AuthProvider>
               <PropriedadeProvider>
-                <NavigationContainer>
-                  <AppContent />
-                </NavigationContainer>
+                  <NavigationContainer>
+                    <AppContent />
+                  </NavigationContainer>
               </PropriedadeProvider>
             </AuthProvider>
       </SafeAreaProvider>
