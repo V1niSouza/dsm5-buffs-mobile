@@ -74,7 +74,6 @@ const handleCloseSheet = () => {
       </View>
 
       <MainLayout>
-        <ScrollView>
           <View style={styles.content}>
             <MapLeaflet
               piquetes={piquetes.map(p => ({
@@ -103,8 +102,7 @@ const handleCloseSheet = () => {
             <Text style={{ marginLeft: 8, fontWeight: 'bold', color: '#111813' }}>Nova Área</Text>
           </TouchableOpacity>
           </View>
-        </ScrollView>
-        {isSheetOpen && <DemarcacaoPiqueteSheet onClose={handleCloseSheet} />}
+        {isSheetOpen && propriedadeSelecionada && (<DemarcacaoPiqueteSheet onClose={handleCloseSheet} propriedadeId={propriedadeSelecionada} />)}
       </MainLayout>
     </View>
   );
@@ -139,6 +137,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
+    flex: 1,
     backgroundColor: '#fff',
     borderRadius: 12,
     paddingTop: 16,
