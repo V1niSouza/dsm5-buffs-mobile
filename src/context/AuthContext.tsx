@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { login as loginService } from "../services/authService";
+import userService from "../services/userService";
 
 interface AuthContextData {
   userToken: string | null;
@@ -36,10 +37,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await AsyncStorage.setItem("userToken", res.access_token);
       await AsyncStorage.setItem("refreshToken", res.refresh_token);
       await AsyncStorage.setItem("expiresAt", res.expires_at.toString());
-      await AsyncStorage.setItem("user", JSON.stringify(res.user));
-
       setUserToken(res.access_token);
-      setUser(res.user);
+
+
+      const { hasProfile, profile: userProfile } = await userService.checkUserProfile();
+
+      if (!hasProfile || !userProfile) {
+        throw new Error("Falha ao carregar o perfil do usuário após o login.");
+      }
+      await AsyncStorage.setItem("user", JSON.stringify(userProfile));
+
+      setUser(userProfile);
     } finally {
       setLoading(false);
     }

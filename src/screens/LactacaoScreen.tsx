@@ -17,7 +17,6 @@ import Truck from "../../assets/images/truck-side.svg";
 import { getCiclosLactacao } from "../services/lactacaoService";
 import { Modal as CustomModal } from "../components/Modal";
 import { ColetaAddBottomSheet } from "../components/FormColeta";
-import { FormEstoque } from "../components/FormEstoque";
 import { CardLactacao } from "../components/CardBufaloLactacao";
 import { usePropriedade } from "../context/PropriedadeContext";
 import { getIndustriasPorPropriedade } from "../services/lactacaoService";
@@ -28,6 +27,7 @@ import Button from "../components/Button";
 import AgroCore from "../icons/agroCore";
 import { LactacaoAddBottomSheet } from "../components/FormLactacao";
 import { FloatingAction } from "react-native-floating-action";
+import { EstoqueAddBottomSheet } from "../components/FormEstoque";
 
 export interface AnimalLac {
   id: string;
@@ -61,6 +61,7 @@ export const LactacaoScreen = () => {
   const itensPorPagina = 10;
   const [isAddingLactacao, setIsAddingLactacao] = useState(false);
   const [isAddingColeta, setIsAddingColeta] = useState(false);
+  const [isAddingEstoque, setIsAddingEstoque] = useState(false);
 
   const fetchCiclos = async () => {
     if (!propriedadeSelecionada) return;
@@ -157,7 +158,7 @@ const fetchIndustrias = async () => {
   ];
   const handleActionPress = (name: string | undefined) => {
     if (name === "estqoue") {
-      setModalVisible1(true);
+      setIsAddingEstoque(true)
     } else if (name === "coleta") {
       setIsAddingColeta(true);
     }
@@ -245,10 +246,17 @@ const fetchIndustrias = async () => {
         position="right" 
       />
 
-      {/* Modais */}
-      <CustomModal visible={modalVisible1} onClose={() => setModalVisible1(false)}>
-        <FormEstoque onSuccess={() => setModalVisible1(false)} />
-      </CustomModal>
+    {isAddingEstoque && (
+        <EstoqueAddBottomSheet
+            propriedadeId={propriedadeSelecionada!}
+            onClose={() => setIsAddingEstoque(false)}
+            onSuccess={() => {
+                setIsAddingEstoque(false);
+                // Atualiza o DashLactation com a nova quantidade
+                fetchCiclos(); 
+            }}
+        />
+    )}
 
       {isAddingColeta && (
         <ColetaAddBottomSheet

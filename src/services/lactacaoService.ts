@@ -46,20 +46,28 @@ export interface Industria {
 export interface LactacaoRegistroPayload {
   id_bufala: string;
   id_propriedade: number;
-  id_ciclo_lactacao: string; // Necessário pela sua API
+  id_ciclo_lactacao: string; 
   qt_ordenha: number;
   periodo: string; 
   ocorrencia?: string;
-  dt_ordenha: string; // ISOString
+  dt_ordenha: string; 
 }
 
 export interface ColetaRegistroPayload {
   id_industria: string;
-  id_propriedade: string; // Assumindo que IDs são strings/UUIDs na API
+  id_propriedade: string; 
   resultado_teste: boolean;
   observacao?: string;
   quantidade: number;
-  dt_coleta: string; // ISOString com data e hora
+  dt_coleta: string; 
+}
+
+export interface EstoqueRegistroPayload {
+  id_propriedade: string | number; // Se for UUID, use string
+  id_usuario: string; // OBRIGATÓRIO no payload da API
+  quantidade: number;
+  dt_registro: string; // ISOString (ex: "2025-08-18T18:00:00.000Z")
+  observacao?: string;
 }
 
 export const getCiclosLactacao = async (propriedadeId: number) => {
@@ -160,5 +168,18 @@ export const registrarColetaApi = async (payload: ColetaRegistroPayload) => {
   } catch (error) {
     console.error("Erro ao registrar coleta na API:", error);
     throw new Error("Falha ao registrar coleta.");
+  }
+};
+
+export const registrarEstoqueApi = async (payload: EstoqueRegistroPayload) => {
+  try {
+    const response = await apiFetch("/estoque-leite", { 
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+    return response;
+  } catch (error) {
+    console.error("Erro ao registrar estoque na API:", error);
+    throw new Error("Falha ao registrar estoque.");
   }
 };
