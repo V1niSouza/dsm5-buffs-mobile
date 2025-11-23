@@ -43,6 +43,16 @@ export interface Industria {
   contato?: string;
 }
 
+export interface LactacaoRegistroPayload {
+  id_bufala: string;
+  id_propriedade: number;
+  id_ciclo_lactacao: string; // Necessário pela sua API
+  qt_ordenha: number;
+  periodo: string; 
+  ocorrencia?: string;
+  dt_ordenha: string; // ISOString
+}
+
 export const getCiclosLactacao = async (propriedadeId: number) => {
   try {
     if (!propriedadeId) throw new Error("ID da propriedade é obrigatório.");
@@ -74,6 +84,7 @@ export const getCiclosLactacao = async (propriedadeId: number) => {
       status: c.ciclo_atual.status,
       producaoTotal: c.producao_atual.total_produzido,
       mediaDiaria: c.producao_atual.media_diaria,
+      idCicloLactacao: c.ciclo_atual.id_ciclo_lactacao,
       ultimaOrdenha: c.producao_atual.ultima_ordenha
         ? {
             data: new Date(c.producao_atual.ultima_ordenha.data).toLocaleDateString("pt-BR"),
@@ -114,5 +125,19 @@ export const getIndustriasPorPropriedade = async (propriedadeId: number) => {
   } catch (error: any) {
     console.error("Erro ao buscar indústrias da propriedade:", error);
     return [];
+  }
+};
+
+
+export const registrarLactacaoApi = async (payload: LactacaoRegistroPayload) => {
+  try {
+    const response = await apiFetch("/lactacao", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+    return response;
+  } catch (error) {
+    console.error("Erro ao registrar lactação na API:", error);
+    throw new Error("Falha ao registrar lactação.");
   }
 };

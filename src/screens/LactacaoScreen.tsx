@@ -9,7 +9,6 @@ import {
   FlatList,
   ActivityIndicator,
 } from "react-native";
-import { useDimensions } from "../utils/useDimensions";
 import { colors } from "../styles/colors";
 import DashLactation from "../components/DashLactacao";
 import { MainLayout } from "../layouts/MainLayout";
@@ -19,13 +18,13 @@ import { getCiclosLactacao } from "../services/lactacaoService";
 import { Modal as CustomModal } from "../components/Modal";
 import { FormColeta } from "../components/FormColeta";
 import { FormEstoque } from "../components/FormEstoque";
-import { FormLactacao } from "../components/FormLactacao";
 import { CardLactacao } from "../components/CardBufaloLactacao";
 import { usePropriedade } from "../context/PropriedadeContext";
 import { getIndustriasPorPropriedade } from "../services/lactacaoService";
 
 import Button from "../components/Button";
 import AgroCore from "../icons/agroCore";
+import { LactacaoAddBottomSheet } from "../components/FormLactacao";
 
 export interface AnimalLac {
   id: string;
@@ -38,7 +37,9 @@ export interface AnimalLac {
   mediaDiaria?: number;
   status: string;
   raca?: string;
+  idCicloLactacao?: string;
 }
+
 
 export const LactacaoScreen = () => {
   const { propriedadeSelecionada } = usePropriedade();
@@ -50,12 +51,12 @@ export const LactacaoScreen = () => {
   const [modalVisible1, setModalVisible1] = useState(false);
   const [modalVisible2, setModalVisible2] = useState(false);
   const [industrias, setIndustrias] = useState<any[]>([]);
-  const [modalLactacaoVisible, setModalLactacaoVisible] = useState(false);
   const [selectedBufala, setSelectedBufala] = useState<AnimalLac | null>(null);
   const [loading, setLoading] = useState(true);
   const [paginaAtual, setPaginaAtual] = useState(1);
   const [totalPaginas, setTotalPaginas] = useState(1);
   const itensPorPagina = 10;
+  const [isAddingLactacao, setIsAddingLactacao] = useState(false);
 
   const fetchCiclos = async () => {
     if (!propriedadeSelecionada) return;
@@ -76,6 +77,7 @@ export const LactacaoScreen = () => {
         mediaDiaria: c.mediaDiaria || 0,
         status: c.status || "Inativo",
         raca: c.raca || "—",
+        idCicloLactacao: c.idCicloLactacao,
       }));
 
       setAnimais(animaisFormatados);
@@ -171,7 +173,6 @@ export const LactacaoScreen = () => {
             renderItem={({ item }) => (
                 <CardLactacao animal={item} onPress={() => {
                   setSelectedBufala(item);
-                  setModalLactacaoVisible(true);
                 }}/>
             )}
             contentContainerStyle={styles.content}
@@ -215,22 +216,22 @@ export const LactacaoScreen = () => {
         />
       </CustomModal>
 
-      <CustomModal
-        visible={modalLactacaoVisible}
-        onClose={() => setModalLactacaoVisible(false)}
-      >
-        {selectedBufala && (
-          <FormLactacao
+      {!!selectedBufala && (
+        <LactacaoAddBottomSheet
             animais={[
               {
                 id_bufala: selectedBufala.id,
                 brinco: selectedBufala.brinco,
+                id_ciclo_lactacao: selectedBufala.idCicloLactacao || '',
               },
             ]}
-            onSuccess={() => setModalLactacaoVisible(false)}
-          />
-        )}
-      </CustomModal>
+            propriedadeId={propriedadeSelecionada!}
+            onClose={() => setSelectedBufala(null)} // Fecha ao limpar o estado
+            onSuccess={() => {
+                setSelectedBufala(null); // Fecha
+            }}
+        />
+      )}
     </View>
   );
 };

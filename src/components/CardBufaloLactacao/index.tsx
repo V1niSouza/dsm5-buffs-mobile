@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     marginTop: 6,
     marginBottom: 6,
-    gap: 8,
+    gap: 5,
   },
   chip: {
     flexDirection: "row",
