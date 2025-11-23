@@ -53,6 +53,15 @@ export interface LactacaoRegistroPayload {
   dt_ordenha: string; // ISOString
 }
 
+export interface ColetaRegistroPayload {
+  id_industria: string;
+  id_propriedade: string; // Assumindo que IDs são strings/UUIDs na API
+  resultado_teste: boolean;
+  observacao?: string;
+  quantidade: number;
+  dt_coleta: string; // ISOString com data e hora
+}
+
 export const getCiclosLactacao = async (propriedadeId: number) => {
   try {
     if (!propriedadeId) throw new Error("ID da propriedade é obrigatório.");
@@ -116,10 +125,9 @@ export const getIndustriasPorPropriedade = async (propriedadeId: number) => {
   try {
     if (!propriedadeId) throw new Error("ID da propriedade é obrigatório.");
 
-    const response: { data: Industria[] } = await apiFetch(
+    const response: Industria[] = await apiFetch(
       `/industrias/propriedade/${propriedadeId}`
     );
-    console.log("Indústrias retornadas pela API:", response);
     return response || [];
     
   } catch (error: any) {
@@ -139,5 +147,18 @@ export const registrarLactacaoApi = async (payload: LactacaoRegistroPayload) => 
   } catch (error) {
     console.error("Erro ao registrar lactação na API:", error);
     throw new Error("Falha ao registrar lactação.");
+  }
+};
+
+export const registrarColetaApi = async (payload: ColetaRegistroPayload) => {
+  try {
+    const response = await apiFetch("/coletas", { 
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+    return response;
+  } catch (error) {
+    console.error("Erro ao registrar coleta na API:", error);
+    throw new Error("Falha ao registrar coleta.");
   }
 };

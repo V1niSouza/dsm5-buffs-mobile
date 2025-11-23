@@ -16,15 +16,18 @@ import Bucket from "../../assets/images/bucket.svg";
 import Truck from "../../assets/images/truck-side.svg";
 import { getCiclosLactacao } from "../services/lactacaoService";
 import { Modal as CustomModal } from "../components/Modal";
-import { FormColeta } from "../components/FormColeta";
+import { ColetaAddBottomSheet } from "../components/FormColeta";
 import { FormEstoque } from "../components/FormEstoque";
 import { CardLactacao } from "../components/CardBufaloLactacao";
 import { usePropriedade } from "../context/PropriedadeContext";
 import { getIndustriasPorPropriedade } from "../services/lactacaoService";
+import Plus from '../../assets/images/plus.svg';
+import Scanner from '../../assets/images/qr-scan.svg';
 
 import Button from "../components/Button";
 import AgroCore from "../icons/agroCore";
 import { LactacaoAddBottomSheet } from "../components/FormLactacao";
+import { FloatingAction } from "react-native-floating-action";
 
 export interface AnimalLac {
   id: string;
@@ -57,11 +60,11 @@ export const LactacaoScreen = () => {
   const [totalPaginas, setTotalPaginas] = useState(1);
   const itensPorPagina = 10;
   const [isAddingLactacao, setIsAddingLactacao] = useState(false);
+  const [isAddingColeta, setIsAddingColeta] = useState(false);
 
   const fetchCiclos = async () => {
     if (!propriedadeSelecionada) return;
-    setLoading(true);
-    setRefreshing(true);
+
     try {
       const { ciclos, totalLactando, dataFormatada, quantidadeAtual } =
         await getCiclosLactacao(propriedadeSelecionada);
@@ -89,16 +92,29 @@ export const LactacaoScreen = () => {
       console.error("Erro ao buscar ciclos de lactação:", error);
       setAnimais([]);
       setTotalPaginas(1);
-    } finally {
-      setRefreshing(false);
+
     }
   };
+
+const fetchIndustrias = async () => {
+    if (!propriedadeSelecionada) return;
+    try {
+      const response = await getIndustriasPorPropriedade(propriedadeSelecionada);
+      // Sua função getIndustriasPorPropriedade retorna response ou um array?
+      // Pela definição do service, ela retorna um objeto com { data: Industria[] }
+      setIndustrias(response); 
+    } catch (error) {
+      console.error("Erro ao buscar indústrias:", error);
+      setIndustrias([]);
+    }
+};
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       if (propriedadeSelecionada){
         await fetchCiclos();
+        await fetchIndustrias();
       }
       setLoading(false);
     };
@@ -106,13 +122,46 @@ export const LactacaoScreen = () => {
   }, [propriedadeSelecionada]);
 
   const onRefresh = async () => {
-    await fetchCiclos();
+      if (!propriedadeSelecionada) return;
+      setRefreshing(true); // Ativa o RefreshControl
+      try {
+          await fetchCiclos();
+          await fetchIndustrias();
+      } catch (error) {
+          console.error("Erro no refresh:", error);
+      } finally {
+          setRefreshing(false); // ✅ Desativa o RefreshControl (garantido)
+      }
   };
 
   const animaisPaginados = animais.slice(
     (paginaAtual - 1) * itensPorPagina,
     paginaAtual * itensPorPagina
   );
+
+  const actions = [
+    {
+      text: "Atualizar Estoque",
+      icon: <Bucket width={18} height={18} style={{ margin: 4 }} />, 
+      name: "estqoue",
+      position: 1,
+      color: colors.yellow.base,
+    },
+    {
+      text: "Registrar Coleta",
+      icon: <Truck width={15} height={15} style={{ margin: 6 }} />, 
+      name: "coleta",
+      position: 2,
+      color: colors.yellow.base,
+    },
+  ];
+  const handleActionPress = (name: string | undefined) => {
+    if (name === "estqoue") {
+      setModalVisible1(true);
+    } else if (name === "coleta") {
+      setIsAddingColeta(true);
+    }
+  };
 
   if (loading) {
     return (
@@ -129,22 +178,6 @@ export const LactacaoScreen = () => {
       <View style={styles.header}>
         <View style={{ alignItems: "center" }}>
           <Text style={styles.header1Text}>Lactação</Text>
-        </View>
-
-        <View style={styles.headerButtons}>
-          <TouchableOpacity
-            onPress={() => setModalVisible1(true)}
-            style={styles.button}
-          >
-            <Bucket width={18} height={18} style={{ margin: 4 }} />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={() => setModalVisible2(true)}
-            style={styles.button}
-          >
-            <Truck width={15} height={15} style={{ margin: 6 }} />
-          </TouchableOpacity>
         </View>
       </View>
 
@@ -203,18 +236,30 @@ export const LactacaoScreen = () => {
           />
         </ScrollView>
       </MainLayout>
+      <FloatingAction
+        actions={actions}
+        onPressItem={handleActionPress}
+        buttonSize={60}
+        color={colors.yellow.dark} 
+        floatingIcon={<Plus width={24} height={24} fill={'black'} />} 
+        position="right" 
+      />
 
       {/* Modais */}
       <CustomModal visible={modalVisible1} onClose={() => setModalVisible1(false)}>
         <FormEstoque onSuccess={() => setModalVisible1(false)} />
       </CustomModal>
 
-      <CustomModal visible={modalVisible2} onClose={() => setModalVisible2(false)}>
-        <FormColeta
-          industrias={industrias}
-          onSuccess={() => setModalVisible2(false)}
+      {isAddingColeta && (
+        <ColetaAddBottomSheet
+            industrias={industrias}
+            propriedadeId={propriedadeSelecionada!}
+            onClose={() => setIsAddingColeta(false)}
+            onSuccess={() => {
+                setIsAddingColeta(false);
+            }}
         />
-      </CustomModal>
+      )}
 
       {!!selectedBufala && (
         <LactacaoAddBottomSheet
