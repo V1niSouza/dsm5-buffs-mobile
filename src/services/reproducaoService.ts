@@ -1,5 +1,14 @@
 import { apiFetch } from "../lib/apiClient";
 
+export interface ReproducaoDashboardStats {
+  totalEmAndamento: number;
+  totalConfirmada: number;
+  totalFalha: number;
+  ultimaDataReproducao: string; // Ex: "2025-11-10"
+}
+
+
+
 const fetchNomeAnimal = async (id: string) => {
   if (!id) return "-";
   try {
@@ -14,6 +23,35 @@ const fetchNomeAnimal = async (id: string) => {
 const fetchNomeSemenOuOvulo = async (id: string) => {
   if (!id) return "-";
   return `${id.slice(0, 5)}`;
+};
+
+export const getReproducaoDashboardStats = async (propriedadeId: number): Promise<ReproducaoDashboardStats> => {
+  if (!propriedadeId) {
+    return {
+      totalEmAndamento: 0,
+      totalConfirmada: 0,
+      totalFalha: 0,
+      ultimaDataReproducao: "-",
+    };
+  }
+  
+  try {
+    const response = await apiFetch(`/dashboard/reproducao/${propriedadeId}`);
+    return {
+      totalEmAndamento: response.totalEmAndamento || 0,
+      totalConfirmada: response.totalConfirmada || 0,
+      totalFalha: response.totalFalha || 0,
+      ultimaDataReproducao: response.ultimaDataReproducao || "-",
+    };
+  } catch (error) {
+    console.error("Erro ao buscar estatísticas do dashboard de reprodução:", error);
+    return {
+      totalEmAndamento: 0,
+      totalConfirmada: 0,
+      totalFalha: 0,
+      ultimaDataReproducao: "-",
+    };
+  }
 };
 
 export const getReproducoes = async (propriedadeId: number) => {
@@ -37,8 +75,20 @@ export const getReproducoes = async (propriedadeId: number) => {
       page++;
     }
 
-    const reproducoesFormatadas = await Promise.all(
-      allReproducoes.map(async (r) => ({
+    const reproducoesFormatadas = allReproducoes.map((r) => {
+      const brincoVaca = r.brinco_femea || r.id_bufala || "-";
+      let brincoMacho;
+      if (r.brinco_macho) {
+        brincoMacho = r.brinco_macho;
+      } else if (r.id_semen) {
+        brincoMacho = r.id_semen.slice(0, 5); 
+      } else if (r.id_ovulo) {
+        brincoMacho = r.id_ovulo.slice(0, 5);
+      } else {
+        brincoMacho = "-";
+      }
+
+      return {
         id: r.id_reproducao,
         status: r.status,
         dt_evento: new Date(r.dt_evento).toLocaleDateString("pt-BR"),
@@ -49,17 +99,15 @@ export const getReproducoes = async (propriedadeId: number) => {
             ? "Natural"
             : "-",
         tipoParto: r.tipo_parto || "-",
-        brincoVaca: r.id_bufala ? await fetchNomeAnimal(r.id_bufala) : "-",
-        brincoTouro: r.id_bufalo
-          ? await fetchNomeAnimal(r.id_bufalo)
-          : r.id_semen
-          ? await fetchNomeSemenOuOvulo(r.id_semen)
-          : r.id_ovulo
-          ? await fetchNomeSemenOuOvulo(r.id_ovulo)
-          : "-",
+        brincoVaca: brincoVaca,
+        brincoTouro: brincoMacho, 
         primeiraCria: r.primeira_cria || false,
-      }))
-    );
+        id_bufala: r.id_bufala,
+        id_bufalo: r.id_bufalo,
+        id_semen: r.id_semen, 
+        previsaoParto: r.previsaoParto,
+      };
+    });
 
     return reproducoesFormatadas;
   } catch (error: any) {

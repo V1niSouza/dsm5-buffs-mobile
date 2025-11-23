@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ScrollView, RefreshControl, TouchableOpacity, A
 import { MainLayout } from '../layouts/MainLayout';
 import { colors } from '../styles/colors';
 import Plus from '../../assets/images/plus.svg';
-import { getReproducoes } from '../services/reproducaoService';
+import { getReproducaoDashboardStats, getReproducoes, ReproducaoDashboardStats } from '../services/reproducaoService';
 import { Modal } from '../components/Modal';
 import { FormReproducaoAtt } from '../components/FormReproductionAtt';
 import { FormReproducaoAdd } from '../components/FormReproductionAdd';
@@ -24,12 +24,25 @@ export const ReproducaoScreen = () => {
   const [totalPaginas, setTotalPaginas] = useState(1);
   const itensPorPagina = 10;
 
+  const [dashboardStats, setDashboardStats] = useState<ReproducaoDashboardStats>({
+    totalEmAndamento: 0,
+    totalConfirmada: 0,
+    totalFalha: 0,
+    ultimaDataReproducao: "-",
+  });
+
   const fetchReproducoes = async () => {
     if (!propriedadeSelecionada) return;
     setLoading(true);
     setRefreshing(true);
     try {
-      const data = await getReproducoes(propriedadeSelecionada);
+      const statsPromise = getReproducaoDashboardStats(propriedadeSelecionada);
+      const listaPromise = getReproducoes(propriedadeSelecionada);
+      
+      // Aguarda ambas as chamadas
+      const [stats, data] = await Promise.all([statsPromise, listaPromise]);
+
+      setDashboardStats(stats);
       setReproducoes(data);
       setTotalPaginas(Math.ceil(data.length / itensPorPagina));
       setPaginaAtual(1); 
@@ -101,10 +114,10 @@ export const ReproducaoScreen = () => {
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         >
           <DashReproduction
-            emProcesso={reproducoes.length > 0 ? reproducoes.filter(r => r.status === 'Em andamento').length : 0}
-            confirmadas={reproducoes.length > 0 ? reproducoes.filter(r => r.status === 'Confirmada').length : 0}
-            falhas={reproducoes.length > 0 ? reproducoes.filter(r => r.status === 'Falha').length : 0}
-            ultimaData={reproducoes.length > 0 ? reproducoes[0].dt_evento : "-"}
+            emProcesso={dashboardStats.totalEmAndamento}
+            confirmadas={dashboardStats.totalConfirmada}
+            falhas={dashboardStats.totalFalha}
+            ultimaData={dashboardStats.ultimaDataReproducao === "-" ? "-" : dashboardStats.ultimaDataReproducao}
           />
 
           <View style={styles.content}>
