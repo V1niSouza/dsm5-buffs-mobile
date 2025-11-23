@@ -5,7 +5,7 @@ import { colors } from '../styles/colors';
 import Plus from '../../assets/images/plus.svg';
 import { getReproducaoDashboardStats, getReproducoes, ReproducaoDashboardStats } from '../services/reproducaoService';
 import { Modal } from '../components/Modal';
-import { FormReproducaoAdd } from '../components/FormReproductionAdd';
+import { ReproducaoAddBottomSheet } from '../components/FormReproductionAdd';
 import DashReproduction from '../components/DashReproducao';
 import { CardReproducao } from '../components/CardBufaloReproduction';
 import Button from '../components/Button';
@@ -24,6 +24,7 @@ export const ReproducaoScreen = () => {
   const [totalPaginas, setTotalPaginas] = useState(1);
   const itensPorPagina = 10;
   const [isAttBottomSheetVisible, setIsAttBottomSheetVisible] = useState(false);
+  const [isAddBottomSheetVisible, setIsAddBottomSheetVisible] = useState(false);
   const [dashboardStats, setDashboardStats] = useState<ReproducaoDashboardStats>({
     totalEmAndamento: 0,
     totalConfirmada: 0,
@@ -105,17 +106,6 @@ const handlePageChange = async (novaPagina: number) => {
         <View style={{ alignItems: 'center' }}>
           <Text style={styles.header1Text}>Reprodução</Text>
         </View>
-        <View style={styles.headerButtons}>
-          <TouchableOpacity
-            onPress={() => {
-              setReproducaoSelecionada(null);
-              setModalVisible(true);
-            }}
-            style={styles.button}
-          >
-            <Plus width={15} height={15} style={{ margin: 6 }} />
-          </TouchableOpacity>
-        </View>
       </View>
 
       <MainLayout>
@@ -171,6 +161,29 @@ const handlePageChange = async (novaPagina: number) => {
         </ScrollView>
       </MainLayout>
 
+      <TouchableOpacity
+        onPress={() => {
+         setReproducaoSelecionada(null);
+         setIsAddBottomSheetVisible(true); 
+        }}
+        // 🎯 Usando o novo estilo fabButtonContainer para posicionamento fixo
+        style={styles.fabButtonContainer}> 
+        <Plus width={24} height={24} color="#FFF" />
+      </TouchableOpacity>
+
+      {isAddBottomSheetVisible && (
+        <ReproducaoAddBottomSheet
+          // Fecha o BottomSheet e limpa a seleção
+          onClose={() => setIsAddBottomSheetVisible(false)}
+          // Após sucesso, recarrega a página ATUAL (geralmente a primeira, ou onde estava)
+          onSuccess={() => {
+            setIsAddBottomSheetVisible(false);
+            fetchReproducoes(1); // Recarrega a primeira página
+          }}
+        />
+      )}
+
+
       {isAttBottomSheetVisible && reproducaoSelecionada && (
         <ReproducaoAttBottomSheet
           initialData={reproducaoSelecionada}
@@ -198,9 +211,21 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingLeft: 16,
   },
-  button: {
-    backgroundColor: colors.yellow.dark,
-    borderRadius: 50,
+fabButtonContainer: { 
+    position: 'absolute', // Permite flutuar sobre o conteúdo
+    bottom: 30,          // Distância do rodapé
+    right: 20,           // Distância da lateral direita
+    width: 60,
+    height: 60,
+    borderRadius: 30, 
+    backgroundColor: colors.yellow.dark, // Usando uma cor escura para contraste
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 }, // Sombra mais forte para destaque
+    shadowOpacity: 0.4,
+    shadowRadius: 5.46,
+    elevation: 8,
   },
   header1Text: {
     fontSize: 20,
