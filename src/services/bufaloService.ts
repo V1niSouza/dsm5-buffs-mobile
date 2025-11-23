@@ -1,4 +1,5 @@
 import { apiFetch } from "../lib/apiClient";
+import { grupoService, Grupo } from "./grupoService"; // Importe o seu grupoService
 
 export const getBufalos = async (propriedadeId: number, page = 1, limit = 10) => {
   try {
@@ -176,6 +177,27 @@ export const getBufaloByBrincoAndSexo = async (
   }
 };
 
+export const getGrupos = async (idPropriedade: number): Promise<Grupo[]> => {
+    return grupoService.getAllByPropriedade(idPropriedade);
+}
 
+// Nova função para mover o búfalo de grupo
+export const moverBufaloDeGrupo = async (idBufalo: string, idNovoGrupo: string) => {
 
-export default { getBufalos, getBufaloDetalhes, createBufalo, updateBufalo, deleteBufalo, getRacas, filtrarBufalos, getBufaloPorMicrochip, getBufaloByBrincoAndSexo };
+    const payload = {
+        ids_bufalos: [idBufalo],
+        id_novo_grupo: idNovoGrupo,
+        motivo: "Mudança manual de grupo via tela de animal",
+    };
+
+    // Rota: /bufalos/grupo/mover (método PATCH)
+    await apiFetch("/bufalos/grupo/mover", {
+        method: "PATCH",
+        body: JSON.stringify(payload),
+        headers: {
+            "Content-Type": "application/json",
+        },
+    });
+}
+
+export default { getGrupos, moverBufaloDeGrupo, getBufalos, getBufaloDetalhes, createBufalo, updateBufalo, deleteBufalo, getRacas, filtrarBufalos, getBufaloPorMicrochip, getBufaloByBrincoAndSexo };

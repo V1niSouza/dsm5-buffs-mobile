@@ -131,7 +131,7 @@ export default function AlertasPendentes({ idPropriedade }: { idPropriedade: str
         style={[
           styles.priorityBar,
           item.prioridade === "ALTA"
-            ? { backgroundColor: colors.red.base }
+            ? { backgroundColor: colors.red.inactive }
             : { backgroundColor: colors.yellow.warning }
         ]}
       />

@@ -143,14 +143,14 @@ export const RebanhoScreen = () => {
   const actions = [
     {
       text: "Novo Animal",
-      icon: <Plus width={24} height={24} fill="white" />, // Use seu SVG aqui
+      icon: <Plus width={24} height={24} fill="black" />, // Use seu SVG aqui
       name: "NovoAnimal",
       position: 1,
       color: colors.yellow.base,
     },
     {
       text: "Scanner NFC",
-      icon: <Scanner width={24} height={24} fill="white" />, // Use seu SVG aqui
+      icon: <Scanner width={24} height={24} fill="black" />, // Use seu SVG aqui
       name: "NfcScanner",
       position: 2,
       color: colors.yellow.base,

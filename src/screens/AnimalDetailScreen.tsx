@@ -40,6 +40,12 @@ interface BufaloDetalhes {
     maeNome?: string;
 }
 
+interface Grupo {
+    id_grupo: string; // Tipo conforme o grupoService/API
+    nome_grupo: string; // Tipo conforme o grupoService/API
+    color: string;
+}
+
 type AnimalDetailRouteProp = RouteProp<RootStackParamList, "AnimalDetail">;
 
 export const AnimalDetailScreen = () => {
@@ -377,7 +383,7 @@ export const AnimalDetailScreen = () => {
       {showAddButton && (
           <View style={styles.addButtonContainer}>
               <TouchableOpacity style={styles.floatingButton} onPress={onAddPress}>
-                <Text><Plus width={24} height={24} fill={'black'} /></Text>
+                <Text style={{padding:18}}><Plus width={24} height={24} fill={'black'} /></Text>
               </TouchableOpacity>
           </View>
       )}
@@ -464,20 +470,19 @@ const styles = StyleSheet.create({
     position: 'absolute', 
     bottom: 24, 
     right: 24, 
+
   },
   floatingButton: {
     width: 60,
     height: 60,
     borderRadius: 30, 
     backgroundColor: colors.yellow.base, 
-    justifyContent: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-    alignItems: 'center',
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 3.84,
     elevation: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

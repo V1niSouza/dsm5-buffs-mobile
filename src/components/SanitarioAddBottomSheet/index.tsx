@@ -6,17 +6,35 @@ import {
     TextInput, 
     TouchableOpacity, 
     Switch, 
-    Animated, // Adicionado para a animação
-    Easing // Adicionado para a animação
+    Animated,
+    Easing,
+    Platform,
+    ToastAndroid,
+    Alert,
 } from "react-native";
 import BottomSheet, { BottomSheetScrollView, BottomSheetBackdrop } from "@gorhom/bottom-sheet";
 import { colors } from "../../styles/colors"; 
 import { DatePickerModal } from "../DatePickerModal"; 
 import dayjs from "dayjs";
 import DropDownPicker from "react-native-dropdown-picker"; 
-import sanitarioService from "../../services/sanitarioService"; // Seu serviço original
+import sanitarioService from "../../services/sanitarioService"; 
+import YellowButton from "../Button"; // Assumindo o componente de botão padrão
 
-// Tipagem baseada no payload de adição
+// ==========================================================
+// --- CONFIGURAÇÃO DE CORES (Padrão Unificado) ---
+// ==========================================================
+const defaultColors = {
+    primary: { base: "#FAC638" },
+    gray: { base: "#6B7280", claro: "#F8F7F5", disabled: "#E5E7EB" },
+    text: { primary: "#111827", secondary: "#4B5563" },
+    border: "#E5E7EB",
+    white: { base: "#FFF" }
+};
+const mergedColors = { ...defaultColors, ...colors };
+
+// ==========================================================
+// --- INTERFACES E DADOS ---
+// ==========================================================
 interface SanitarioPayload {
     id_bufalo: string;
     id_medicao?: string;
@@ -36,7 +54,6 @@ interface SanitarioAddBottomSheetProps {
     propriedadeId: number;
 }
 
-// Dados iniciais para um novo registro
 const initialFormData: Omit<SanitarioPayload, 'id_bufalo'> = {
     dt_aplicacao: dayjs().format("YYYY-MM-DD"), 
     dosagem: undefined,
@@ -48,7 +65,9 @@ const initialFormData: Omit<SanitarioPayload, 'id_bufalo'> = {
     id_medicao: undefined,
 };
 
-// --- Componente de Input com Floating Label (Replicado do Zootecnico) ---
+// ==========================================================
+// --- Componente de Input com Floating Label (UNIFICADO) ---
+// ==========================================================
 interface FloatingLabelInputProps {
     label: string;
     value: string;
@@ -59,14 +78,10 @@ interface FloatingLabelInputProps {
 }
 
 const InputWithFloatingLabel: React.FC<FloatingLabelInputProps> = ({
-    label,
-    value,
-    onChangeText,
-    keyboardType = "default",
-    multiline = false,
-    style,
+    label, value, onChangeText, keyboardType = "default", multiline = false, style,
 }) => {
     const [isFocused, setIsFocused] = useState(false);
+    // Usa 'floatingStylesLocal' e 'styles.inputBase' definidos no final
     const focusAnim = useRef(new Animated.Value(value ? 1 : 0)).current;
 
     const handleFocus = () => {
@@ -86,25 +101,19 @@ const InputWithFloatingLabel: React.FC<FloatingLabelInputProps> = ({
     }, [value]);
 
     const labelStyle = {
-        top: focusAnim.interpolate({
-            inputRange: [0, 1],
-            outputRange: [18, -12], 
-        }),
-        fontSize: focusAnim.interpolate({
-            inputRange: [0, 1],
-            outputRange: [16, 12],
-        }),
+        top: focusAnim.interpolate({ inputRange: [0, 1], outputRange: [18, -12] }),
+        fontSize: focusAnim.interpolate({ inputRange: [0, 1], outputRange: [16, 12] }),
         color: focusAnim.interpolate({
             inputRange: [0, 1],
-            outputRange: ["#6B7280", isFocused ? (colors.yellow.base || "#FAC638") : "#6B7280"], 
+            outputRange: [mergedColors.gray.base, isFocused ? mergedColors.primary.base : mergedColors.gray.base], 
         }),
     };
 
-    const borderColor = isFocused ? (colors.yellow.base || "#FAC638") : (colors.gray.base || "#E5E7EB");
+    const borderColor = isFocused ? mergedColors.primary.base : mergedColors.border;
     
     return (
-        <View style={[floatingStyles.inputContainer, multiline && floatingStyles.inputContainerMultiline, style]}>
-            <Animated.Text style={[floatingStyles.label, labelStyle]}>
+        <View style={[floatingStylesLocal.inputContainer, multiline && floatingStylesLocal.inputContainerMultiline, style]}>
+            <Animated.Text style={[floatingStylesLocal.label, labelStyle]}>
                 {label}
             </Animated.Text>
             <TextInput
@@ -141,13 +150,14 @@ export const SanitarioAddBottomSheet: React.FC<SanitarioAddBottomSheetProps> = (
     const [openMedicacao, setOpenMedicacao] = useState(false);
     const [medicacaoSelecionada, setMedicacaoSelecionada] = useState<string | null>(null);
     const [loadingMedicacoes, setLoadingMedicacoes] = useState(true);
+    const [isSaving, setIsSaving] = useState(false); // Para desabilitar o botão
     
     // Sincroniza o id_medicao
     useEffect(() => {
         setFormData(prev => ({ ...prev, id_medicao: medicacaoSelecionada || undefined }));
     }, [medicacaoSelecionada]);
 
-    // Lógica de carregamento de medicações (mantida a original)
+    // Lógica de carregamento de medicações
     useEffect(() => {
         const fetchMedicacoes = async () => {
           if (!propriedadeId){
@@ -156,6 +166,7 @@ export const SanitarioAddBottomSheet: React.FC<SanitarioAddBottomSheetProps> = (
           }
           setLoadingMedicacoes(true);
           try {
+            // Assumindo que `sanitarioService.getMedicamentosByPropriedade` existe e funciona
             const data = await sanitarioService.getMedicamentosByPropriedade(propriedadeId);
             
             const mappedData = data.map(g => ({ 
@@ -180,10 +191,32 @@ export const SanitarioAddBottomSheet: React.FC<SanitarioAddBottomSheetProps> = (
     }, [onClose]);
 
     const handleChange = (key: keyof typeof initialFormData, value: any) => {
-        setFormData((prev) => ({ ...prev, [key]: value }));
+        // Se o retorno for desativado, limpa a data de retorno
+        if (key === 'necessita_retorno' && value === false) {
+             setFormData((prev) => ({ ...prev, [key]: value, dt_retorno: undefined }));
+        } else {
+             setFormData((prev) => ({ ...prev, [key]: value }));
+        }
     };
 
+    const showToast = (message: string, isError: boolean = false) => {
+        if (Platform.OS === 'android') {
+            ToastAndroid.show(message, ToastAndroid.LONG);
+        } else {
+            Alert.alert(isError ? "Erro" : "Sucesso", message);
+        }
+    };
+
+
     const handleSave = () => {
+        if (isSaving) return;
+        
+        if (!formData.doenca && !formData.id_medicao) {
+            return showToast("Preencha o nome da Doença ou selecione uma Medicação.", true);
+        }
+
+        setIsSaving(true); 
+        
         const payloadApi: SanitarioPayload = {
             id_bufalo: id_bufalo,
             id_medicao: formData.id_medicao,
@@ -192,22 +225,42 @@ export const SanitarioAddBottomSheet: React.FC<SanitarioAddBottomSheetProps> = (
             unidade_medida: formData.unidade_medida,
             doenca: formData.doenca,
             necessita_retorno: formData.necessita_retorno,
-            dt_retorno: formData.necessita_retorno ? formData.dt_retorno : undefined,
+            // Inclui dt_retorno apenas se necessário e preenchido
+            dt_retorno: (formData.necessita_retorno && formData.dt_retorno) ? formData.dt_retorno : undefined, 
             observacao: formData.observacao,
         };
         
+        // Remove campos vazios, nulos ou indefinidos do payload
         const cleanedPayload = Object.fromEntries(
             Object.entries(payloadApi).filter(([_, value]) => value !== null && value !== undefined && value !== '')
         ) as SanitarioPayload;
         
-        onAddSave(cleanedPayload); 
+        // Simulação de delay para o botão de salvar
+        setTimeout(() => {
+            onAddSave(cleanedPayload); 
+            setIsSaving(false);
+            showToast("Registro sanitário adicionado com sucesso!");
+            onClose();
+        }, 800);
     };
     
     const formatDate = (dateString?: string | null) => {
         if (!dateString) return "Selecionar";
-        // Ajustado para usar dayjs diretamente para consistência
         return dayjs(dateString).format("DD/MM/YYYY"); 
     };
+
+    // Determina qual data o Modal deve abrir
+    const dateToOpen = useMemo(() => {
+        if (showDatePicker) {
+            // Se o retorno é necessário mas ainda não tem data, abre para o retorno
+            if (formData.necessita_retorno && !formData.dt_retorno) {
+                return dayjs().format("YYYY-MM-DD"); // Sugere hoje ou uma data padrão
+            }
+            // Se clicou na data de aplicação, usa a data de aplicação
+            return formData.dt_retorno || formData.dt_aplicacao || dayjs().format("YYYY-MM-DD");
+        }
+        return dayjs().format("YYYY-MM-DD");
+    }, [showDatePicker, formData.dt_aplicacao, formData.dt_retorno, formData.necessita_retorno]);
 
 
 return (
@@ -228,14 +281,19 @@ return (
         />
     )}
   >
-    <BottomSheetScrollView contentContainerStyle={styles.container} scrollEnabled={!openMedicacao}>
+    <BottomSheetScrollView 
+        contentContainerStyle={styles.container} 
+        nestedScrollEnabled={true}
+        // Desativa o scroll do ScrollView quando o Dropdown está aberto
+        scrollEnabled={!openMedicacao} 
+    >
 
                 {/* Header */}
                 <View style={styles.header}>
-                    <Text style={styles.headerTitle}>Novo Tratamento Sanitário</Text>
+                    <Text style={styles.headerTitle}>Novo Registro Sanitário</Text>
                 </View>
 
-                {/* Data de Aplicação (NOVO DESIGN DE DATA) */}
+                {/* Data de Aplicação (NOVO DESIGN DE DATA - Fora do Container Principal) */}
                 <View style={styles.listContainerHeader}>
                     <Text style={styles.listLabel}>Data Aplicação:</Text>
                     <TouchableOpacity 
@@ -255,7 +313,7 @@ return (
 
                     {/* Doença (FLOATING LABEL) */}
                     <InputWithFloatingLabel
-                        label="Doença"
+                        label="Doença (Opcional)"
                         value={formData.doenca ?? ""}
                         onChangeText={(t) => handleChange("doenca", t)}
                     />
@@ -276,7 +334,10 @@ return (
                                     placeholder="Selecione a Medicação"
                                     style={styles.dropdownStyle}
                                     dropDownContainerStyle={styles.dropdownContainerStyle}
-                                    listMode="MODAL"
+                                    listMode="SCROLLVIEW"
+                                    // ZIndex para garantir que ele esteja acima do conteúdo
+                                    zIndex={openMedicacao ? 4000 : 1}
+                                    zIndexInverse={openMedicacao ? 1 : 4000}
                                 />
                             )}
                         </View>
@@ -304,12 +365,11 @@ return (
                     {/* Necessita retorno (SWITCH ESTILIZADO) */}
                     <View style={styles.switchItem}>
                         <Text style={styles.listLabel}>Necessita retorno:</Text>
-
                         <Switch
                             value={Boolean(formData.necessita_retorno)}
                             onValueChange={(v) => handleChange("necessita_retorno", v)}
-                            thumbColor="#FFFFFF"
-                            trackColor={{ false: "#E5E7EB", true: colors.yellow.base || "#FAC638" }}
+                            thumbColor={mergedColors.white.base}
+                            trackColor={{ false: mergedColors.border, true: mergedColors.primary.base }}
                         />
                     </View>
 
@@ -318,6 +378,7 @@ return (
                       <View style={styles.dateFieldContainer}>
                         <Text style={styles.listLabel}>Data Retorno:</Text>
                         <TouchableOpacity 
+                            // Abre o DatePicker focado na data de retorno
                             onPress={() => setShowDatePicker(true)}
                             style={styles.dateDisplayButton}
                         >
@@ -330,7 +391,7 @@ return (
 
                     {/* Observação (FLOATING LABEL e multiline) */}
                     <InputWithFloatingLabel
-                        label="Observação"
+                        label="Observação (Opcional)"
                         value={formData.observacao ?? ""}
                         onChangeText={(t) => handleChange("observacao", t)}
                         multiline={true}
@@ -340,38 +401,38 @@ return (
 
                 {/* Footer (Botão de ação) */}
                 <View style={styles.footer}>
-                    <TouchableOpacity
-                        style={[styles.footerBtn, styles.saveBtn]}
+                    <YellowButton
+                        title={isSaving ? "Salvando..." : "Adicionar Registro"}
                         onPress={handleSave}
-                    >
-                        <Text style={styles.saveText}>
-                            Adicionar Registro
-                        </Text>
-                    </TouchableOpacity>
+                        disabled={isSaving}
+                    />
                 </View>
 
+                {/* Modal de Data */}
                 <DatePickerModal
                   visible={showDatePicker}
-                  date={
-                    (formData.necessita_retorno && !formData.dt_retorno) 
-                        ? dayjs().format("YYYY-MM-DD")
-                        : formData.dt_retorno || formData.dt_aplicacao
-                  } 
+                  date={dateToOpen} // Usa a data calculada
                   onClose={() => setShowDatePicker(false)}
                   onSelectDate={(selected) => {
-                    const keyToUpdate = formData.necessita_retorno && !formData.dt_retorno 
-                        ? "dt_retorno" 
-                        : "dt_aplicacao";
-                        
-                    handleChange(keyToUpdate as keyof typeof initialFormData, dayjs(selected).format("YYYY-MM-DD"));
+                    const selectedDate = dayjs(selected).format("YYYY-MM-DD");
+                    // Se o retorno é necessário E o dt_retorno está vazio (indicando que foi o botão de retorno que abriu) OU a data atual é a data de retorno (ajuste complexo para evitar bugs)
+                    // Simplificando: se a data de retorno está sendo exibida, atualiza ela. Senão, atualiza a data de aplicação.
+                    if (formData.necessita_retorno && (dateToOpen === formData.dt_retorno || !formData.dt_retorno)) {
+                        handleChange("dt_retorno", selectedDate);
+                    } else {
+                        handleChange("dt_aplicacao", selectedDate);
+                    }
                   }}
                 />
     </BottomSheetScrollView>
   </BottomSheet>
 )};
 
-// --- Estilos Auxiliares do Floating Label (UNIFICADO) ---
-const floatingStyles = StyleSheet.create({
+// ==========================================================
+// --- ESTILOS UNIFICADOS (Baseados no seu padrão) ---
+// ==========================================================
+// Estilos de suporte para o Floating Label
+const floatingStylesLocal = StyleSheet.create({
     inputContainer: {
         marginBottom: 12, 
         paddingTop: 8, 
@@ -383,25 +444,12 @@ const floatingStyles = StyleSheet.create({
     label: {
         position: "absolute",
         left: 12,
-        backgroundColor: "#FFFFFF", 
+        backgroundColor: mergedColors.white.base, 
         paddingHorizontal: 4,
         zIndex: 1,
         fontWeight: "400",
     },
 });
-
-// --- Estilos Principais (UNIFICADO E APRIMORADO) ---
-// Definindo cores de exemplo para uso consistente (Ajuste conforme suas cores globais)
-const defaultColors = {
-    primary: { base: "#FAC638" }, 
-    gray: { base: "#6B7280", claro: "#F8F7F5" },
-    text: { primary: "#111827", secondary: "#4B5563" },
-    border: "#E5E7EB",
-    white: { base: "#FFF" }
-};
-// Mesclando com o 'colors' importado (se ele tiver mais propriedades)
-const mergedColors = { ...defaultColors, ...colors };
-
 
 const styles = StyleSheet.create({
     // Estilos do BottomSheet
@@ -447,6 +495,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: mergedColors.text.primary,
         backgroundColor: mergedColors.white.base,
+        minHeight: 50,
     },
 
     // --- Estilos da Lista e Itens ---
@@ -455,11 +504,11 @@ const styles = StyleSheet.create({
         borderRadius: 16,
         marginHorizontal: 16,
         padding: 16,
-        overflow: "hidden",
+        overflow: "visible",
     },
     listContainerHeader: { // Para o item de data fora do listContainer principal (Data Aplicação)
         backgroundColor: mergedColors.white.base,
-        borderRadius: 8,
+        borderRadius: 16,
         marginHorizontal: 16,
         flexDirection: "row",
         justifyContent: "space-between",
@@ -533,7 +582,8 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         alignItems: "center",
         paddingVertical: 8,
-        marginBottom: 12,
+        // Mantido o marginBottom para seguir o padrão de espaçamento
+        marginBottom: 12, 
     },
 
     // --- Dropdown ---
@@ -547,9 +597,11 @@ const styles = StyleSheet.create({
         borderColor: mergedColors.border,
         backgroundColor: mergedColors.white.base,
         height: 50,
+        minHeight: 50,
     },
     dropdownContainerStyle: {
         borderColor: mergedColors.border,
+        backgroundColor: mergedColors.white.base,
     },
 
     // --- Observação ---
@@ -568,6 +620,7 @@ const styles = StyleSheet.create({
         backgroundColor: mergedColors.white.base,
     },
     footerBtn: {
+        // Estilos do botão replicados para quando o YellowButton não é usado diretamente
         paddingHorizontal: 24,
         height: 50,
         borderRadius: 10,
@@ -583,5 +636,4 @@ const styles = StyleSheet.create({
         color: mergedColors.text.primary,
         fontSize: 16,
     },
-    // Estilos obsoletos removidos ou substituídos pelos novos.
 });
