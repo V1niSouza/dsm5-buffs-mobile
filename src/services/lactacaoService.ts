@@ -183,3 +183,22 @@ export const registrarEstoqueApi = async (payload: EstoqueRegistroPayload) => {
     throw new Error("Falha ao registrar estoque.");
   }
 };
+
+export const encerrarLactacao = async (idCiclo: string | number) => {
+  try {
+    if (!idCiclo) throw new Error("ID do ciclo é obrigatório.");
+
+    const hoje = new Date().toISOString().split("T")[0];
+
+    return await apiFetch(`/ciclos-lactacao/${idCiclo}`, {
+      method: "PATCH",
+      body: JSON.stringify({
+        dt_secagem_real: hoje,
+        observacao: "Seca",
+      }),
+    });
+  } catch (error) {
+    console.error("Erro ao encerrar lactação:", error);
+    throw new Error("Falha ao encerrar lactação.");
+  }
+};
