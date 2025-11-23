@@ -105,10 +105,9 @@ export const CadastrarBufaloForm: React.FC<CadastrarBufaloFormProps> = ({ onClos
             categoria: "PA",
             id_propriedade: propriedadeSelecionada,
         };
-
         await bufaloService.createBufalo(payload);
         showToast("Búfalo cadastrado com sucesso!");
-        } catch (err) {
+        } catch (err) { 
         console.error("Erro ao salvar búfalo:", err);
         showToast("Não foi possível salvar o búfalo.", true);
         }

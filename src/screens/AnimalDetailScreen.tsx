@@ -15,10 +15,27 @@ import AgroCore from '../../src/icons/agroCore';
 import Button from "../components/Button";
 import { ZootecnicoBottomSheet } from "../components/ZootecnicoBottomSheet"; 
 import { SanitarioBottomSheet } from "../components/SanitarioBottomSheet";
+import { AnimalEditBottomSheet } from "../components/AnimalEditBottomSheet";
 
 type RootStackParamList = {
   AnimalDetail: { id: string };
 };
+
+type NivelMaturidade = 'B' | 'N' | 'V' | 'T';
+
+interface BufaloDetalhes {
+    id_bufalo: number;
+    nome: string;
+    brinco: string;
+    sexo: 'F' | 'M';
+    nivel_maturidade: NivelMaturidade;
+    dt_nascimento: string;
+    racaNome: string;
+    id_raca: number;
+    paiNome?: string;
+    maeNome?: string;
+}
+
 type AnimalDetailRouteProp = RouteProp<RootStackParamList, "AnimalDetail">;
 
 export const AnimalDetailScreen = () => {
@@ -38,7 +55,7 @@ export const AnimalDetailScreen = () => {
 
   const [selectedZootec, setSelectedZootec] = useState<any>(null);
   const [selectedSanit, setSelectedSanit] = useState<any>(null);
-
+  const [isEditingInfo, setIsEditingInfo] = useState(false);
   const fetchData = async (
     pageZootecToLoad = pageZootec, 
     pageSanitToLoad = pageSanit
@@ -114,7 +131,17 @@ export const AnimalDetailScreen = () => {
     // fetchData(pageZootec, pageSanit); 
   };
 
-  // --- Componentes Auxiliares ---
+  const handleSaveInfo = async (id_bufalo: number, dadosAtualizados: any) => {
+    try {
+      await bufaloService.updateBufalo(id_bufalo, dadosAtualizados); 
+      setIsEditingInfo(false); // Fecha o BottomSheet usando o estado da tela
+      await fetchData(); // Recarrega os dados para atualizar a tela
+    } catch (error) {
+      console.error("Erro ao salvar informações do animal AQUI:", error);
+      // Lógica para mostrar alerta de erro
+    }
+  };
+
 
   const PaginationComponent = ({ 
     paginaAtual, 
@@ -181,7 +208,7 @@ export const AnimalDetailScreen = () => {
         />
         <View style={styles.cardContainer}>
           
-          {tab === "info" && detalhes && <AnimalInfoCard detalhes={detalhes} />}
+          {tab === "info" && detalhes && <AnimalInfoCard detalhes={detalhes} onEdit={() => setIsEditingInfo(true)} />}
           
           {tab === "zootec" && (
             <FlatList
@@ -251,6 +278,14 @@ export const AnimalDetailScreen = () => {
               onClose={() => setSelectedSanit(null)} 
               onEditSave={handleSaveSanitario}
         />    
+        )}
+
+        {!!isEditingInfo && detalhes && (
+            <AnimalEditBottomSheet 
+                item={detalhes as BufaloDetalhes} 
+                onClose={() => setIsEditingInfo(false)} 
+                onEditSave={handleSaveInfo}
+            />
         )}
       </MainLayout> 
     </View>

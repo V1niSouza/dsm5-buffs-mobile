@@ -3,8 +3,9 @@ import { View, Text, StyleSheet, Switch, TouchableOpacity } from "react-native";
 import { colors } from "../../styles/colors";
 import { ConfirmarAlteracaoStatusModal } from "../ModalAlterarStatus";
 import bufaloService from "../../services/bufaloService";
+import Pen  from "../../../assets/images/pen.svg";
 
-export const AnimalInfoCard = ({ detalhes }: { detalhes: any }) => {
+export const AnimalInfoCard = ({ detalhes, onEdit }: { detalhes: any, onEdit: () => void }) => {
 
   // Função auxiliar para formatar
   function formatarDataSimples(dataISO: string) {
@@ -22,12 +23,11 @@ export const AnimalInfoCard = ({ detalhes }: { detalhes: any }) => {
     T: "Touro",
     V: "Vaca",
   };
+
   const maturidadeTexto = maturidadeMap[detalhes.nivel_maturidade] || detalhes.nivel_maturidade;
   const[isEnabled, setIsEnabled] = useState(Boolean(detalhes?.status));
   const [modalVisible, setModalVisible] = useState(false);
   const [novoStatus, setNovoStatus] = useState<boolean | null>(null);
-
-  
   
   const toggleSwitch = () => {
     const valorPretendido = !isEnabled;
@@ -66,28 +66,32 @@ export const AnimalInfoCard = ({ detalhes }: { detalhes: any }) => {
                 </View>
               )}
             </View>
-            <Text style={styles.brincoText}>Brinco: Nº {detalhes?.brinco ?? '-'}</Text>
+            <Text style={styles.brincoText}>Brinco Nº: {detalhes?.brinco ?? '-'}</Text>
           </View>
-
-          <View style={[
-            styles.statusBadge,
-            { backgroundColor: detalhes?.status ? colors.green.active : colors.red.inactive },
-          ]}>
+          <View style={{flexDirection: 'row', alignItems: 'center', gap: 10}}>
+            <TouchableOpacity onPress={onEdit} style={styles.editButton}>
+              <Pen width={20} height={20} fill={colors.brown.base} />
+            </TouchableOpacity>
             <View style={[
-              styles.statusDot,
-              { backgroundColor: detalhes?.status ? colors.green.extra : colors.red.extra },
-            ]} />
-            <Text style={[
-              styles.statusText,
-              { color: detalhes?.status ? colors.green.text : colors.red.text },
-            ]}>
-              {detalhes?.status ? 'Ativo' : 'Inativo'}
-            </Text>
-            <Switch
-              trackColor={{ false: colors.gray.claro, true: colors.gray.claro }}
-              thumbColor={isEnabled ? colors.green.extra : colors.red.extra}
-              onValueChange={toggleSwitch}
-              value={isEnabled} />
+              styles.statusBadge,
+              { backgroundColor: detalhes?.status ? colors.green.active : colors.red.inactive },
+                ]}>
+              <View style={[
+                styles.statusDot,
+                { backgroundColor: detalhes?.status ? colors.green.extra : colors.red.extra },
+                ]} />
+              <Text style={[
+                styles.statusText,
+                { color: detalhes?.status ? colors.green.text : colors.red.text },
+                   ]}>
+                {detalhes?.status ? 'Ativo' : 'Inativo'}
+              </Text>
+              <Switch
+                trackColor={{ false: colors.gray.claro, true: colors.gray.claro }}
+                thumbColor={isEnabled ? colors.green.extra : colors.red.extra}
+                onValueChange={toggleSwitch}
+                value={isEnabled} />
+            </View>
           </View>
         </View>
         <View style={styles.infoGrid}>
@@ -227,4 +231,7 @@ const styles = StyleSheet.create({
     color: '#1A1A1A', 
     marginTop: 2 
   },
+  editButton: {
+        padding: 5,
+    },
 });

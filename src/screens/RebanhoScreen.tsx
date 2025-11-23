@@ -181,11 +181,6 @@ export const RebanhoScreen = () => {
         <View style={{ alignItems: 'center' }}>
           <Text style={styles.header1Text}>Rebanho</Text>
         </View>
-        <View style={styles.headerButtons}>
-          <TouchableOpacity onPress={() => setSelectedZootec(true)} style={styles.button}>
-            <Plus width={15} height={15} style={{ margin: 6 }}/>
-          </TouchableOpacity>
-        </View>
       </View>
 
       <MainLayout>
@@ -198,12 +193,6 @@ export const RebanhoScreen = () => {
               filtros={filtros}  />
           </View>
           
-          {tagsRecebidas.length > 0 && (
-             <View style={styles.tagConfirmationBox}>
-                 <Text style={styles.tagConfirmationText}>✅ {tagsRecebidas.length} Tags lidas e prontas para processamento.</Text>
-             </View>
-          )}
-
           <FlatList
             data={animaisFiltrados}
             keyExtractor={(item, index) => String(item.id || item.id_bufalo || index)}
@@ -246,33 +235,23 @@ export const RebanhoScreen = () => {
               </View>
             }
           />
-
-          <TouchableOpacity onPress={iniciarScanner} style={styles.button}>
-            <Scanner width={18} height={18} style={{ margin: 6 }} />
-          </TouchableOpacity>
         </ScrollView>
       </MainLayout>
       <FloatingAction
         actions={actions}
         onPressItem={handleActionPress}
         buttonSize={60}
-        color={colors.yellow.dark} // Cor de fundo do botão principal
-        floatingIcon={<Plus width={24} height={24} fill="white" />} // Seu SVG para o ícone de '+'
-        
-        // Posição (opcional, pois o padrão é canto inferior direito)
+        color={colors.yellow.dark} 
+        floatingIcon={<Plus width={24} height={24} fill={'black'} />} 
         position="right" 
       />
 
         {!!selectedZootec && (
-            <CadastrarBufaloForm 
-                // A chave força a remontagem quando um NOVO item é selecionado, 
-                // garantindo que o index={0} seja respeitado na montagem.
-                key={selectedZootec.id_zootec}
-                onClose={() => setSelectedZootec(null)} 
-            />
+          <CadastrarBufaloForm 
+            key={selectedZootec.id_zootec}
+            onClose={() => setSelectedZootec(null)} 
+          />
         )}
-
-
     </View>
   );
 };
