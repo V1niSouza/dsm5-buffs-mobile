@@ -5,13 +5,13 @@ import { colors } from '../styles/colors';
 import Plus from '../../assets/images/plus.svg';
 import { getReproducaoDashboardStats, getReproducoes, ReproducaoDashboardStats } from '../services/reproducaoService';
 import { Modal } from '../components/Modal';
-import { FormReproducaoAtt } from '../components/FormReproductionAtt';
 import { FormReproducaoAdd } from '../components/FormReproductionAdd';
 import DashReproduction from '../components/DashReproducao';
 import { CardReproducao } from '../components/CardBufaloReproduction';
 import Button from '../components/Button';
 import AgroCore from '../icons/agroCore';
 import { usePropriedade } from '../context/PropriedadeContext';
+import { ReproducaoAttBottomSheet } from '../components/FormReproductionAtt';
 
 export const ReproducaoScreen = () => {
   const { propriedadeSelecionada } = usePropriedade();
@@ -23,7 +23,7 @@ export const ReproducaoScreen = () => {
   const [paginaAtual, setPaginaAtual] = useState(1);
   const [totalPaginas, setTotalPaginas] = useState(1);
   const itensPorPagina = 10;
-
+  const [isAttBottomSheetVisible, setIsAttBottomSheetVisible] = useState(false);
   const [dashboardStats, setDashboardStats] = useState<ReproducaoDashboardStats>({
     totalEmAndamento: 0,
     totalConfirmada: 0,
@@ -68,7 +68,7 @@ const onRefresh = async () => {
 
   const handleCardPress = (reproducao: any) => {
     setReproducaoSelecionada(reproducao);
-    setModalVisible(true);
+    setIsAttBottomSheetVisible(true);
   };
 
 const handlePageChange = async (novaPagina: number) => {
@@ -145,7 +145,8 @@ const handlePageChange = async (novaPagina: number) => {
                   tipo_inseminacao: reproducao.tipoInseminacao,
                   id_semen: reproducao.id_semen,
                 }}
-                onPress={() => handleCardPress(reproducao)}
+                onPress={() => {
+                  handleCardPress(reproducao)}}
               />
             ))}
 
@@ -170,6 +171,21 @@ const handlePageChange = async (novaPagina: number) => {
         </ScrollView>
       </MainLayout>
 
+      {isAttBottomSheetVisible && reproducaoSelecionada && (
+        <ReproducaoAttBottomSheet
+          initialData={reproducaoSelecionada}
+          // Fecha o BottomSheet e limpa a seleção
+          onClose={() => {
+            setIsAttBottomSheetVisible(false);
+            setReproducaoSelecionada(null);
+          }}
+          // Após sucesso, recarrega a página ATUAL
+          onSuccess={() => {
+            setIsAttBottomSheetVisible(false);
+            fetchReproducoes(paginaAtual);
+          }}
+        />
+      )}
     </View>
   );
 };

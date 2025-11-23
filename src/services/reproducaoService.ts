@@ -19,6 +19,11 @@ export interface ReproducoesResponse {
   };
 }
 
+export interface ReproducaoUpdatePayload {
+  status: string;
+  tipo_parto: string; 
+}
+
 const fetchNomeAnimal = async (id: string) => {
   if (!id) return "-";
   try {
@@ -123,7 +128,15 @@ export const getReproducoes = async (
     return { reproducoes: [], meta: { totalPages: 1 } };
   }
 };
-export const updateReproducao = async (id: string, data: any) => {
+
+export const updateReproducao = async (
+  id: string, 
+  data: ReproducaoUpdatePayload // Usando a interface de tipagem
+) => {
+  if (!id) {
+    throw new Error("ID da reprodução é obrigatório para atualização.");
+  }
+  
   try {
     const response = await apiFetch(`/cobertura/${id}`, {
       method: "PATCH",
@@ -133,9 +146,10 @@ export const updateReproducao = async (id: string, data: any) => {
       },
     });
     return response;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Erro ao atualizar reprodução:", error);
-    throw error;
+    // Lançar o erro com uma mensagem mais clara, se possível
+    throw new Error(error.message || "Erro desconhecido ao atualizar reprodução.");
   }
 };
 
