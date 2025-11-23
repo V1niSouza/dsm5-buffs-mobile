@@ -105,17 +105,35 @@ export const AnimalDetailScreen = () => {
     fetchData();
   }, [id]);
 
-  // Função que será passada para o BottomSheet para salvar os dados
-  const handleSaveZootecnico = (data: any) => {
+  const handleSaveZootecnico = async (data: any) => {
     console.log("Salvando alterações do registro Zootec:", data);
-    // 1. Chamar o serviço de atualização
-    // Ex: zootecnicoService.update(data);
+    const { id_zootec, ...payload } = data;
+    if (!id_zootec) {
+        console.error("ID do registro zootécnico não encontrado.");
+        return;
+    }
+    try {
+        await zootecnicoService.update(id_zootec, payload); 
+        setSelectedZootec(null); 
+        await fetchData(pageZootec, pageSanit);
+    } catch (error) {
+        console.error("Erro ao atualizar histórico Zootécnico:", error);
+    }
+  };
 
-    // 2. Fechar o BottomSheet
-    setSelectedZootec(null); 
-    
-    // 3. Recarregar a lista (opcional, dependendo da necessidade)
-    // fetchData(pageZootec, pageSanit); 
+  const handleDeleteZootecnico = async (id_zootec: any) => {
+    try {
+      if (!id_zootec) {
+        console.error("ID do registro zootécnico para exclusão não encontrado.");
+        return;
+      }
+      await zootecnicoService.delete(id_zootec); 
+      setSelectedZootec(null); 
+      setPageZootec(1);
+      await fetchData(1, pageSanit); 
+    } catch (error) {
+      console.error("Erro ao excluir histórico Zootécnico:", error);
+    }
   };
 
     // Função que será passada para o BottomSheet para salvar os dados
@@ -268,6 +286,7 @@ export const AnimalDetailScreen = () => {
                 item={selectedZootec} 
                 onClose={() => setSelectedZootec(null)} 
                 onEditSave={handleSaveZootecnico}
+                onDelete={handleDeleteZootecnico}
             />
         )}
         
