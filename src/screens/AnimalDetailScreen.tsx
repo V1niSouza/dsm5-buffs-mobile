@@ -17,6 +17,9 @@ import { ZootecnicoBottomSheet } from "../components/ZootecnicoBottomSheet";
 import { SanitarioBottomSheet } from "../components/SanitarioBottomSheet";
 import { AnimalEditBottomSheet } from "../components/AnimalEditBottomSheet";
 import { usePropriedade } from "../context/PropriedadeContext";
+import { SanitarioAddBottomSheet } from "../components/SanitarioAddBottomSheet";
+import { ZootecnicoAddBottomSheet } from "../components/ZootecnicoAddBottomSheet";
+import Plus from '../../assets/images/plus.svg';
 
 type RootStackParamList = {
   AnimalDetail: { id: string };
@@ -58,6 +61,10 @@ export const AnimalDetailScreen = () => {
   const [selectedZootec, setSelectedZootec] = useState<any>(null);
   const [selectedSanit, setSelectedSanit] = useState<any>(null);
   const [isEditingInfo, setIsEditingInfo] = useState(false);
+
+  const [isAddingZootecnico, setIsAddingZootecnico] = useState(false);
+  const [isAddingSanitario, setIsAddingSanitario] = useState(false);
+
   const fetchData = async (
     pageZootecToLoad = pageZootec, 
     pageSanitToLoad = pageSanit
@@ -106,6 +113,8 @@ export const AnimalDetailScreen = () => {
   useEffect(() => {
     fetchData();
   }, [id]);
+
+
 
   const handleSaveZootecnico = async (data: any) => {
     console.log("Salvando alterações do registro Zootec:", data);
@@ -176,7 +185,29 @@ export const AnimalDetailScreen = () => {
       await fetchData(); // Recarrega os dados para atualizar a tela
     } catch (error) {
       console.error("Erro ao salvar informações do animal AQUI:", error);
-      // Lógica para mostrar alerta de erro
+    }
+  };
+
+  const handleAddZootecnico = async (payload: any) => {
+    try {
+        await zootecnicoService.add(id, payload);
+        setIsAddingZootecnico(false);
+        setPageZootec(1);
+        await fetchData(1, pageSanit);
+    } catch (error) {
+        console.error("Erro ao adicionar histórico Zootécnico:", error);
+    }
+  };
+
+  const handleAddSanitario = async (payload: any) => {
+    try {
+        // id_bufalo deve ser incluído no payload para a API Sanitária
+        await sanitarioService.add({ ...payload, id_bufalo: id });
+        setIsAddingSanitario(false);
+        setPageSanit(1);
+        await fetchData(pageZootec, 1);
+    } catch (error) {
+        console.error("Erro ao adicionar histórico Sanitário:", error);
     }
   };
 
@@ -223,6 +254,16 @@ export const AnimalDetailScreen = () => {
     { key: "sanit", label: "Sanitário" },
   ];
 
+  const showAddButton = tab === "zootec" || tab === "sanit";
+
+  const onAddPress = () => {
+      if (tab === "zootec") {
+          setIsAddingZootecnico(true);
+      } else if (tab === "sanit" && propriedadeSelecionada) {
+          setIsAddingSanitario(true);
+      }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -244,6 +285,7 @@ export const AnimalDetailScreen = () => {
             }
           }} 
         />
+
         <View style={styles.cardContainer}>
           
           {tab === "info" && detalhes && <AnimalInfoCard detalhes={detalhes} onEdit={() => setIsEditingInfo(true)} />}
@@ -295,6 +337,7 @@ export const AnimalDetailScreen = () => {
                 }
               />
             )}
+            
         </View>
         
         {/* Renderização do BottomSheet com a correção de boas práticas */}
@@ -328,7 +371,33 @@ export const AnimalDetailScreen = () => {
                 onEditSave={handleSaveInfo}
             />
         )}
+
       </MainLayout> 
+
+      {showAddButton && (
+          <View style={styles.addButtonContainer}>
+              <TouchableOpacity style={styles.floatingButton} onPress={onAddPress}>
+                <Text><Plus width={24} height={24} fill={'black'} /></Text>
+              </TouchableOpacity>
+          </View>
+      )}
+
+          {isAddingZootecnico && (
+            <ZootecnicoAddBottomSheet
+                id_bufalo={id}
+                onClose={() => setIsAddingZootecnico(false)}
+                onAddSave={handleAddZootecnico}
+            />
+        )}
+
+        {isAddingSanitario && propriedadeSelecionada && (
+            <SanitarioAddBottomSheet
+                id_bufalo={id}
+                propriedadeId={propriedadeSelecionada}
+                onClose={() => setIsAddingSanitario(false)}
+                onAddSave={handleAddSanitario}
+            />
+        )}
     </View>
   );
 };
@@ -390,5 +459,25 @@ const styles = StyleSheet.create({
     marginTop: 12,
     gap: 8,
     marginBottom: 40
+  },
+  addButtonContainer: {
+    position: 'absolute', 
+    bottom: 24, 
+    right: 24, 
+  },
+  floatingButton: {
+    width: 60,
+    height: 60,
+    borderRadius: 30, 
+    backgroundColor: colors.yellow.base, 
+    justifyContent: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    alignItems: 'center',
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
 });
