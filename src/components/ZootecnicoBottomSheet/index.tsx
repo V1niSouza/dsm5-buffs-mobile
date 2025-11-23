@@ -2,7 +2,6 @@ import React, { useCallback, useMemo, useRef, useState } from "react";
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from "react-native";
 import BottomSheet, { BottomSheetScrollView, BottomSheetBackdrop } from "@gorhom/bottom-sheet";
 import { colors } from "../../styles/colors";
-import Pen from "../../../assets/images/pen.svg";
 import { ConfirmarExclusaoModal } from "../ModalAlertaDelete";
 
 interface ZootecnicoItem {

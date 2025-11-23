@@ -16,6 +16,7 @@ import Button from "../components/Button";
 import { ZootecnicoBottomSheet } from "../components/ZootecnicoBottomSheet"; 
 import { SanitarioBottomSheet } from "../components/SanitarioBottomSheet";
 import { AnimalEditBottomSheet } from "../components/AnimalEditBottomSheet";
+import { usePropriedade } from "../context/PropriedadeContext";
 
 type RootStackParamList = {
   AnimalDetail: { id: string };
@@ -46,7 +47,8 @@ export const AnimalDetailScreen = () => {
   const [detalhes, setDetalhes] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-
+  const { propriedadeSelecionada } = usePropriedade();
+  
   const PAGE_SIZE = 10;
   const [pageZootec, setPageZootec] = useState(1);
   const [totalPagesZootec, setTotalPagesZootec] = useState(1);
@@ -136,17 +138,35 @@ export const AnimalDetailScreen = () => {
     }
   };
 
-    // Função que será passada para o BottomSheet para salvar os dados
-  const handleSaveSanitario = (data: any) => {
+  const handleSaveSanitario = async (data: any) => {
     console.log("Salvando alterações do registro Sanit:", data);
-    // 1. Chamar o serviço de atualização
-    // Ex: zootecnicoService.update(data);
+    const { id_sanit, ...payload } = data;
+    if (!id_sanit) {
+        console.error("ID do registro sanitario não encontrado.");
+        return;
+    }
+    try {
+        await sanitarioService.update(id_sanit, payload); 
+        setSelectedSanit(null); 
+        await fetchData(pageSanit, pageZootec);
+    } catch (error) {
+        console.error("Erro ao atualizar histórico Sanitário:", error);
+    }
+  };
 
-    // 2. Fechar o BottomSheet
-    setSelectedSanit(null); 
-    
-    // 3. Recarregar a lista (opcional, dependendo da necessidade)
-    // fetchData(pageZootec, pageSanit); 
+  const handleDeleteSanitario = async (id_sanit: any) => {
+    try {
+      if (!id_sanit) {
+        console.error("ID do registro sanitario para exclusão não encontrado.");
+        return;
+      }
+      await sanitarioService.delete(id_sanit); 
+      setSelectedSanit(null); 
+      setPageSanit(1);
+      await fetchData(1, pageZootec); 
+    } catch (error) {
+      console.error("Erro ao excluir histórico sanitario:", error);
+    }
   };
 
   const handleSaveInfo = async (id_bufalo: number, dadosAtualizados: any) => {
@@ -290,12 +310,14 @@ export const AnimalDetailScreen = () => {
             />
         )}
         
-        {!!selectedSanit && (
+        {!!selectedSanit && propriedadeSelecionada &&(
         <SanitarioBottomSheet 
               key={selectedSanit.id_sanit}
               item={selectedSanit} 
               onClose={() => setSelectedSanit(null)} 
               onEditSave={handleSaveSanitario}
+              propriedadeId={propriedadeSelecionada}
+              onDelete={handleDeleteSanitario}
         />    
         )}
 

@@ -1,12 +1,12 @@
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Switch } from "react-native";
 import BottomSheet, { BottomSheetScrollView, BottomSheetBackdrop } from "@gorhom/bottom-sheet";
 import { colors } from "../../styles/colors";
-import { Modal } from "../Modal";
-import Pen from "../../../assets/images/pen.svg";
 import { DatePickerModal } from "../DatePickerModal";
 import dayjs from "dayjs";
-
+import DropDownPicker from "react-native-dropdown-picker";
+import sanitarioService from "../../services/sanitarioService";
+import { ConfirmarExclusaoModal } from "../ModalAlertaDelete";
 
 interface SanitarioItem {
     id_sanit: string;
@@ -25,14 +25,47 @@ interface SanitarioBottomSheetProps {
     item: SanitarioItem;
     onEditSave: (data: SanitarioItem) => void;
     onClose: () => void;
+    onDelete: (id_sanit: string) => void;
+    propriedadeId: number;
 }
 
-export const SanitarioBottomSheet: React.FC<SanitarioBottomSheetProps> = ({ item, onEditSave, onClose }) => {
+export const SanitarioBottomSheet: React.FC<SanitarioBottomSheetProps> = ({ item, onEditSave, onClose, onDelete, propriedadeId}) => {
     const sheetRef = useRef<BottomSheet>(null);
     const snapPoints = useMemo(() => ["70%", "90%"], []);
     const [isEditing, setIsEditing] = useState(false);
     const [formData, setFormData] = useState<SanitarioItem>({ ...item });
     const [showDatePicker, setShowDatePicker] = useState(false);
+    const [medicacoes, setMedicacoes] = useState<{label:string,value:string}[]>([]);
+    const [openMedicacao, setOpenMedicacao] = useState(false);
+    const [medicacaoSelecionada, setMedicacaoSelecionada] = useState<string | null>(item.id_medicao || null);
+    const [loadingMedicacoes, setLoadingMedicacoes] = useState(true);
+    const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+
+    useEffect(() => {
+        const fetchMedicacoes = async () => {
+          if (!propriedadeId){
+            setLoadingMedicacoes(false);
+            return;
+          }
+          setLoadingMedicacoes(true);
+          try {
+            const data = await sanitarioService.getMedicamentosByPropriedade(propriedadeId);
+            
+            const mappedData = data.map(g => ({ 
+                label: g.medicacao, 
+                value: String(g.id_medicacao) 
+            }));
+            
+            setMedicacoes(mappedData);
+          } catch (error) {
+              console.error("Erro ao carregar medicações:", error);
+          } finally {
+              // 3. O PONTO CRÍTICO: DESLIGAR O LOADING AQUI!
+              setLoadingMedicacoes(false); 
+          }
+        };
+        fetchMedicacoes();
+    }, [propriedadeId]);
 
     const handleSheetChange = useCallback((index: number) => {
         if (index === -1) {
@@ -46,16 +79,39 @@ export const SanitarioBottomSheet: React.FC<SanitarioBottomSheetProps> = ({ item
 
     const toggleEdit = () => {
         if (isEditing) {
-            console.log("Salvar alterações:", formData);
-            onEditSave(formData); 
+            const id_medicao = formData.id_medicao;
+            const dosagem = formData.dosagem;
+            const unidade_medida = formData.unidade_medida;
+            const necessita_retorno = formData.necessita_retorno;
+            const dt_retorno = formData.dt_retorno;
+
+            const payloadApi = {
+                id_medicao: id_medicao  || null,
+                dosagem: dosagem || 0,              
+                unidade_medida: unidade_medida || null,
+                necessita_retorno: necessita_retorno || null,
+                dt_retorno: dt_retorno || null,
+            };
+            
+            const cleanedPayload = Object.fromEntries(
+                Object.entries(payloadApi).filter(([_, value]) => value !== null && value !== undefined)
+            );
+            
+            console.log("PAYLOAD ZOOTÉCNICO LIMPO PARA API:", cleanedPayload);
+            onEditSave({ id_sanit: formData.id_sanit, ...cleanedPayload }); 
         }
         setIsEditing(!isEditing);
     };
     
     const handleDelete = () => {
-        console.log("Excluir registro:", item.id_sanit);
- 
+        setIsDeleteModalVisible(true);
     };
+
+    const handleConfirmDelete = () => {
+        setIsDeleteModalVisible(false); 
+        onDelete(item.id_sanit); 
+        onClose();
+    }
 
     const formatDate = (dateString?: string | null) => {
         if (!dateString) return "Nda";
@@ -82,25 +138,22 @@ return (
         />
     )}
   >
-    <BottomSheetScrollView contentContainerStyle={styles.container}>
+    <BottomSheetScrollView contentContainerStyle={styles.container} scrollEnabled={!openMedicacao}>
 
                 {/* Header */}
                 <View style={styles.header}>
-                    <View style={{ width: 40 }} />
                     <Text style={styles.headerTitle}>Tratamento Sanitário</Text>
                 </View>
 
                 {/* Card Principal */}
                 <View style={styles.mainCard}>
                     <View style={styles.cardRow}>
-                        <View>
-                            <Text style={styles.cardTitle}>
-                                Doença: {String(formData.doenca ?? "-")}
-                            </Text>
-                            <Text style={styles.cardSubtitle}>
-                                Aplicado em: {formatDate(formData?.dt_aplicacao)}
-                            </Text>
-                        </View>
+                      <Text style={styles.cardTitle}>
+                        Doença: {String(formData.doenca ?? "-")}
+                      </Text>
+                      <Text style={styles.cardSubtitle}>
+                        Aplicado em: {formatDate(formData?.dt_aplicacao)}
+                      </Text>
                     </View>
                 </View>
 
@@ -111,23 +164,34 @@ return (
 
                     {/* Nome do medicamento */}
                     <View style={styles.listItem}>
-                        <Text style={styles.listIcon}>💊</Text>
                         <Text style={styles.listLabel}>Medicação:</Text>
 
                         {!isEditing ? (
                             <Text style={styles.listValue}>{formData.nome_medicamento ?? "-"}</Text>
                         ) : (
-                            <TextInput
-                                style={[styles.listValue, styles.inputEditable]}
-                                value={formData.nome_medicamento ?? ""}
-                                onChangeText={(t) => handleChange("nome_medicamento", t)}
-                            />
+                            <View style={{ flex: 1, marginLeft: 10 }}>
+                                {loadingMedicacoes ? (
+                                    <Text style={styles.listValue}>Carregando medicações...</Text>
+                                ) : (
+                                    <DropDownPicker
+                                        open={openMedicacao}
+                                        setOpen={setOpenMedicacao}
+                                        value={medicacaoSelecionada}
+                                        setValue={setMedicacaoSelecionada }
+                                        items={medicacoes}
+                                        placeholder="Selecione a Medicação"
+                                        containerStyle={{ flex: 1, marginBottom: 16 }}
+                                        style={styles.dropdownStyle}
+                                        listMode="MODAL"
+                                        zIndex={4000}
+                                    />
+                                )}
+                            </View>
                         )}
                     </View>
 
                     {/* Dosagem */}
                     <View style={styles.listItem}>
-                        <Text style={styles.listIcon}>🧪</Text>
                         <Text style={styles.listLabel}>Dosagem:</Text>
 
                         {!isEditing ? (
@@ -135,15 +199,15 @@ return (
                                 {String(formData.dosagem ?? "-")} {formData.unidade_medida ?? ""}
                             </Text>
                         ) : (
-                            <View style={{ flexDirection: "row", gap: 8, alignItems: "center" }}>
+                            <View style={{ flexDirection: "row", gap: 8, left: '15%' }}>
                                 <TextInput
-                                    style={[styles.listValue, styles.inputEditable, { minWidth: 40 }]}
+                                    style={styles.inputFull1}
                                     keyboardType="numeric"
                                     value={String(formData.dosagem ?? "")}
                                     onChangeText={(t) => handleChange("dosagem", t)}
                                 />
                                 <TextInput
-                                    style={[styles.listValue, styles.inputEditable, { minWidth: 40 }]}
+                                    style={styles.inputFull2}
                                     value={formData.unidade_medida ?? ""}
                                     onChangeText={(t) => handleChange("unidade_medida", t)}
                                 />
@@ -153,7 +217,6 @@ return (
 
                     {/* Necessita retorno */}
                     <View style={styles.listItem}>
-                        <Text style={styles.listIcon}>⏳</Text>
                         <Text style={styles.listLabel}>Necessita retorno:</Text>
 
                         {!isEditing ? (
@@ -172,7 +235,6 @@ return (
                     {/* Retorno (apenas se necessitar) */}
                     {formData.necessita_retorno && (
                       <View style={styles.listItem}>
-                        <Text style={styles.listIcon}>📅</Text>
                         <Text style={styles.listLabel}>Retorno:</Text>
                         {!isEditing ? (
                           <Text style={styles.listValue}>{formatDate(formData.dt_retorno)}</Text>
@@ -185,21 +247,6 @@ return (
                         )}
                       </View>
                     )}
-
-                    <View style={[styles.listItem, styles.listItemLast]}>
-                        <Text style={styles.listIcon}>📝</Text>
-                        <Text style={styles.listLabel}>Observação:</Text>
-
-                        {!isEditing ? (
-                            <Text style={styles.listValue}>{formData.observacao ?? "-"}</Text>
-                        ) : (
-                            <TextInput
-                                style={[styles.listValue, styles.inputEditable]}
-                                value={formData.observacao ?? ""}
-                                onChangeText={(t) => handleChange("observacao", t)}
-                            />
-                        )}
-                    </View>
                 </View>
 
                 {/* Footer */}
@@ -232,6 +279,13 @@ return (
                   }}
                 />
     </BottomSheetScrollView>
+      <ConfirmarExclusaoModal
+          visible={isDeleteModalVisible}
+          onClose={() => setIsDeleteModalVisible(false)}
+          onConfirm={handleConfirmDelete}
+          title="Excluir Registro Sanitário"
+          message={`Tem certeza que deseja excluir o registro da doença ${formatDate(item.doenca)}? Esta ação é irreversível.`}
+        />
   </BottomSheet>
 )};
 
@@ -240,7 +294,6 @@ const styles = StyleSheet.create({
     paddingBottom: 32,
     backgroundColor: colors.gray.claro,
   },
-
   handleWrapper: {
     alignItems: "center",
     paddingTop: 8,
@@ -251,7 +304,6 @@ const styles = StyleSheet.create({
     borderRadius: 2,
     backgroundColor: "#D1D5DB",
   },
-
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -278,7 +330,7 @@ const styles = StyleSheet.create({
     alignItems: "center"
   },
   cardRow: {
-    flexDirection: "row",
+    flexDirection: "column",
     alignItems: "center",
     gap: 12,
   },
@@ -291,7 +343,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#6B7280",
   },
-
   sectionTitle: {
     fontSize: 18,
     fontWeight: "700",
@@ -300,7 +351,6 @@ const styles = StyleSheet.create({
     marginTop: 8,
     marginBottom: 4,
   },
-
   listContainer: {
     backgroundColor: "#FFF",
     borderRadius: 16,
@@ -334,13 +384,11 @@ const styles = StyleSheet.create({
     textAlign: "right",
     minWidth: 60,
   },
-
   inputEditable: {
     borderBottomWidth: 1,
     borderColor: "#FAC638",
     paddingBottom: 2,
   },
-
   highlightBox: {
     marginTop: 12,
     marginHorizontal: 16,
@@ -357,7 +405,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#78350F",
   },
-
   footer: {
     flexDirection: "row",
     justifyContent: "flex-end",
@@ -389,31 +436,50 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: "#111827",
   },
-radioItem: {
-  flexDirection: "row",
-  alignItems: "center",
-},
-
-radioCircle: {
-  width: 20,
-  height: 20,
-  borderRadius: 10,
-  borderWidth: 2,
-  borderColor: "#FAC638",
-  alignItems: "center",
-  justifyContent: "center",
-  marginRight: 6,
-},
-
-radioSelected: {
-  width: 10,
-  height: 10,
-  borderRadius: 5,
-  backgroundColor: "#FAC638",
-},
-
-radioLabel: {
-  fontSize: 14,
-  color: "#111827",
-},
+  radioItem: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  radioCircle: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: colors.gray.base,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 6,
+  },
+  radioSelected: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: "#FAC638",
+  },
+  radioLabel: {
+    fontSize: 14,
+    color: "#111827",
+  },
+  inputFull1: { 
+    width: "35%", 
+    borderWidth: 1, 
+    borderColor: colors.gray.base, 
+    borderRadius: 6, 
+    marginBottom: 12,
+    backgroundColor: colors.white.base,
+    justifyContent: 'center',
+  },
+  inputFull2: { 
+    width: "40%", 
+    borderWidth: 1, 
+    borderColor: colors.gray.base, 
+    borderRadius: 6, 
+    marginBottom: 12,
+    backgroundColor: colors.white.base,
+    justifyContent: 'center',
+  },
+  dropdownStyle: {
+    borderColor: colors.gray.base,
+    backgroundColor: colors.white.base,
+  },
 });
