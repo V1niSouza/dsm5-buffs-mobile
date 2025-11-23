@@ -7,11 +7,10 @@ import YellowButton from "../components/Button";
 import { useAuth } from "../context/AuthContext";
 
 export const LoginScreen = () => {
-  const { login } = useAuth(); // 🔑 pegar login do contexto
+  const { login, loading } = useAuth(); 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
     setError(null);
@@ -21,12 +20,10 @@ export const LoginScreen = () => {
     }
 
     try {
-      setLoading(true);
       await login(email, password);   
     } catch (err: any) {
       setError(err.message || "Erro ao tentar entrar.");
     } finally {
-      setLoading(false);
     }
   };
 

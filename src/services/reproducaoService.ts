@@ -24,6 +24,14 @@ export interface ReproducaoUpdatePayload {
   tipo_parto: string; 
 }
 
+export interface CicloLactacaoPayload {
+  id_bufala: any;      // UUID
+  id_propriedade: number; // UUID
+  dt_parto: string;       // Formato YYYY-MM-DD
+  padrao_dias: number;    // 305
+  observacao: string;     
+}
+
 const fetchNomeAnimal = async (id: string) => {
   if (!id) return "-";
   try {
@@ -165,6 +173,22 @@ export const createReproducao = async (data: any) => {
     return response;
   } catch (error) {
     console.error("Erro ao criar reprodução:", error);
+    throw error;
+  }
+};
+
+export const createCicloLactacao = async (data: CicloLactacaoPayload) => {
+  try {
+    const response = await apiFetch("/ciclos-lactacao", {
+      method: "POST",
+      body: JSON.stringify(data),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return response;
+  } catch (error) {
+    console.error("Erro ao criar ciclo de lactação:", error);
     throw error;
   }
 };

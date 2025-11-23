@@ -33,7 +33,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setLoading(true);
     try {
       const res = await loginService(email, password);
-
       await AsyncStorage.setItem("userToken", res.access_token);
       await AsyncStorage.setItem("refreshToken", res.refresh_token);
       await AsyncStorage.setItem("expiresAt", res.expires_at.toString());

@@ -17,9 +17,9 @@ import BottomSheet, {
 } from "@gorhom/bottom-sheet";
 import DropDownPicker from "react-native-dropdown-picker";
 import "dayjs/locale/pt-br"; 
-
+import { usePropriedade } from "../../context/PropriedadeContext";
 import { colors } from "../../styles/colors";
-import { updateReproducao, ReproducaoUpdatePayload } from "../../services/reproducaoService";
+import { updateReproducao, ReproducaoUpdatePayload, createCicloLactacao } from "../../services/reproducaoService";
 import YellowButton from "../Button";
 
 // Configuração de cores (Inalterado)
@@ -158,7 +158,7 @@ export const ReproducaoAttBottomSheet: React.FC<
 > = ({ initialData, onClose, onSuccess }) => {
   const sheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ["45%", "60%"], []); 
-
+  const { propriedadeSelecionada } = usePropriedade();
   const [form, setForm] = useState({
     status: initialData?.status || "",
     tipo_parto: initialData?.tipo_parto || "",
@@ -174,7 +174,7 @@ export const ReproducaoAttBottomSheet: React.FC<
   const statusItems = useMemo(() => [
     { label: "Em andamento", value: "Em andamento" },
     { label: "Falha", value: "Falha" },
-    { label: "Confirmada, está em prenha", value: "Aborto" },
+    { label: "Confirmada, está em prenha", value: "Confirmada" },
     { label: "Concluída, nasceu", value: "Concluída" },
   ], []);
 
@@ -209,19 +209,38 @@ export const ReproducaoAttBottomSheet: React.FC<
   };
 
   const handleSave = async () => {
-    // ⚠️ Removidas todas as checagens chat (obrigatoriedade, regras de negócio)
+    if (!propriedadeSelecionada) {
+      return showToast("Propriedade não selecionada.", true);
+    }
     
     const reproducaoId = initialData.id; 
+
+    if (form.status === "Concluida" && !form.tipo_parto) {
+        return showToast("Se o status for 'Concluída', o Tipo de Parto é obrigatório.", true);
+    }
     
     // Payload tipado
     const payload: ReproducaoUpdatePayload = {
       status: form.status,
-      tipo_parto: form.tipo_parto,
+      tipo_parto: form.status === "Concluida" ? form.tipo_parto : null,
     };
 
     try {
       await updateReproducao(reproducaoId, payload);
       showToast("Reprodução atualizada com sucesso!");
+      if (form.status === "Concluida") {
+        const dtParto = new Date().toISOString().split("T")[0];
+        const lactacaoPayload = {
+            id_bufala: initialData.id_bufala,      // UUID da Búfala (deve vir no initialData)
+            id_propriedade: propriedadeSelecionada, // UUID da Propriedade
+            dt_parto: dtParto,
+            padrao_dias: 305, 
+            observacao: `Parto registrado: ${form.tipo_parto}. Reprodução ID: ${initialData.id}`,
+        };
+        console.log("PAYLOAD CICLO LACTAÇÃO ENVIADO:", JSON.stringify(lactacaoPayload, null, 2));
+
+        await createCicloLactacao(lactacaoPayload);
+      }
       onSuccess();
       onClose();
     } catch (error: any) {
