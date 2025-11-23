@@ -31,52 +31,61 @@ export const ReproducaoScreen = () => {
     ultimaDataReproducao: "-",
   });
 
-  const fetchReproducoes = async () => {
-    if (!propriedadeSelecionada) return;
-    setLoading(true);
-    setRefreshing(true);
-    try {
-      const statsPromise = getReproducaoDashboardStats(propriedadeSelecionada);
-      const listaPromise = getReproducoes(propriedadeSelecionada);
-      
-      // Aguarda ambas as chamadas
-      const [stats, data] = await Promise.all([statsPromise, listaPromise]);
+  const fetchReproducoes = async (pagina: number) => {
+      if (!propriedadeSelecionada) return;
+      setLoading(true);
+      setRefreshing(true);
+      try {
+        const statsPromise = getReproducaoDashboardStats(propriedadeSelecionada);
+        
+        // Passa a página atual e o limite para o serviço
+        const listaPromise = getReproducoes(propriedadeSelecionada, pagina, itensPorPagina);      
+        
+        // Aguarda ambas as chamadas
+        const [stats, dadosLista] = await Promise.all([statsPromise, listaPromise]);
 
-      setDashboardStats(stats);
-      setReproducoes(data);
-      setTotalPaginas(Math.ceil(data.length / itensPorPagina));
-      setPaginaAtual(1); 
-    } catch (error) {
-      console.error(error);
-      setReproducoes([]);
-      setTotalPaginas(1);
-      setPaginaAtual(1);
-    }
-    setRefreshing(false);
+        setDashboardStats(stats);
+        
+        // Ajuste para pegar a lista formatada e os metadados do serviço
+        setReproducoes(dadosLista.reproducoes); 
+        setTotalPaginas(dadosLista.meta.totalPages);
+        setPaginaAtual(pagina); // Define a página que acabou de ser carregada
+      } catch (error) {
+        console.error(error);
+        setReproducoes([]);
+        setTotalPaginas(1);
+        setPaginaAtual(1);
+      } finally {
+          // Ocultar o ActivityIndicator apenas após todas as buscas
+          setLoading(false); 
+          setRefreshing(false);
+      }
   };
 
-  const onRefresh = async () => {
-    await fetchReproducoes();
-  };
+const onRefresh = async () => {
+    await fetchReproducoes(1); 
+};
 
   const handleCardPress = (reproducao: any) => {
     setReproducaoSelecionada(reproducao);
     setModalVisible(true);
   };
 
-  const reproducoesPaginadas = reproducoes.slice(
-    (paginaAtual - 1) * itensPorPagina,
-    paginaAtual * itensPorPagina
-  );
+const handlePageChange = async (novaPagina: number) => {
+    if (novaPagina < 1 || novaPagina > totalPaginas) return;
+    await fetchReproducoes(novaPagina);
+};
+
 
   useEffect(() => {
-      const fetchData = async () => {
+    const fetchData = async () => {
         setLoading(true);
-        await fetchReproducoes();
-        setLoading(false);
-      }
-      fetchData();
-  }, []);
+        // Inicia buscando a primeira página (1)
+        await fetchReproducoes(1); 
+        // Não é mais necessário setLoading(false) aqui, pois está no finally do fetchReproducoes
+    }
+    fetchData();
+}, [propriedadeSelecionada]);
 
 
   if (loading) {
@@ -121,7 +130,7 @@ export const ReproducaoScreen = () => {
           />
 
           <View style={styles.content}>
-            {reproducoesPaginadas.map(reproducao => (
+            {reproducoes.map(reproducao => (
               <CardReproducao
                 key={reproducao.id}
                 reproducao={{
@@ -144,7 +153,7 @@ export const ReproducaoScreen = () => {
               <View style={styles.pagination}>
                 <Button
                   title="Anterior"
-                  onPress={() => paginaAtual > 1 && setPaginaAtual(paginaAtual - 1)}
+                  onPress={() => handlePageChange(paginaAtual - 1)}
                   disabled={paginaAtual === 1}
                 />
                 <Text style={styles.pageInfo}>
@@ -152,7 +161,7 @@ export const ReproducaoScreen = () => {
                 </Text>
                 <Button
                   title="Próxima"
-                  onPress={() => paginaAtual < totalPaginas && setPaginaAtual(paginaAtual + 1)}
+                  onPress={() => handlePageChange(paginaAtual + 1)}
                   disabled={paginaAtual === totalPaginas}
                 />
               </View>
@@ -161,20 +170,6 @@ export const ReproducaoScreen = () => {
         </ScrollView>
       </MainLayout>
 
-      <Modal visible={modalVisible} onClose={() => setModalVisible(false)}>
-        {reproducaoSelecionada ? (
-          <FormReproducaoAtt
-            initialData={reproducaoSelecionada}
-            onClose={() => setModalVisible(false)}
-            onSuccess={fetchReproducoes}
-          />
-        ) : (
-          <FormReproducaoAdd
-            onClose={() => setModalVisible(false)}
-            onSuccess={fetchReproducoes}
-          />
-        )}
-      </Modal>
     </View>
   );
 };

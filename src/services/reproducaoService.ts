@@ -7,7 +7,17 @@ export interface ReproducaoDashboardStats {
   ultimaDataReproducao: string; // Ex: "2025-11-10"
 }
 
-
+export interface ReproducoesResponse {
+  data: any[];
+  meta: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPrevPage: boolean;
+  };
+}
 
 const fetchNomeAnimal = async (id: string) => {
   if (!id) return "-";
@@ -54,28 +64,24 @@ export const getReproducaoDashboardStats = async (propriedadeId: number): Promis
   }
 };
 
-export const getReproducoes = async (propriedadeId: number) => {
-  if (!propriedadeId) return [];
+export const getReproducoes = async (
+  propriedadeId: number, 
+  page: number = 1, 
+  limit: number = 10
+): Promise<{ reproducoes: any[], meta: any }> => {
+  if (!propriedadeId) return { reproducoes: [], meta: { totalPages: 1 } };
 
   try {
-    let page = 1;
-    const limit = 10; 
-    let allReproducoes: any[] = [];
-    let hasNextPage = true;
+    // ⚠️ Removido o loop 'while (hasNextPage)'
+    const response: ReproducoesResponse = await apiFetch(
+      `/cobertura/propriedade/${propriedadeId}?page=${page}&limit=${limit}`
+    );
 
-    while (hasNextPage) {
-      const response: any = await apiFetch(
-        `/cobertura/propriedade/${propriedadeId}?page=${page}&limit=${limit}`
-      );
+    const reproducoes: any[] = response.data || [];
+    const meta = response.meta || { totalPages: 1 };
 
-      const reproducoes: any[] = response.data || [];
-      allReproducoes = allReproducoes.concat(reproducoes);
-
-      hasNextPage = response.meta?.hasNextPage;
-      page++;
-    }
-
-    const reproducoesFormatadas = allReproducoes.map((r) => {
+    const reproducoesFormatadas = reproducoes.map((r) => {
+      // Usando os campos já retornados pela API (nome_femea, brinco_femea, etc.)
       const brincoVaca = r.brinco_femea || r.id_bufala || "-";
       let brincoMacho;
       if (r.brinco_macho) {
@@ -106,16 +112,17 @@ export const getReproducoes = async (propriedadeId: number) => {
         id_bufalo: r.id_bufalo,
         id_semen: r.id_semen, 
         previsaoParto: r.previsaoParto,
+        // Adicionar campos brutos necessários para atualização aqui
       };
     });
 
-    return reproducoesFormatadas;
+    return { reproducoes: reproducoesFormatadas, meta };
+
   } catch (error: any) {
     console.error("Erro ao buscar reproduções:", error);
-    return [];
+    return { reproducoes: [], meta: { totalPages: 1 } };
   }
 };
-
 export const updateReproducao = async (id: string, data: any) => {
   try {
     const response = await apiFetch(`/cobertura/${id}`, {
