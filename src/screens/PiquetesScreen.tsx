@@ -74,7 +74,8 @@ const handleCloseSheet = () => {
       </View>
 
       <MainLayout>
-          <View style={styles.content}>
+          <ScrollView style={{ flex: 1, top: 30 }} refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
             <MapLeaflet
               piquetes={piquetes.map(p => ({
                 ...p,
@@ -101,7 +102,7 @@ const handleCloseSheet = () => {
             <Plus width={24} height={24} />
             <Text style={{ marginLeft: 8, fontWeight: 'bold', color: '#111813' }}>Nova Área</Text>
           </TouchableOpacity>
-          </View>
+          </ScrollView>
         {isSheetOpen && propriedadeSelecionada && (<DemarcacaoPiqueteSheet onClose={handleCloseSheet} propriedadeId={propriedadeSelecionada} />)}
       </MainLayout>
     </View>

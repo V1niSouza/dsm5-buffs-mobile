@@ -35,7 +35,6 @@ export const ReproducaoScreen = () => {
   const fetchReproducoes = async (pagina: number) => {
       if (!propriedadeSelecionada) return;
       setLoading(true);
-      setRefreshing(true);
       try {
         const statsPromise = getReproducaoDashboardStats(propriedadeSelecionada);
         
@@ -59,13 +58,12 @@ export const ReproducaoScreen = () => {
       } finally {
           // Ocultar o ActivityIndicator apenas após todas as buscas
           setLoading(false); 
-          setRefreshing(false);
       }
   };
 
-const onRefresh = async () => {
-    await fetchReproducoes(1); 
-};
+  const onRefresh = async () => {
+      await fetchReproducoes(1); 
+  };
 
   const handleCardPress = (reproducao: any) => {
     setReproducaoSelecionada(reproducao);
@@ -86,7 +84,7 @@ const handlePageChange = async (novaPagina: number) => {
         // Não é mais necessário setLoading(false) aqui, pois está no finally do fetchReproducoes
     }
     fetchData();
-}, [propriedadeSelecionada]);
+  }, [propriedadeSelecionada]);
 
 
   if (loading) {

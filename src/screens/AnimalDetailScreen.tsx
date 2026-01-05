@@ -95,7 +95,6 @@ export const AnimalDetailScreen = () => {
       console.error("Erro ao buscar dados do búfalo:", err);
     } finally {
       setLoading(false);
-      setRefreshing(false);
     }
   };
 
@@ -114,6 +113,7 @@ export const AnimalDetailScreen = () => {
     setPageZootec(1);
     setPageSanit(1);
     await fetchData(1, 1);
+    setRefreshing(false);
   };
 
   useEffect(() => {
