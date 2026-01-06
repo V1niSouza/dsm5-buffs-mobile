@@ -7,6 +7,7 @@ import { colors } from "../styles/colors";
 import BuffsLogo from '../../assets/images/logoBuffs.svg'; 
 import { MainLayout } from "../layouts/MainLayout";
 import { UserMenu } from "../components/UserMenu";
+import BuffaloLoader from "../components/BufaloLoader";
 
 import { usePropriedade } from "../context/PropriedadeContext";
 import bufaloService from "../services/bufaloService";
@@ -90,8 +91,7 @@ export const HomeScreen = () => {
           <Propriedades dropdownOpen={dropdownOpen} setDropdownOpen={setDropdownOpen} prop={propriedades}/>
           {loading || !dashboard ? (
             <View style={styles.loading}>
-              <Text>Carregando informações da propriedade...</Text>
-              <ActivityIndicator size="large" color={colors.yellow.static} style={{ marginTop: 20 }} />
+              <BuffaloLoader />
             </View>
           ) : (
             <>
