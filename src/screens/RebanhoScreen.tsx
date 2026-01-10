@@ -195,15 +195,14 @@ export const RebanhoScreen = () => {
       <MainLayout>
         <ScrollView>
           <View style={styles.containetSearch}>
-            <FiltroRebanho onFiltrar={(f) => {
-                setFiltros(f);
-                fetchBufalosFiltrados(f);
-              }}
-              filtros={filtros}  />
+            <FiltroRebanho
+              onFiltrar={(f) => setFiltros(f)}
+              filtros={filtros}
+            />
           </View>
           
           <FlatList
-            data={animaisFiltrados}
+            data={listLoading ? [] : animaisFiltrados}
             keyExtractor={(item, index) => String(item.id || item.id_bufalo || index)}
             renderItem={({ item }) => (
               <CardBufalo
@@ -222,31 +221,53 @@ export const RebanhoScreen = () => {
               <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
             }
             contentContainerStyle={styles.contentContainer}
-            ListFooterComponent={
-              <View style={styles.pagination}>
-                <Button
-                  title="Anterior"
-                  onPress={() => {
-                    if (paginaAtual > 1) fetchBufalosFiltrados(filtros, paginaAtual - 1);
-                  }}
-                  disabled={paginaAtual === 1}
-                />
-                <Text style={styles.pageInfo}>
-                  Página {paginaAtual} de {totalPaginas}
+            ListEmptyComponent={
+              listLoading ? (
+                <View style={styles.inlineLoader}>
+                  <ActivityIndicator size="large" color={colors.yellow.base} />
+                  <Text style={{ marginTop: 8 }}>
+                    Atualizando rebanho...
+                  </Text>
+                </View>
+              ) : (
+                <Text style={{ textAlign: "center", marginTop: 20 }}>
+                  Nenhum animal encontrado
                 </Text>
-                <Button
-                  title="Próxima"
-                  onPress={() => {
-                    if (paginaAtual < totalPaginas) fetchBufalosFiltrados(filtros, paginaAtual + 1);
-                  }}
-                  disabled={paginaAtual === totalPaginas || listLoading}
-                />
-              </View>
+              ) 
             }
+            ListFooterComponent={
+              listLoading ? null : (
+                <View style={styles.pagination}>
+                  <Button
+                    title="Anterior"
+                    onPress={() => {
+                      if (paginaAtual > 1)
+                        fetchBufalosFiltrados(filtros, paginaAtual - 1);
+                    }}
+                    disabled={paginaAtual === 1 || listLoading}
+                  />
+
+                  <Text style={styles.pageInfo}>
+                    Página {paginaAtual} de {totalPaginas}
+                  </Text>
+
+                  <Button
+                    title="Próxima"
+                    onPress={() => {
+                      if (paginaAtual < totalPaginas)
+                        fetchBufalosFiltrados(filtros, paginaAtual + 1);
+                    }}
+                    disabled={paginaAtual === totalPaginas || listLoading}
+                  />
+                </View>
+              )
+            }
+
           />
         </ScrollView>
       </MainLayout>
       <FloatingAction
+        visible={!listLoading}
         actions={actions}
         onPressItem={handleActionPress}
         buttonSize={60}
@@ -360,4 +381,10 @@ const styles = StyleSheet.create({
     right: 16,
     backgroundColor: colors.yellow.dark,
   },
+
+  inlineLoader: {
+  height: 200,
+  justifyContent: "center",
+  alignItems: "center",
+},
 });
