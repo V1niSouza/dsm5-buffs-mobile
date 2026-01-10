@@ -28,6 +28,7 @@ import AgroCore from "../icons/agroCore";
 import { LactacaoAddBottomSheet } from "../components/FormLactacao";
 import { FloatingAction } from "react-native-floating-action";
 import { EstoqueAddBottomSheet } from "../components/FormEstoque";
+import BuffaloLoader from "../components/BufaloLoader";
 
 export interface AnimalLac {
   id: string;
@@ -167,9 +168,7 @@ const fetchIndustrias = async () => {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <AgroCore width={200} height={200} />
-        <Text>Carregando lactações...</Text>
-        <ActivityIndicator size="large" color={colors.yellow.static} />
+        <BuffaloLoader />
       </View>
     );
   }

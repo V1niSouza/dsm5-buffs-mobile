@@ -12,6 +12,7 @@ import Button from '../components/Button';
 import AgroCore from '../icons/agroCore';
 import { usePropriedade } from '../context/PropriedadeContext';
 import { ReproducaoAttBottomSheet } from '../components/FormReproductionAtt';
+import BuffaloLoader from '../components/BufaloLoader';
 
 export const ReproducaoScreen = () => {
   const { propriedadeSelecionada } = usePropriedade();
@@ -90,9 +91,7 @@ const handlePageChange = async (novaPagina: number) => {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <AgroCore width={200} height={200} />
-        <Text>Carregando reproduções...</Text>
-        <ActivityIndicator size="large" color={colors.yellow.static} />
+        <BuffaloLoader />
       </View>
     );
   }

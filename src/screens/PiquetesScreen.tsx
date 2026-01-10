@@ -10,6 +10,7 @@ import { usePropriedade } from "../context/PropriedadeContext";
 import AgroCore from '../icons/agroCore';
 import { DemarcacaoPiqueteSheet } from '../components/DemarcacaoPiqueteSheet'; 
 import { useGpsLocation } from '../hooks/useLocation';
+import BuffaloLoader from '../components/BufaloLoader';
 
 
 export const PiquetesScreen = () => {
@@ -57,9 +58,7 @@ const handleCloseSheet = () => {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <AgroCore width={200} height={200} />
-        <Text>Carregando demarcações...</Text>
-        <ActivityIndicator size="large" color={colors.yellow.static} />
+        <BuffaloLoader />
       </View>
     );
   }
