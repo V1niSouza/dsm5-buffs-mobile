@@ -18,6 +18,7 @@ import { CardBufalo } from '../components/CardBufaloRebanho';
 import AgroCore from '../icons/agroCore';
 import FiltroRebanho from '../components/SearchBar';
 import { CadastrarBufaloForm } from '../components/CriaBufaloBottomSheet';
+import BuffaloLoader from '../components/BufaloLoader';
 
 type Animal = {
   id: string;
@@ -150,7 +151,7 @@ export const RebanhoScreen = () => {
     },
     {
       text: "Scanner NFC",
-      icon: <Scanner width={24} height={24} fill="black" />, // Use seu SVG aqui
+      icon: <Scanner width={24} height={24} fill="black" />, 
       name: "NfcScanner",
       position: 2,
       color: colors.yellow.base,
@@ -167,9 +168,7 @@ export const RebanhoScreen = () => {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <AgroCore width={200} height={200} />
-        <Text>Carregando animais...</Text>
-        <ActivityIndicator size="large" color={colors.yellow.static} />
+        <BuffaloLoader />
       </View>
     );
   }
