@@ -58,22 +58,34 @@ export const RebanhoScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [tagsRecebidas, setTagsRecebidas] = useState<string[]>([]); 
 
-  const [loading, setLoading] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [listLoading, setListLoading] = useState(false);
+
   const [paginaAtual, setPaginaAtual] = useState(1);
   const [totalPaginas, setTotalPaginas] = useState(1);
   const [filtros, setFiltros] = useState<Filtros>({});
   const [selectedZootec, setSelectedZootec] = useState<any>(null);
 
-  const fetchBufalosFiltrados = async (filtrosAplicados: any = {}, page = 1) => {
+  const fetchBufalosFiltrados = async (
+    filtrosAplicados: any = {},
+    page = 1,
+    isInitial = false
+  ) => {
     try {
       if (!propriedadeSelecionada) return;
-      setLoading(true);
+
+      if (isInitial) {
+        setInitialLoading(true);
+      } else {
+        setListLoading(true);
+      }
 
       const { bufalos, meta } = await bufaloService.filtrarBufalos(
         propriedadeSelecionada,
         filtrosAplicados,
         page
       );
+
       const animaisFormatados = bufalos.map((b: any) => ({
         id: b.id_bufalo,
         status: b.status,
@@ -83,16 +95,20 @@ export const RebanhoScreen = () => {
         sexo: b.sexo,
         maturidade: b.nivel_maturidade,
       }));
+
       setAnimais(animaisFormatados);
       setAnimaisFiltrados(animaisFormatados);
       setPaginaAtual(meta.page);
       setTotalPaginas(meta.totalPages);
+
     } catch (err) {
       console.error("Erro ao buscar búfalos:", err);
     } finally {
-      setLoading(false);
+      setInitialLoading(false);
+      setListLoading(false);
     }
   };
+
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -101,19 +117,13 @@ export const RebanhoScreen = () => {
   };
 
   useEffect(() => {
-    const loadInitialData = async () => {
-      setLoading(true);
-      if (propriedadeSelecionada) {
-        await fetchBufalosFiltrados();
-      }
-      setLoading(false);
-    };
-    loadInitialData();
+    if (propriedadeSelecionada) {
+      fetchBufalosFiltrados({}, 1, true);
+    }
   }, [propriedadeSelecionada]);
 
-
   useEffect(() => {
-    fetchBufalosFiltrados(filtros, 1); 
+    fetchBufalosFiltrados(filtros, 1);
   }, [filtros]);
 
   useEffect(() => {
@@ -165,7 +175,7 @@ export const RebanhoScreen = () => {
     }
   };
   
-  if (loading) {
+  if (initialLoading) {
     return (
       <View style={styles.loadingContainer}>
         <BuffaloLoader />
@@ -229,7 +239,7 @@ export const RebanhoScreen = () => {
                   onPress={() => {
                     if (paginaAtual < totalPaginas) fetchBufalosFiltrados(filtros, paginaAtual + 1);
                   }}
-                  disabled={paginaAtual === totalPaginas}
+                  disabled={paginaAtual === totalPaginas || listLoading}
                 />
               </View>
             }
