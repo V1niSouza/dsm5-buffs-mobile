@@ -20,6 +20,7 @@ import { usePropriedade } from "../context/PropriedadeContext";
 import { SanitarioAddBottomSheet } from "../components/SanitarioAddBottomSheet";
 import { ZootecnicoAddBottomSheet } from "../components/ZootecnicoAddBottomSheet";
 import Plus from '../../assets/images/plus.svg';
+import BuffaloLoader from "../components/BufaloLoader";
 
 type RootStackParamList = {
   AnimalDetail: { id: string };
@@ -247,9 +248,7 @@ export const AnimalDetailScreen = () => {
   if (loading && !detalhes) {
     return (
       <View style={styles.loadingContainer}>
-        <AgroCore width={200} height={200} />
-        <Text>Carregando Prontuário do Animal...</Text>
-        <ActivityIndicator size="large" color={colors.yellow.static} />
+        <BuffaloLoader />
       </View>
     );
   }

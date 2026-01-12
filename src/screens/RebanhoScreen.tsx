@@ -18,6 +18,7 @@ import { CardBufalo } from '../components/CardBufaloRebanho';
 import AgroCore from '../icons/agroCore';
 import FiltroRebanho from '../components/SearchBar';
 import { CadastrarBufaloForm } from '../components/CriaBufaloBottomSheet';
+import BuffaloLoader from '../components/BufaloLoader';
 
 type Animal = {
   id: string;
@@ -57,22 +58,34 @@ export const RebanhoScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [tagsRecebidas, setTagsRecebidas] = useState<string[]>([]); 
 
-  const [loading, setLoading] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [listLoading, setListLoading] = useState(false);
+
   const [paginaAtual, setPaginaAtual] = useState(1);
   const [totalPaginas, setTotalPaginas] = useState(1);
   const [filtros, setFiltros] = useState<Filtros>({});
   const [selectedZootec, setSelectedZootec] = useState<any>(null);
 
-  const fetchBufalosFiltrados = async (filtrosAplicados: any = {}, page = 1) => {
+  const fetchBufalosFiltrados = async (
+    filtrosAplicados: any = {},
+    page = 1,
+    isInitial = false
+  ) => {
     try {
       if (!propriedadeSelecionada) return;
-      setLoading(true);
+
+      if (isInitial) {
+        setInitialLoading(true);
+      } else {
+        setListLoading(true);
+      }
 
       const { bufalos, meta } = await bufaloService.filtrarBufalos(
         propriedadeSelecionada,
         filtrosAplicados,
         page
       );
+
       const animaisFormatados = bufalos.map((b: any) => ({
         id: b.id_bufalo,
         status: b.status,
@@ -82,16 +95,20 @@ export const RebanhoScreen = () => {
         sexo: b.sexo,
         maturidade: b.nivel_maturidade,
       }));
+
       setAnimais(animaisFormatados);
       setAnimaisFiltrados(animaisFormatados);
       setPaginaAtual(meta.page);
       setTotalPaginas(meta.totalPages);
+
     } catch (err) {
       console.error("Erro ao buscar búfalos:", err);
     } finally {
-      setLoading(false);
+      setInitialLoading(false);
+      setListLoading(false);
     }
   };
+
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -100,19 +117,13 @@ export const RebanhoScreen = () => {
   };
 
   useEffect(() => {
-    const loadInitialData = async () => {
-      setLoading(true);
-      if (propriedadeSelecionada) {
-        await fetchBufalosFiltrados();
-      }
-      setLoading(false);
-    };
-    loadInitialData();
+    if (propriedadeSelecionada) {
+      fetchBufalosFiltrados({}, 1, true);
+    }
   }, [propriedadeSelecionada]);
 
-
   useEffect(() => {
-    fetchBufalosFiltrados(filtros, 1); 
+    fetchBufalosFiltrados(filtros, 1);
   }, [filtros]);
 
   useEffect(() => {
@@ -150,7 +161,7 @@ export const RebanhoScreen = () => {
     },
     {
       text: "Scanner NFC",
-      icon: <Scanner width={24} height={24} fill="black" />, // Use seu SVG aqui
+      icon: <Scanner width={24} height={24} fill="black" />, 
       name: "NfcScanner",
       position: 2,
       color: colors.yellow.base,
@@ -164,12 +175,10 @@ export const RebanhoScreen = () => {
     }
   };
   
-  if (loading) {
+  if (initialLoading) {
     return (
       <View style={styles.loadingContainer}>
-        <AgroCore width={200} height={200} />
-        <Text>Carregando animais...</Text>
-        <ActivityIndicator size="large" color={colors.yellow.static} />
+        <BuffaloLoader />
       </View>
     );
   }
@@ -184,60 +193,92 @@ export const RebanhoScreen = () => {
       </View>
 
       <MainLayout>
-        <ScrollView>
-          <View style={styles.containetSearch}>
-            <FiltroRebanho onFiltrar={(f) => {
-                setFiltros(f);
-                fetchBufalosFiltrados(f);
-              }}
-              filtros={filtros}  />
-          </View>
-          
-          <FlatList
-            data={animaisFiltrados}
-            keyExtractor={(item, index) => String(item.id || item.id_bufalo || index)}
-            renderItem={({ item }) => (
-              <CardBufalo
-                nome={item.nome}
-                brinco={item.brinco}
-                status={item.status}
-                sexo={item.sexo}
-                maturidade={item.maturidade || "Desconhecida"}
-                categoria={item.raca}
-                onPress={() => navigation.navigate("AnimalDetail", { id: item.id })}
+        <FlatList
+          data={listLoading ? [] : animaisFiltrados}
+          keyExtractor={(item, index) =>
+            String(item.id || item.id_bufalo || index)
+          }
+          showsVerticalScrollIndicator={false}
+
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={[colors.yellow.base]}
+              tintColor={colors.yellow.base}
+            />
+          }
+
+          ListHeaderComponent={
+            <View style={styles.containetSearch}>
+              <FiltroRebanho
+                onFiltrar={(f) => setFiltros(f)}
+                filtros={filtros}
               />
-            )}
-            nestedScrollEnabled={true}
-            scrollEnabled={false} 
-            refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-            }
-            contentContainerStyle={styles.contentContainer}
-            ListFooterComponent={
+            </View>
+          }
+
+          renderItem={({ item }) => (
+            <CardBufalo
+              nome={item.nome}
+              brinco={item.brinco}
+              status={item.status}
+              sexo={item.sexo}
+              maturidade={item.maturidade || "Desconhecida"}
+              categoria={item.raca}
+              onPress={() =>
+                navigation.navigate("AnimalDetail", { id: item.id })
+              }
+            />
+          )}
+
+          ListEmptyComponent={
+            listLoading ? (
+              <View style={styles.inlineLoader}>
+                <ActivityIndicator size="large" color={colors.yellow.base} />
+                <Text style={{ marginTop: 8 }}>
+                  Atualizando rebanho...
+                </Text>
+              </View>
+            ) : (
+              <Text style={{ textAlign: "center", marginTop: 20 }}>
+                Nenhum animal encontrado
+              </Text>
+            )
+          }
+
+          ListFooterComponent={
+            listLoading ? null : (
               <View style={styles.pagination}>
                 <Button
                   title="Anterior"
                   onPress={() => {
-                    if (paginaAtual > 1) fetchBufalosFiltrados(filtros, paginaAtual - 1);
+                    if (paginaAtual > 1)
+                      fetchBufalosFiltrados(filtros, paginaAtual - 1);
                   }}
-                  disabled={paginaAtual === 1}
+                  disabled={paginaAtual === 1 || listLoading}
                 />
+
                 <Text style={styles.pageInfo}>
                   Página {paginaAtual} de {totalPaginas}
                 </Text>
+
                 <Button
                   title="Próxima"
                   onPress={() => {
-                    if (paginaAtual < totalPaginas) fetchBufalosFiltrados(filtros, paginaAtual + 1);
+                    if (paginaAtual < totalPaginas)
+                      fetchBufalosFiltrados(filtros, paginaAtual + 1);
                   }}
-                  disabled={paginaAtual === totalPaginas}
+                  disabled={paginaAtual === totalPaginas || listLoading}
                 />
               </View>
-            }
-          />
-        </ScrollView>
+            )
+          }
+        />
       </MainLayout>
+
       <FloatingAction
+        visible={!listLoading}
         actions={actions}
         onPressItem={handleActionPress}
         buttonSize={60}
@@ -262,19 +303,7 @@ const styles = StyleSheet.create({
    },
   containetSearch: { 
     flex: 1, 
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    backgroundColor: colors.white.base,
-    borderRadius: 20,
     marginBottom: 12,
-    borderWidth: 1,
-    borderColor: colors.gray.disabled,
-    shadowColor: colors.black.base,
-    shadowOpacity: 0.05,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
-    elevation: 1,
-    zIndex: 1,
    },
   header: { 
     height: 80, 
@@ -300,15 +329,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.yellow.dark, 
     borderRadius: 50 
   },
-  contentContainer: { 
-    backgroundColor: "#fff", 
-    borderRadius: 12, 
-    paddingVertical: 16, 
-    paddingHorizontal: 10, 
-    borderWidth: 1, 
-    marginBottom: 50, 
-    borderColor: colors.gray.disabled 
-  },
+
   pageInfo: {
     marginHorizontal: 12,
     fontWeight: "600",
@@ -351,4 +372,10 @@ const styles = StyleSheet.create({
     right: 16,
     backgroundColor: colors.yellow.dark,
   },
+
+  inlineLoader: {
+  height: 200,
+  justifyContent: "center",
+  alignItems: "center",
+},
 });
