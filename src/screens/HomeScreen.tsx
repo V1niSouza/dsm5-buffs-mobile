@@ -13,6 +13,8 @@ import { usePropriedade } from "../context/PropriedadeContext";
 import bufaloService from "../services/bufaloService";
 import propriedadeService from "../services/propriedadeService";
 import AgroCore from "../icons/agroCore";
+import BellIcon from "../icons/bell";
+import { NotificacoesButton } from "../components/NotificacoesButton";
 
 
 export const HomeScreen = () => {
@@ -77,8 +79,11 @@ export const HomeScreen = () => {
           <View style={{alignItems: 'center'}}>
             <BuffsLogo width={90} height={90} />
           </View>
-          <View style={styles.headerButtons}>
+          <View style={{position: 'absolute', right: 60, top: 30}}>
             <UserMenu />
+          </View>
+          <View style={{position: 'absolute', left: 70, top: 0}}>
+            <NotificacoesButton />
           </View>
       </View>
       <MainLayout>
@@ -104,7 +109,6 @@ export const HomeScreen = () => {
               vacas={countsMat.vacas}
               touros={countsMat.touros}
             />
-            <AlertasPendentes idPropriedade={propriedadeSelecionada?.toString() ?? null} />
             </>
           )}
         </ScrollView>
@@ -130,13 +134,6 @@ const styles = StyleSheet.create({
     flex: 1, 
     justifyContent: "center", 
     alignItems: "center" 
-  },
-  headerButtons: {
-    marginTop: 30,
-    flexDirection: "row",
-    position: "absolute",
-    right: 20,
-    gap: 20, 
   },
   button: {
     backgroundColor: colors.yellow.dark,

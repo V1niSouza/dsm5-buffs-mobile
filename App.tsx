@@ -24,6 +24,7 @@ import { PiquetesScreen } from './src/screens/PiquetesScreen';
 import { LoginScreen } from './src/screens/LoginScreen';
 import { PropriedadeProvider } from './src/context/PropriedadeContext';
 import { AnimalDetailScreen } from './src/screens/AnimalDetailScreen';
+import { NotificacoesScreen } from './src/screens/Notificacoes';
 
 // Icons SVG
 import BuffsLogo from './assets/images/logoBuffs.svg'; 
@@ -42,6 +43,7 @@ export type RootStackParamList = {
   MainTab: undefined;
   CompleteProfile: undefined;
   NfcScannerScreen: undefined;
+  Notificacoes: undefined;
 };
 
 const Tab = createBottomTabNavigator();
@@ -167,9 +169,8 @@ function AppContent() {
         <>
         <Stack.Screen name="MainTab" component={MainTab} />
         <Stack.Screen name="AnimalDetail" component={AnimalDetailScreen} />
-        <Stack.Screen name="NfcScannerScreen" component={NfcScannerScreen} 
-  options={{ title: 'Scanner NFC' }} // Opcional: define um título
-/>
+        <Stack.Screen name="NfcScannerScreen" component={NfcScannerScreen} options={{ title: 'Scanner NFC' }} />
+        <Stack.Screen name="Notificacoes" component={NotificacoesScreen} options={{ title: 'Notificações' }} />
         </>
       )}
     </Stack.Navigator>

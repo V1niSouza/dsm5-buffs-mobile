@@ -193,79 +193,90 @@ export const RebanhoScreen = () => {
       </View>
 
       <MainLayout>
-        <ScrollView>
-          <View style={styles.containetSearch}>
-            <FiltroRebanho
-              onFiltrar={(f) => setFiltros(f)}
-              filtros={filtros}
+        <FlatList
+          data={listLoading ? [] : animaisFiltrados}
+          keyExtractor={(item, index) =>
+            String(item.id || item.id_bufalo || index)
+          }
+          showsVerticalScrollIndicator={false}
+
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={[colors.yellow.base]}
+              tintColor={colors.yellow.base}
             />
-          </View>
-          
-          <FlatList
-            data={listLoading ? [] : animaisFiltrados}
-            keyExtractor={(item, index) => String(item.id || item.id_bufalo || index)}
-            renderItem={({ item }) => (
-              <CardBufalo
-                nome={item.nome}
-                brinco={item.brinco}
-                status={item.status}
-                sexo={item.sexo}
-                maturidade={item.maturidade || "Desconhecida"}
-                categoria={item.raca}
-                onPress={() => navigation.navigate("AnimalDetail", { id: item.id })}
+          }
+
+          ListHeaderComponent={
+            <View style={styles.containetSearch}>
+              <FiltroRebanho
+                onFiltrar={(f) => setFiltros(f)}
+                filtros={filtros}
               />
-            )}
-            nestedScrollEnabled={true}
-            scrollEnabled={false} 
-            refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-            }
-            contentContainerStyle={styles.contentContainer}
-            ListEmptyComponent={
-              listLoading ? (
-                <View style={styles.inlineLoader}>
-                  <ActivityIndicator size="large" color={colors.yellow.base} />
-                  <Text style={{ marginTop: 8 }}>
-                    Atualizando rebanho...
-                  </Text>
-                </View>
-              ) : (
-                <Text style={{ textAlign: "center", marginTop: 20 }}>
-                  Nenhum animal encontrado
+            </View>
+          }
+
+          renderItem={({ item }) => (
+            <CardBufalo
+              nome={item.nome}
+              brinco={item.brinco}
+              status={item.status}
+              sexo={item.sexo}
+              maturidade={item.maturidade || "Desconhecida"}
+              categoria={item.raca}
+              onPress={() =>
+                navigation.navigate("AnimalDetail", { id: item.id })
+              }
+            />
+          )}
+
+          ListEmptyComponent={
+            listLoading ? (
+              <View style={styles.inlineLoader}>
+                <ActivityIndicator size="large" color={colors.yellow.base} />
+                <Text style={{ marginTop: 8 }}>
+                  Atualizando rebanho...
                 </Text>
-              ) 
-            }
-            ListFooterComponent={
-              listLoading ? null : (
-                <View style={styles.pagination}>
-                  <Button
-                    title="Anterior"
-                    onPress={() => {
-                      if (paginaAtual > 1)
-                        fetchBufalosFiltrados(filtros, paginaAtual - 1);
-                    }}
-                    disabled={paginaAtual === 1 || listLoading}
-                  />
+              </View>
+            ) : (
+              <Text style={{ textAlign: "center", marginTop: 20 }}>
+                Nenhum animal encontrado
+              </Text>
+            )
+          }
 
-                  <Text style={styles.pageInfo}>
-                    Página {paginaAtual} de {totalPaginas}
-                  </Text>
+          ListFooterComponent={
+            listLoading ? null : (
+              <View style={styles.pagination}>
+                <Button
+                  title="Anterior"
+                  onPress={() => {
+                    if (paginaAtual > 1)
+                      fetchBufalosFiltrados(filtros, paginaAtual - 1);
+                  }}
+                  disabled={paginaAtual === 1 || listLoading}
+                />
 
-                  <Button
-                    title="Próxima"
-                    onPress={() => {
-                      if (paginaAtual < totalPaginas)
-                        fetchBufalosFiltrados(filtros, paginaAtual + 1);
-                    }}
-                    disabled={paginaAtual === totalPaginas || listLoading}
-                  />
-                </View>
-              )
-            }
+                <Text style={styles.pageInfo}>
+                  Página {paginaAtual} de {totalPaginas}
+                </Text>
 
-          />
-        </ScrollView>
+                <Button
+                  title="Próxima"
+                  onPress={() => {
+                    if (paginaAtual < totalPaginas)
+                      fetchBufalosFiltrados(filtros, paginaAtual + 1);
+                  }}
+                  disabled={paginaAtual === totalPaginas || listLoading}
+                />
+              </View>
+            )
+          }
+        />
       </MainLayout>
+
       <FloatingAction
         visible={!listLoading}
         actions={actions}
@@ -292,19 +303,7 @@ const styles = StyleSheet.create({
    },
   containetSearch: { 
     flex: 1, 
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    backgroundColor: colors.white.base,
-    borderRadius: 20,
     marginBottom: 12,
-    borderWidth: 1,
-    borderColor: colors.gray.disabled,
-    shadowColor: colors.black.base,
-    shadowOpacity: 0.05,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
-    elevation: 1,
-    zIndex: 1,
    },
   header: { 
     height: 80, 
@@ -330,15 +329,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.yellow.dark, 
     borderRadius: 50 
   },
-  contentContainer: { 
-    backgroundColor: "#fff", 
-    borderRadius: 12, 
-    paddingVertical: 16, 
-    paddingHorizontal: 10, 
-    borderWidth: 1, 
-    marginBottom: 50, 
-    borderColor: colors.gray.disabled 
-  },
+
   pageInfo: {
     marginHorizontal: 12,
     fontWeight: "600",

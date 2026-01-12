@@ -47,7 +47,6 @@ export interface AnimalLac {
 
 export const LactacaoScreen = () => {
   const { propriedadeSelecionada } = usePropriedade();
-  const [refreshing, setRefreshing] = useState(false);
   const [animais, setAnimais] = useState<AnimalLac[]>([]);
   const [totalLactando, setTotalLactando] = useState<number>(0);
   const [dataFormatada, setDataFormatada] = useState<string | null>(null);
@@ -56,13 +55,17 @@ export const LactacaoScreen = () => {
   const [modalVisible2, setModalVisible2] = useState(false);
   const [industrias, setIndustrias] = useState<any[]>([]);
   const [selectedBufala, setSelectedBufala] = useState<AnimalLac | null>(null);
-  const [loading, setLoading] = useState(true);
   const [paginaAtual, setPaginaAtual] = useState(1);
   const [totalPaginas, setTotalPaginas] = useState(1);
   const itensPorPagina = 10;
   const [isAddingLactacao, setIsAddingLactacao] = useState(false);
   const [isAddingColeta, setIsAddingColeta] = useState(false);
   const [isAddingEstoque, setIsAddingEstoque] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [listLoading, setListLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+
+
 
   const fetchCiclos = async () => {
     if (!propriedadeSelecionada) return;
@@ -98,30 +101,33 @@ export const LactacaoScreen = () => {
     }
   };
 
-const fetchIndustrias = async () => {
-    if (!propriedadeSelecionada) return;
-    try {
-      const response = await getIndustriasPorPropriedade(propriedadeSelecionada);
-      // Sua função getIndustriasPorPropriedade retorna response ou um array?
-      // Pela definição do service, ela retorna um objeto com { data: Industria[] }
-      setIndustrias(response); 
-    } catch (error) {
-      console.error("Erro ao buscar indústrias:", error);
-      setIndustrias([]);
-    }
-};
+  const fetchIndustrias = async () => {
+      if (!propriedadeSelecionada) return;
+      try {
+        const response = await getIndustriasPorPropriedade(propriedadeSelecionada);
+        // Sua função getIndustriasPorPropriedade retorna response ou um array?
+        // Pela definição do service, ela retorna um objeto com { data: Industria[] }
+        setIndustrias(response); 
+      } catch (error) {
+        console.error("Erro ao buscar indústrias:", error);
+        setIndustrias([]);
+      }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true);
-      if (propriedadeSelecionada){
+      setInitialLoading(true);
+      if (propriedadeSelecionada) {
         await fetchCiclos();
         await fetchIndustrias();
       }
-      setLoading(false);
+      setInitialLoading(false);
     };
+
     fetchData();
   }, [propriedadeSelecionada]);
+
+
 
   const onRefresh = async () => {
       if (!propriedadeSelecionada) return;
@@ -165,13 +171,26 @@ const fetchIndustrias = async () => {
     }
   };
 
-  if (loading) {
+  const handleChangePage = (novaPagina: number) => {
+    setListLoading(true);
+    setPaginaAtual(novaPagina);
+
+    setTimeout(() => {
+      setListLoading(false);
+    }, 300);
+  };
+
+
+
+  if (initialLoading) {
     return (
       <View style={styles.loadingContainer}>
         <BuffaloLoader />
       </View>
     );
   }
+
+
 
   return (
     <View style={styles.container}>
@@ -183,60 +202,73 @@ const fetchIndustrias = async () => {
 
       {/* Scroll geral */}
       <MainLayout>
-        <ScrollView
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-        >
-          {/* Dashboard */}
-          <DashLactation
-            totalArmazenado={quantidadeAtual || 0}
-            vacasLactando={totalLactando}
-            dataAtualizacao={dataFormatada || "N/D"}
-          />
-
           {/* Lista paginada */}
           <FlatList
-            data={animaisPaginados}
+            data={listLoading ? [] : animaisPaginados}
             keyExtractor={(item) => item.id}
-            scrollEnabled={false} 
-            nestedScrollEnabled={true}
             renderItem={({ item }) => (
-                <CardLactacao animal={item} onPress={() => {
-                  setSelectedBufala(item);
-                }}/>
+              <CardLactacao
+                animal={item}
+                onPress={() => setSelectedBufala(item)}
+              />
             )}
-            contentContainerStyle={styles.content}
+            showsVerticalScrollIndicator={false}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+                colors={[colors.yellow.base]}
+                tintColor={colors.yellow.base}
+              />
+            }
+            ListHeaderComponent={
+              <>
+                <DashLactation
+                  totalArmazenado={quantidadeAtual || 0}
+                  vacasLactando={totalLactando}
+                  dataAtualizacao={dataFormatada || "N/D"}
+                />
+              </>
+            }
+            ListEmptyComponent={
+              listLoading ? (
+                <View style={styles.inlineLoader}>
+                  <ActivityIndicator size="large" color={colors.yellow.base} />
+                  <Text style={{ marginTop: 8 }}>Atualizando rebanho...</Text>
+                </View>
+              ) : (
+                <Text style={{ textAlign: "center", marginTop: 20 }}>
+                  Nenhum animal encontrado
+                </Text>
+              )
+            }
             ListFooterComponent={
-              totalPaginas > 1 ? (
+              totalPaginas > 1 && !listLoading ? (
                 <View style={styles.pagination}>
                   <Button
                     title="Anterior"
-                    onPress={() => {
-                      if (paginaAtual > 1) setPaginaAtual(paginaAtual - 1);
-                    }}
+                    onPress={() => paginaAtual > 1 && handleChangePage(paginaAtual - 1)}
                     disabled={paginaAtual === 1}
                   />
+
                   <Text style={styles.pageInfo}>
                     Página {paginaAtual} de {totalPaginas}
                   </Text>
+
                   <Button
                     title="Próxima"
-                    onPress={() => {
-                      if (paginaAtual < totalPaginas)
-                        setPaginaAtual(paginaAtual + 1);
-                    }}
+                    onPress={() =>
+                      paginaAtual < totalPaginas && handleChangePage(paginaAtual + 1)
+                    }
                     disabled={paginaAtual === totalPaginas}
                   />
                 </View>
               ) : null
             }
           />
-        </ScrollView>
       </MainLayout>
       <FloatingAction
+        visible={!listLoading}
         actions={actions}
         onPressItem={handleActionPress}
         buttonSize={60}
@@ -314,16 +346,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.yellow.dark,
     borderRadius: 50,
   },
-  content: {
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    paddingTop: 16,
-    paddingBottom: 16,
-    paddingHorizontal: 10,
-    borderWidth: 1,
-    marginBottom: 50,
-    borderColor: colors.gray.disabled,
-  },
   pagination: {
     flexDirection: "row",
     alignItems: "center",
@@ -341,5 +363,10 @@ const styles = StyleSheet.create({
     flex: 1, 
     justifyContent: "center", 
     alignItems: "center" 
+  },
+  inlineLoader: {
+    paddingVertical: 40,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
