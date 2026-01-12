@@ -4,7 +4,7 @@ import { AuthProvider, useAuth } from './src/context/AuthContext'
 
 // App.tsx
 import React, { useEffect } from 'react';
-import { Platform, StatusBar, useColorScheme } from 'react-native';
+import { Platform, StatusBar, useColorScheme, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -34,6 +34,7 @@ import Lactation from './src/icons/lactation';
 import GlobeIcon from './src/icons/sex';
 import Fance from './src/icons/fance';
 import { NfcScannerScreen } from './src/screens/NfcScannerScreen';
+import BuffaloLoader from './src/components/BufaloLoader';
 
 
 export type RootStackParamList = {
@@ -157,14 +158,21 @@ function MainTab() {
 
 // App.tsx (parte relevante)
 function AppContent() {
-  const { userToken } = useAuth();
+  const { userToken, loading } = useAuth();
+  
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#fff' }}>
+        <BuffaloLoader />
+      </View>
+    );
+  }
+
 
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       {!userToken ? (
-        <>
           <Stack.Screen name="Login" component={LoginScreen} />
-        </>
       ) : (
         <>
         <Stack.Screen name="MainTab" component={MainTab} />
