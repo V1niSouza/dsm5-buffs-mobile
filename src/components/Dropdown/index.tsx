@@ -23,7 +23,6 @@ export default function Propriedades({ dropdownOpen, setDropdownOpen, prop }: Pr
       label: p.nome,
       value: p.id,
     }));
-    console.log(mapped);
       setItems(mapped);
 
       if (!propriedadeSelecionada) {

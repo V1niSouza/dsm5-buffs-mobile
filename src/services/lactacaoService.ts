@@ -105,9 +105,11 @@ export const getCiclosLactacao = async (
     const ciclosFormatados = ciclos.map((c) => ({
       idCicloLactacao: c.idCicloLactacao,
       idBufala: c.idBufala,
-      nome: c.bufalo?.nome ?? "Não informado",
-      brinco: c.bufalo?.brinco ?? "-",
+      nome: c.bufala?.nome ?? "Não informado",
+      brinco: c.bufala?.brinco ?? "-",
       status: c.status,
+      raca: c.bufala?.raca ?? "Não informado",
+      diasEmLactacao: c.diasEmLactacao,
       dtSecagemPrevista: c.dtSecagemPrevista
         ? formatarDataBR(c.dtSecagemPrevista)
         : "—",
@@ -137,7 +139,7 @@ export const getEstatisticasLactacao = async (propriedadeId: string) => {
     }
 
     return await apiFetch(
-      `/lactacao/propriedade/${propriedadeId}/estatistica`
+      `/lactacao/propriedade/${propriedadeId}/estatisticas`
     );
   } catch (error) {
     console.error("Erro ao buscar estatísticas de lactação:", error);
@@ -227,5 +229,46 @@ export const encerrarLactacao = async (idCiclo: string | number) => {
   } catch (error) {
     console.error("Erro ao encerrar lactação:", error);
     throw new Error("Falha ao encerrar lactação.");
+  }
+};
+
+/* =========================
+   GET — PRODUÇÃO / ESTOQUE ATUAL
+========================= */
+
+export const getProducaoDiariaAtual = async (propriedadeId: string) => {
+  try {
+    if (!propriedadeId) {
+      throw new Error("ID da propriedade é obrigatório.");
+    }
+
+    const response: {
+      data: {
+        quantidade: string;
+        dt_registro: string;
+      }[];
+    } = await apiFetch(
+      `/producao-diaria/propriedade/${propriedadeId}?page=1&limit=1`
+    );
+
+    const registro = response?.data?.[0];
+
+    if (!registro) {
+      return {
+        quantidade: 0,
+        dataAtualizacao: "N/D",
+      };
+    }
+
+    return {
+      quantidade: Number(registro.quantidade),
+      dataAtualizacao: formatarDataBR(registro.dt_registro),
+    };
+  } catch (error) {
+    console.error("Erro ao buscar produção diária:", error);
+    return {
+      quantidade: 0,
+      dataAtualizacao: "N/D",
+    };
   }
 };
