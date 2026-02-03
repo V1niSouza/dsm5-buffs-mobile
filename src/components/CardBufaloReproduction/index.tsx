@@ -7,28 +7,28 @@ export type CardReproducaoProps = {
   onPress?: () => void;
 };
 
-type StatusType = "Em Andamento/Confirmada" | "Concluída" | "Falha";
+type StatusType = "Confirmada" | "Em andamento" | "Falha";
 
 export const CardReproducao: React.FC<CardReproducaoProps> = ({ reproducao, onPress }) => {
 const status: StatusType =
     reproducao.status === "Falha"
       ? "Falha"
-      : reproducao.status === "Concluída" // Novo status de sucesso
-      ? "Concluída"
-      : "Em Andamento/Confirmada"; // Agrupa "Em andamento" e "Confirmada"
+      : reproducao.status === "Confirmada" // Novo status de sucesso
+      ? "Confirmada"
+      : "Em andamento"; // Agrupa "Em andamento"
 
 const statusColors: Record<StatusType, { bg: string; text: string }> = {
     // Laranja/Amarelo para "Em andamento" E "Confirmada"
-    "Em Andamento/Confirmada": { bg: "#FEF3C7", text: colors.yellow.static }, 
+    "Em andamento": { bg: "#FEF3C7", text: colors.yellow.static }, 
     // Verde para "Concluída"
-    "Concluída": { bg: "#D1FAE5", text: colors.green.active }, 
+    "Confirmada": { bg: "#D1FAE5", text: colors.green.active }, 
     // Vermelho para "Falha"
     Falha: { bg: "#FEE2E2", text: colors.red.inactive },
   };
 
 const barColors: Record<StatusType, string> = {
-    "Em Andamento/Confirmada": colors.yellow.static,
-    "Concluída": colors.green.active,
+    "Em andamento": colors.yellow.static,
+    "Confirmada": colors.green.active,
     Falha: colors.red.inactive,
   };
 
