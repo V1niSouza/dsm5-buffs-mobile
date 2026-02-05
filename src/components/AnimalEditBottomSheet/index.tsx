@@ -145,7 +145,7 @@ const InputWithFloatingLabel: React.FC<FloatingLabelInputProps> = ({
 // --- INTERFACES (Inalteradas) ---
 // ==========================================================
 interface AnimalInfoItem {
-    id_bufalo: string;
+    idBufalo: string;
     nome?: string;
     brinco: string;
     microchip?: string;
@@ -160,7 +160,7 @@ interface AnimalInfoItem {
 
 interface AnimalEditBottomSheetProps {
     item: AnimalInfoItem;
-    onEditSave: (id_bufalo: string, data: any) => Promise<void>;
+    onEditSave: (idBufalo: string, data: any) => Promise<void>;
     onClose: () => void;
 }
 
@@ -292,7 +292,7 @@ export const AnimalEditBottomSheet: React.FC<AnimalEditBottomSheetProps> = ({ it
                 id_mae: idMae,
             };
             // Chama a função passada pela tela pai para persistir e recarregar
-            await onEditSave(item.id_bufalo, payload); 
+            await onEditSave(item.idBufalo, payload); 
             showToast("Informações atualizadas com sucesso!");
             
         } catch (err) {

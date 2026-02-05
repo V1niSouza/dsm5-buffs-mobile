@@ -15,7 +15,7 @@ export const CardLactacao: React.FC<CardLactacaoProps> = ({ animal, onPress, onS
   const isLactando = animal.status === "Em Lactação";
   const [isEnabled, setIsEnabled] = useState(isLactando);
   const [modalVisible, setModalVisible] = useState(false);
-
+  console.log("Animal no CardLactacao:", animal);
   const toggleSwitch = () => {
     setModalVisible(true);
   };
@@ -51,7 +51,7 @@ export const CardLactacao: React.FC<CardLactacaoProps> = ({ animal, onPress, onS
           <Text style={styles.nome}>{animal.nome || "Sem nome"}</Text>
           <Text style={styles.brinco}>Brinco: Nº {animal.brinco}</Text>
         </View>
-        <View style={[styles.statusBadge, { backgroundColor: isEnabled ? colors.green.active : colors.red.inactive }, ]}>
+        <View style={[styles.statusBadge, !isEnabled && styles.statusBadgeSeca]}>
           <View style={[ styles.statusDot, { backgroundColor: isEnabled ? colors.green.extra : colors.red.extra, }, ]} />
           <Text style={[ styles.statusText, { color: isEnabled ? colors.green.text : colors.red.text, },]}>
             {isEnabled ? "Em Lactação" : "Seca"}
@@ -73,7 +73,7 @@ export const CardLactacao: React.FC<CardLactacaoProps> = ({ animal, onPress, onS
           </View>
           <View style={styles.chip}>
             <Text style={styles.chipLabel}>Ciclo:</Text>
-            <Text style={styles.chipValue}>{animal.ciclo ? `${animal.ciclo}º` : "—"}</Text>
+            <Text style={styles.chipValue}>{animal.cicloAtual ? `${animal.cicloAtual}º` : "—"}</Text>
           </View>
           <View style={styles.chip}>
             <Text style={styles.chipLabel}>Dias Lactação:</Text>
@@ -177,14 +177,18 @@ const styles = StyleSheet.create({
     color: colors.yellow.base,
   },
   statusBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 16,
-    width: '40%',
-    height: 40,
+    minHeight: 40,
+    gap: 4,
+    alignSelf: "flex-start", // 👈 evita esticar
+  },
 
+  statusBadgeSeca: {
+    paddingHorizontal: 0, // 👈 MAIS ESPAÇO quando Seca
   },
   statusDot: { 
     width: 8, 

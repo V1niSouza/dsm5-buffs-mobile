@@ -7,59 +7,102 @@ export type CardReproducaoProps = {
   onPress?: () => void;
 };
 
-type StatusType = "Confirmada" | "Em andamento" | "Falha";
+// ✅ Status reais do domínio
+type StatusType =
+  | "Em andamento"
+  | "Confirmada"
+  | "Concluída"
+  | "Falhou";
 
-export const CardReproducao: React.FC<CardReproducaoProps> = ({ reproducao, onPress }) => {
-const status: StatusType =
-    reproducao.status === "Falha"
-      ? "Falha"
-      : reproducao.status === "Confirmada" // Novo status de sucesso
-      ? "Confirmada"
-      : "Em andamento"; // Agrupa "Em andamento"
+// 🔁 Normaliza qualquer valor inesperado
+const normalizeStatus = (status: string): StatusType => {
+  if (
+    status === "Em andamento" ||
+    status === "Confirmada" ||
+    status === "Concluída" ||
+    status === "Falhou"
+  ) {
+    return status;
+  }
 
-const statusColors: Record<StatusType, { bg: string; text: string }> = {
-    // Laranja/Amarelo para "Em andamento" E "Confirmada"
-    "Em andamento": { bg: "#FEF3C7", text: colors.yellow.static }, 
-    // Verde para "Concluída"
-    "Confirmada": { bg: "#D1FAE5", text: colors.green.active }, 
-    // Vermelho para "Falha"
-    Falha: { bg: "#FEE2E2", text: colors.red.inactive },
+  return "Em andamento";
+};
+
+export const CardReproducao: React.FC<CardReproducaoProps> = ({
+  reproducao,
+  onPress,
+}) => {
+  const status: StatusType = normalizeStatus(reproducao.status);
+
+  // 🎨 Cores por status (regra FINAL)
+  const statusColors: Record<
+    StatusType,
+    { bg: string; text: string }
+  > = {
+    "Em andamento": {
+      bg: "#FEF3C7",
+      text: colors.yellow.warning,
+    },
+    "Confirmada": {
+      bg: "#FEF3C7",
+      text: colors.yellow.warning,
+    },
+    "Concluída": {
+      bg: "#D1FAE5",
+      text: colors.green.active,
+    },
+    "Falhou": {
+      bg: "#FEE2E2",
+      text: colors.red.inactive,
+    },
   };
 
-const barColors: Record<StatusType, string> = {
-    "Em andamento": colors.yellow.static,
-    "Confirmada": colors.green.active,
-    Falha: colors.red.inactive,
+  const barColors: Record<StatusType, string> = {
+    "Em andamento": colors.yellow.warning,
+    "Confirmada": colors.yellow.warning,
+    "Concluída": colors.green.active,
+    "Falhou": colors.red.inactive,
   };
 
   const color = statusColors[status];
 
-  // Determina o material genético exibido
+  // 🧬 Material genético
   const materialGenetico = !reproducao.brincoTouro
     ? reproducao.id_semen || reproducao.id_ovulo
       ? `${(reproducao.id_semen || reproducao.id_ovulo).slice(0, 5)}`
       : "—"
     : null;
 
-  // Determina o valor do chip "Concluída"
+  // ✅ Texto de sucesso (agora coerente)
   const concluidaValue =
-    status === "Falha"
-      ? "Não, Falha"
-      : reproducao.concluida
+    status === "Falhou"
+      ? "Não, falhou"
+      : status === "Concluída"
       ? reproducao.tipo_parto
         ? `Sim, parto: ${reproducao.tipo_parto.toLowerCase()}`
         : "Sim"
-      : "Não";
+      : status === "Confirmada"
+      ? "Sim, prenha"
+      : "Em acompanhamento";
 
   return (
     <TouchableOpacity style={styles.cardContainer} onPress={onPress}>
-      <View style={[styles.statusBar, { backgroundColor: barColors[status] }]} />
+      <View
+        style={[
+          styles.statusBar,
+          { backgroundColor: barColors[status] },
+        ]}
+      />
       <View style={styles.content}>
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.nome}>Búfala: {reproducao.brincoBufala || "Sem nome"}</Text>
+          <Text style={styles.nome}>
+            Búfala: {reproducao.brincoBufala || "Sem nome"}
+          </Text>
           {reproducao.brincoTouro && (
-            <Text style={styles.brinco}>Reprodutor: {reproducao.brincoTouro}</Text>
+            <Text style={styles.brinco}>
+              Reprodutor: {reproducao.brincoTouro}
+            </Text>
           )}
         </View>
 
@@ -67,20 +110,23 @@ const barColors: Record<StatusType, string> = {
         <View style={styles.chipRow}>
           <View style={styles.chip}>
             <Text style={styles.chipLabel}>Inseminação</Text>
-            <Text style={styles.chipValue}>{reproducao.tipo_inseminacao || "—"}</Text>
+            <Text style={styles.chipValue}>
+              {reproducao.tipo_inseminacao || "—"}
+            </Text>
           </View>
 
           <View style={styles.chip}>
             <Text style={styles.chipLabel}>Data Cruzamento</Text>
-            <Text style={styles.chipValue}>{reproducao.dataCruzamento || "—"}</Text>
+            <Text style={styles.chipValue}>
+              {reproducao.dataCruzamento || "—"}
+            </Text>
           </View>
 
           <View style={styles.chip}>
-            <Text style={styles.chipLabel}>Sucesso ? </Text>
+            <Text style={styles.chipLabel}>Sucesso?</Text>
             <Text style={styles.chipValue}>{concluidaValue}</Text>
           </View>
 
-          {/* Mostra material genético se não houver brincoTouro */}
           {materialGenetico && (
             <View style={styles.chip}>
               <Text style={styles.chipLabel}>Material</Text>
@@ -92,6 +138,7 @@ const barColors: Record<StatusType, string> = {
     </TouchableOpacity>
   );
 };
+
 
 const styles = StyleSheet.create({
   cardContainer: {

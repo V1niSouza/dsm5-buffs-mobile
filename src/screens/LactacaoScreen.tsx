@@ -32,9 +32,8 @@ export interface AnimalLac {
   nome: string;
   diasEmLactacao: number;
   secagemPrevista?: string;
-  ciclo?: number;
+  cicloAtual?: number;
   producaoTotal?: number;
-  mediaDiaria?: number;
   status: string;
   raca?: string;
   idCicloLactacao?: string;
@@ -90,9 +89,9 @@ const fetchCiclos = async (page = 1, isInitial = false) => {
       secagemPrevista: c.dtSecagemPrevista,
       diasEmLactacao: c.diasEmLactacao,
       producaoTotal: 0,
-      mediaDiaria: 0,
       raca: c.raca,
       idCicloLactacao: c.idCicloLactacao,
+      cicloAtual: 0
     }));
 
     setAnimais(animaisFormatados);

@@ -59,12 +59,12 @@ export interface LactacaoRegistroPayload {
 }
 
 export interface ColetaRegistroPayload {
-  id_industria: string;
-  id_propriedade: string;
-  resultado_teste: boolean;
+  idIndustria: string;
+  idPropriedade: string;
+  resultadoTeste: boolean;
   observacao?: string;
   quantidade: number;
-  dt_coleta: string;
+  dtColeta: string;
 }
 
 export interface EstoqueRegistroPayload {
@@ -179,7 +179,7 @@ export const getIndustriasPorPropriedade = async (propriedadeId: string) => {
 
 export const registrarLactacaoApi = async (payload: LactacaoRegistroPayload) => {
   try {
-    return await apiFetch("/lactacao", {
+    return await apiFetch("/ordenhas", {
       method: "POST",
       body: JSON.stringify(payload),
     });
@@ -191,7 +191,8 @@ export const registrarLactacaoApi = async (payload: LactacaoRegistroPayload) => 
 
 export const registrarColetaApi = async (payload: ColetaRegistroPayload) => {
   try {
-    return await apiFetch("/coletas", {
+    console.log('📦 PAYLOAD FINAL / SWAGGER:', JSON.stringify(payload, null, 2));
+    return await apiFetch("/retiradas", {
       method: "POST",
       body: JSON.stringify(payload),
     });
@@ -203,7 +204,7 @@ export const registrarColetaApi = async (payload: ColetaRegistroPayload) => {
 
 export const registrarEstoqueApi = async (payload: EstoqueRegistroPayload) => {
   try {
-    return await apiFetch("/estoque-leite", {
+    return await apiFetch("/producao-diaria", {
       method: "POST",
       body: JSON.stringify(payload),
     });
@@ -219,7 +220,7 @@ export const encerrarLactacao = async (idCiclo: string | number) => {
 
     const hoje = new Date().toISOString().split("T")[0];
 
-    return await apiFetch(`/ciclos-lactacao/${idCiclo}`, {
+    return await apiFetch(`/lactacao/${idCiclo}`, {
       method: "PATCH",
       body: JSON.stringify({
         dt_secagem_real: hoje,

@@ -23,7 +23,7 @@ export const AnimalInfoCard = ({ detalhes, onEdit }: { detalhes: any, onEdit: ()
         B: "Bezerro", N: "Novilha", T: "Touro", V: "Vaca",
     };
     const maturidadeTexto = maturidadeMap[detalhes.nivelMaturidade] || detalhes.nivelMaturidade;
-    const[isEnabled, setIsEnabled] = useState(Boolean(detalhes?.status));
+    const [isEnabled, setIsEnabled] = useState(Boolean(detalhes?.status));
     const [modalVisible, setModalVisible] = useState(false);
     const [novoStatus, setNovoStatus] = useState<boolean | null>(null);
     const [grupos, setGrupos] = useState<Grupo[]>([]);
@@ -171,10 +171,7 @@ export const AnimalInfoCard = ({ detalhes, onEdit }: { detalhes: any, onEdit: ()
                         <TouchableOpacity onPress={onEdit} style={styles.editButton}>
                             <Pen width={20} height={20} fill={colors.brown.base} />
                         </TouchableOpacity>
-                        <View style={[
-                            styles.statusBadge,
-                            { backgroundColor: isEnabled ? colors.green.active : colors.red.inactive },
-                        ]}>
+                        <View style={[styles.statusBadge]}>
                             <View style={[
                                 styles.statusDot,
                                 { backgroundColor: isEnabled ? colors.green.extra : colors.red.extra },

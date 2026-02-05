@@ -2,6 +2,7 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { Modal } from "../Modal"; // seu componente já existente
+import { colors } from "../../styles/colors";
 
 interface ConfirmModalProps {
   visible: boolean;
@@ -49,6 +50,6 @@ const styles = StyleSheet.create({
   buttons: { flexDirection: "row", justifyContent: "flex-end" },
   cancelButton: { padding: 10, marginRight: 10 },
   cancelText: { color: "gray" },
-  confirmButton: { padding: 10, backgroundColor: "red", borderRadius: 6 },
+  confirmButton: { padding: 10, backgroundColor: colors.red.base, borderRadius: 6 },
   confirmText: { color: "#fff", fontWeight: "bold" },
 });

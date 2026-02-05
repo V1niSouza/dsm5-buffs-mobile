@@ -25,7 +25,7 @@ import { PiquetesScreen } from './src/screens/PiquetesScreen';
 import { LoginScreen } from './src/screens/LoginScreen';
 import { PropriedadeProvider } from './src/context/PropriedadeContext';
 import { AnimalDetailScreen } from './src/screens/AnimalDetailScreen';
-import { NotificacoesScreen } from './src/screens/Notificacoes';
+import { NotificacoesScreen } from './src/screens/NotificacoesScreen';
 
 // Icons SVG
 import BuffsLogo from './assets/images/logoBuffs.svg'; 

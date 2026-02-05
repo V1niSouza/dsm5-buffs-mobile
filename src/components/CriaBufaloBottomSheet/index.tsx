@@ -155,9 +155,9 @@ export const CadastrarBufaloForm: React.FC<CadastrarBufaloFormProps> = ({ onClos
         try {
             // Verifica se a estrutura de raças retornada é compatível
             const racasApi = await bufaloService.getRacas();
-            const mappedRacas = racasApi.map((r: { nome: any; id_raca: any; }) => ({ 
+            const mappedRacas = racasApi.map((r: { nome: any; idRaca: any; }) => ({ 
                 label: r.nome, 
-                value: r.id_raca 
+                value: r.idRaca 
             }));
             setRacas(mappedRacas);
         } catch (err) {
@@ -195,7 +195,7 @@ export const CadastrarBufaloForm: React.FC<CadastrarBufaloFormProps> = ({ onClos
         setIsSaving(true);
 
         try {
-            let idPai: number | null = null;
+            let idPai: string | null = null;
             if (brincoPai) {
                 const paiEncontrado = await bufaloService.getBufaloByBrincoAndSexo(
                 propriedadeSelecionada, brincoPai, "M"
@@ -205,10 +205,10 @@ export const CadastrarBufaloForm: React.FC<CadastrarBufaloFormProps> = ({ onClos
                     setIsSaving(false);
                     return;
                 }
-                idPai = paiEncontrado.id || paiEncontrado.id_bufalo;
+                idPai = paiEncontrado.idBufalo;
             }
 
-            let idMae: number | null = null;
+            let idMae: string | null = null;
             if (brincoMae) {
                 const maeEncontrada = await bufaloService.getBufaloByBrincoAndSexo(
                 propriedadeSelecionada, brincoMae, "F"
@@ -218,7 +218,7 @@ export const CadastrarBufaloForm: React.FC<CadastrarBufaloFormProps> = ({ onClos
                     setIsSaving(false);
                     return;
                 }
-                idMae = maeEncontrada.id || maeEncontrada.id_bufalo;
+                idMae = maeEncontrada.idBufalo;
             }
 
             const payload = {
@@ -236,6 +236,8 @@ export const CadastrarBufaloForm: React.FC<CadastrarBufaloFormProps> = ({ onClos
                 id_propriedade: propriedadeSelecionada,
             };
             
+            console.log("Payload para criação do búfalo:", payload);
+
             // Remove campos nulos/vazios do payload, exceto o brinco que é obrigatório e já foi validado.
             const cleanedPayload = Object.fromEntries(
                 Object.entries(payload).filter(([_, value]) => value !== null && value !== undefined && value !== '')
@@ -323,7 +325,7 @@ export const CadastrarBufaloForm: React.FC<CadastrarBufaloFormProps> = ({ onClos
                                 placeholder="Selecione"
                                 style={styles.dropdownStyle}
                                 dropDownContainerStyle={styles.dropdownContainerStyle}
-                                listMode="SCROLLVIEW"
+                                listMode="MODAL"
                             />
                         </View>
                         
@@ -344,7 +346,7 @@ export const CadastrarBufaloForm: React.FC<CadastrarBufaloFormProps> = ({ onClos
                                 placeholder="Selecione"
                                 style={styles.dropdownStyle}
                                 dropDownContainerStyle={styles.dropdownContainerStyle}
-                                listMode="SCROLLVIEW"
+                                listMode="MODAL"
                             />
                         </View>
                     </View>
@@ -369,12 +371,14 @@ export const CadastrarBufaloForm: React.FC<CadastrarBufaloFormProps> = ({ onClos
                             open={openRaca}
                             setOpen={setOpenRaca}
                             value={idRaca}
-                            setValue={setIdRaca}
+                            setValue={(callback) => {
+                                setIdRaca(callback(idRaca));
+                            }}
                             items={racas} // Já mapeadas no useEffect
                             placeholder="Selecione Raça"
                             style={styles.dropdownStyle}
                             dropDownContainerStyle={styles.dropdownContainerStyle}
-                            listMode="SCROLLVIEW"
+                            listMode="MODAL"
                         />
                     </View>
                     

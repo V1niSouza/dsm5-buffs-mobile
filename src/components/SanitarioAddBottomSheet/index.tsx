@@ -44,7 +44,6 @@ interface SanitarioPayload {
     doenca?: string;
     necessita_retorno?: boolean;
     dt_retorno?: string;
-    observacao?: string;
 }
 
 interface SanitarioAddBottomSheetProps {
@@ -61,7 +60,6 @@ const initialFormData: Omit<SanitarioPayload, 'id_bufalo'> = {
     doenca: '',
     necessita_retorno: false,
     dt_retorno: undefined,
-    observacao: '',
     id_medicao: undefined,
 };
 
@@ -225,9 +223,7 @@ export const SanitarioAddBottomSheet: React.FC<SanitarioAddBottomSheetProps> = (
             unidade_medida: formData.unidade_medida,
             doenca: formData.doenca,
             necessita_retorno: formData.necessita_retorno,
-            // Inclui dt_retorno apenas se necessário e preenchido
             dt_retorno: (formData.necessita_retorno && formData.dt_retorno) ? formData.dt_retorno : undefined, 
-            observacao: formData.observacao,
         };
         
         // Remove campos vazios, nulos ou indefinidos do payload
@@ -388,15 +384,6 @@ return (
                         </TouchableOpacity>
                       </View>
                     )}
-
-                    {/* Observação (FLOATING LABEL e multiline) */}
-                    <InputWithFloatingLabel
-                        label="Observação (Opcional)"
-                        value={formData.observacao ?? ""}
-                        onChangeText={(t) => handleChange("observacao", t)}
-                        multiline={true}
-                        style={styles.observacaoInput}
-                    />
                 </View>
 
                 {/* Footer (Botão de ação) */}
