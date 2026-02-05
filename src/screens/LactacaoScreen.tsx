@@ -91,7 +91,7 @@ const fetchCiclos = async (page = 1, isInitial = false) => {
       producaoTotal: 0,
       raca: c.raca,
       idCicloLactacao: c.idCicloLactacao,
-      cicloAtual: 0
+      cicloAtual: c.cicloAtual,
     }));
 
     setAnimais(animaisFormatados);

@@ -105,6 +105,7 @@ export const getCiclosLactacao = async (
     const ciclosFormatados = ciclos.map((c) => ({
       idCicloLactacao: c.idCicloLactacao,
       idBufala: c.idBufala,
+      cicloAtual: c.cicloAtual,
       nome: c.bufala?.nome ?? "Não informado",
       brinco: c.bufala?.brinco ?? "-",
       status: c.status,
