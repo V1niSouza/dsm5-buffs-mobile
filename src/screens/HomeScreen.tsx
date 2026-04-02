@@ -1,6 +1,6 @@
 import React, { useState, useEffect} from "react";
 import { View, FlatList, StyleSheet, RefreshControl, Text, ActivityIndicator } from "react-native";
-import Propriedades from "../components/Dropdown";
+import Propriedades from "../components/SelectPropriedade";
 import DashPropriedade from "../components/DashPropriedade";
 import { colors } from "../styles/colors";
 import BuffsLogo from '../../assets/images/logoBuffs.svg'; 
