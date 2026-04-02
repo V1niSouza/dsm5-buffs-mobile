@@ -2,6 +2,7 @@ import 'react-native-reanimated';
 import 'react-native-gesture-handler';
 import { AuthProvider, useAuth } from './src/context/AuthContext'
 import { PortalProvider } from '@gorhom/portal';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 
 // App.tsx
 import React, { useEffect } from 'react';
@@ -198,9 +199,11 @@ export default function App() {
         <AuthProvider>
           <PropriedadeProvider>
             <PortalProvider>
-              <NavigationContainer>
-                <AppContent />
-              </NavigationContainer>
+              <BottomSheetModalProvider>
+                <NavigationContainer>
+                  <AppContent />
+                </NavigationContainer>
+              </BottomSheetModalProvider>
             </PortalProvider>
           </PropriedadeProvider>
         </AuthProvider>

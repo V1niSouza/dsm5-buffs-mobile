@@ -1,4 +1,9 @@
 {
   "name": "MeuApp",
-  "displayName": "Buffs"
+  "displayName": "Buffs",
+  "expo": {
+    "android": {
+      "usesCleartextTraffic": true
+    }
+  }
 }
