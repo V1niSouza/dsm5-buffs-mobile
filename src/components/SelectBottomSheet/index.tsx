@@ -37,8 +37,17 @@ export default function SelectBottomSheet({
         bottomSheetRef.current?.dismiss();
     }, []);
 
-    const selectedLabel =
-        items.find((i) => i.value === value)?.label || placeholder;
+    const selectedLabel = useMemo(() => {
+      if (!value) return placeholder;
+
+      const normalizedValue = value.trim().toUpperCase();
+
+      const found = items.find(
+        (i) => i.value.trim().toUpperCase() === normalizedValue
+      );
+
+      return found?.label || placeholder;
+    }, [value, items, placeholder]);
 
     const renderBackdrop = useCallback(
         (props: any) => (
@@ -60,6 +69,7 @@ return (
         <BottomSheetModal
             ref={bottomSheetRef}
             index={0}
+            stackBehavior="push"
             snapPoints={snapPoints}
             backdropComponent={renderBackdrop}
             enablePanDownToClose={true}
@@ -69,16 +79,26 @@ return (
                 <FlatList
                     data={items}
                     keyExtractor={(item) => item.value}
-                    renderItem={({ item }) => (
-                    <TouchableOpacity
-                        style={styles.item}
-                        onPress={() => {
-                        onChange(item.value);
-                        close();
-                        }}>
-                        <Text style={styles.itemText}>{item.label}</Text>
-                    </TouchableOpacity>
-                    )}
+                    renderItem={({ item }) => {
+                      const isSelected = item.value === value;
+
+                      return (
+                        <TouchableOpacity
+                          style={[styles.item, isSelected && styles.itemSelected]}
+                          onPress={() => {
+                            onChange(item.value);
+                            close();
+                          }}
+                        >
+                          <Text style={[
+                            styles.itemText,
+                            isSelected && styles.itemTextSelected
+                          ]}>
+                            {item.label}
+                          </Text>
+                        </TouchableOpacity>
+                      );
+                    }}
                 />
             </BottomSheetView>
         </BottomSheetModal>
@@ -114,5 +134,11 @@ const styles = StyleSheet.create({
   },
   itemText: {
     fontSize: 16,
+  },
+  itemSelected: {
+    backgroundColor: "#f0f0f0",
+  },
+  itemTextSelected: {
+    fontWeight: "bold",
   },
 });

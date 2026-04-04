@@ -286,12 +286,12 @@ export const CadastrarBufaloForm: React.FC<CadastrarBufaloFormProps> = ({ onClos
                     <View style={[{ zIndex: getDropdownZIndex('raca'), marginBottom: 12 }]}>
                         <Text style={styles.dropdownLabel}>Raça:</Text>
                         <SelectBottomSheet
-                        items={racas}
-                        value={idRaca}
-                        onChange={(value) => setIdRaca(value)}
-                        title="Selecionar raça"
-                        placeholder="Selecione raça"
-                        />
+                            items={racas}
+                            value={idRaca}
+                            onChange={(value) => setIdRaca(value)}
+                            title="Selecionar raça"
+                            placeholder="Selecione raça"
+                            />
                     </View>
                 </View>                
                 {/* Características */}

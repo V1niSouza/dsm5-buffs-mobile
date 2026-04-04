@@ -382,17 +382,16 @@ export const AnimalDetailScreen = () => {
         />    
         )}
 
+      </MainLayout> 
+
         {!!isEditingInfo && detalhes && (
-          <Portal>
             <AnimalEditBottomSheet 
+              key="edit-info-sheet"
               item={detalhes as BufaloDetalhes} 
               onClose={() => setIsEditingInfo(false)} 
               onEditSave={handleSaveInfo}
             />
-          </Portal>
         )}
-
-      </MainLayout> 
 
       {showAddButton && !isAnyBottomSheetOpen && (
           <View style={styles.addButtonContainer}>
