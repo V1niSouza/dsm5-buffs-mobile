@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { View, Text, StyleSheet, Switch, TouchableOpacity, Alert } from "react-native";
 import { colors } from "../../styles/colors";
-import { ConfirmarAlteracaoStatusModal } from "../ModalAlterarStatus";
 import bufaloService from "../../services/bufaloService";
 import Pen from "../../../assets/images/pen.svg";
-import { ConfirmModal } from "../ModalDeleteConfirm";
+import { ConfirmModal } from "../ModalStatus";
 import { formatarDataBR } from "../../utils/date";
 import SelectBottomSheet from "../SelectBottomSheet";
 
@@ -212,15 +211,16 @@ export const AnimalInfoCard = ({ detalhes, onEdit }: { detalhes: any, onEdit: ()
                     setModalMudarGrupoVisible(false);
                     setNovoGrupoSelecionado(grupoAtualId); 
                 }}
-                confirmText="Mover"
-            />
+                confirmText="Mover"/>
 
-            <ConfirmarAlteracaoStatusModal
+            <ConfirmModal
                 visible={modalVisible}
-                novoStatus={novoStatus ?? false}
-                onClose={cancelarAlteracao}
+                title="Alterar status"
+                message={`Deseja mudar o status desse animal para ${novoStatus ? "ATIVO" : "INATIVO"}?`}
                 onConfirm={confirmarAlteracaoStatus}
-            />
+                onCancel={cancelarAlteracao}
+                confirmText={novoStatus ? "Ativar" : "Inativar"}
+                variant={novoStatus ? "success" : "danger"}/>
         </>
     );
 };

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Switch } from "react-native";
 import { colors } from "../../styles/colors";
-import { ConfirmModal } from "../ModalDeleteConfirm";
+import { ConfirmModal } from "../ModalStatus";
 import { encerrarLactacao } from "../../services/lactacaoService";
 
 
