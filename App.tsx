@@ -87,7 +87,7 @@ function MainTab() {
         // --- CORES ATIVAS / INATIVAS ---
         tabBarActiveTintColor: colors.yellow.dark,
         tabBarInactiveTintColor: "gray",
-
+        tabBarHideOnKeyboard: true,
       }}>
       <Tab.Screen 
         name="Home" 
