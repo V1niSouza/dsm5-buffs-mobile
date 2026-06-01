@@ -1,4 +1,4 @@
-# DSM5 Buffs Mobile
+# Buffs Mobile
 
 Aplicativo mobile **offline-first** para gestão de búfalas leiteiras em propriedades rurais brasileiras. Desenvolvido em React Native (Android), permite ao fazendeiro registrar e acompanhar todas as operações do rebanho — ordenhas, reprodução, sanitário, pesagens e estoque de leite — mesmo sem internet, sincronizando com o backend quando houver conexão.
 
