@@ -8,6 +8,7 @@ import DropDownPicker from "react-native-dropdown-picker";
 import sanitarioService from "../../services/sanitarioService";
 import { ConfirmarExclusaoModal } from "../ModalAlertaDelete";
 import { formatarDataBR } from "../../utils/date";
+import { useTranslation } from "react-i18next";
 
 interface SanitarioItem {
     idSanit: string;
@@ -34,6 +35,8 @@ export const SanitarioBottomSheet: React.FC<SanitarioBottomSheetProps> = ({ item
     const sheetRef = useRef<BottomSheet>(null);
     const snapPoints = useMemo(() => ["50%", "70%"], []);
     const [isEditing, setIsEditing] = useState(false);
+    const { t } = useTranslation("sanitario");
+    const { t: tc } = useTranslation("common");
     const [formData, setFormData] = useState<SanitarioItem>({ ...item });
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [medicacoes, setMedicacoes] = useState<{label:string,value:string}[]>([]);
@@ -153,36 +156,36 @@ return (
 
                 {/* Header */}
                 <View style={styles.header}>
-                    <Text style={styles.headerTitle}>Tratamento Sanitário</Text>
+                    <Text style={styles.headerTitle}>{t("edit.title")}</Text>
                 </View>
 
                 {/* Card Principal */}
                 <View style={styles.mainCard}>
                     <View style={styles.cardRow}>
                       <Text style={styles.cardTitle}>
-                        Doença: {String(formData.doenca ?? "-")}
+                        {t("edit.diseaseLabel", { value: String(formData.doenca ?? "-") })}
                       </Text>
                       <Text style={styles.cardSubtitle}>
-                        Aplicado em: {formatarDataBR(formData?.dtAplicacao)}
+                        {t("edit.appliedOn", { date: formatarDataBR(formData?.dtAplicacao) })}
                       </Text>
                     </View>
                 </View>
 
-                <Text style={styles.sectionTitle}>Detalhes do Tratamento:</Text>
+                <Text style={styles.sectionTitle}>{t("edit.treatmentDetails")}</Text>
 
                 {/* Lista */}
                 <View style={styles.listContainer}>
 
                     {/* Nome do medicamento */}
                     <View style={styles.listItem}>
-                        <Text style={styles.listLabel}>Medicação:</Text>
+                        <Text style={styles.listLabel}>{t("medicationLabel")}</Text>
 
                         {!isEditing ? (
                             <Text style={styles.listValue}>{formData.nome_medicamento ?? "-"}</Text>
                         ) : (
                             <View style={{ flex: 1, marginLeft: 10 }}>
                                 {loadingMedicacoes ? (
-                                    <Text style={styles.listValue}>Carregando medicações...</Text>
+                                    <Text style={styles.listValue}>{t("loadingMedications")}</Text>
                                 ) : (
                                     <DropDownPicker
                                         open={openMedicacao}
@@ -190,7 +193,7 @@ return (
                                         value={medicacaoSelecionada}
                                         setValue={setMedicacaoSelecionada }
                                         items={medicacoes}
-                                        placeholder="Selecione a Medicação"
+                                        placeholder={t("selectMedicationPlaceholder")}
                                         containerStyle={{ flex: 1, marginBottom: 16 }}
                                         style={styles.dropdownStyle}
                                         listMode="MODAL"
@@ -203,7 +206,7 @@ return (
 
                     {/* Dosagem */}
                     <View style={styles.listItem}>
-                        <Text style={styles.listLabel}>Dosagem:</Text>
+                        <Text style={styles.listLabel}>{t("edit.dosageLabel")}</Text>
 
                         {!isEditing ? (
                             <Text style={styles.listValue}>
@@ -228,11 +231,11 @@ return (
 
                     {/* Necessita retorno */}
                     <View style={styles.listItem}>
-                        <Text style={styles.listLabel}>Necessita retorno:</Text>
+                        <Text style={styles.listLabel}>{t("edit.needsReturnLabel")}</Text>
 
                         {!isEditing ? (
                             <Text style={styles.listValue}>
-                                {formData.necessitaRetorno ? "Sim" : "Não"}
+                                {formData.necessitaRetorno ? tc("yes") : tc("no")}
                             </Text>
                         ) : (
                             <Switch
@@ -246,13 +249,13 @@ return (
                     {/* Retorno (apenas se necessitar) */}
                     {formData.necessitaRetorno && (
                       <View style={styles.listItem}>
-                        <Text style={styles.listLabel}>Retorno:</Text>
+                        <Text style={styles.listLabel}>{t("edit.returnLabel")}</Text>
                         {!isEditing ? (
                           <Text style={styles.listValue}>{formatarDataBR(formData.dtRetorno)}</Text>
                         ) : (
                           <TouchableOpacity onPress={() => setShowDatePicker(true)}>
                             <Text style={[styles.listValue, { color: colors.black }]}>
-                              {formData.dtRetorno ? formatarDataBR(formData.dtRetorno) : "Selecionar"}
+                              {formData.dtRetorno ? formatarDataBR(formData.dtRetorno) : tc("select.placeholder")}
                             </Text>
                           </TouchableOpacity>
                         )}
@@ -267,7 +270,7 @@ return (
                             style={[styles.footerBtn, styles.deleteBtn]}
                             onPress={handleDelete}
                         >
-                            <Text style={styles.deleteText}>Excluir</Text>
+                            <Text style={styles.deleteText}>{tc("actions.delete")}</Text>
                         </TouchableOpacity>
                     )}
 
@@ -276,7 +279,7 @@ return (
                         onPress={toggleEdit}
                     >
                         <Text style={styles.editText}>
-                            {isEditing ? "Salvar" : "Editar"}
+                            {isEditing ? tc("actions.save") : tc("actions.edit")}
                         </Text>
                     </TouchableOpacity>
                 </View>
@@ -294,8 +297,8 @@ return (
           visible={isDeleteModalVisible}
           onClose={() => setIsDeleteModalVisible(false)}
           onConfirm={handleConfirmDelete}
-          title="Excluir Registro Sanitário"
-          message={`Tem certeza que deseja excluir o registro da doença ${formatDate(item.doenca)}? Esta ação é irreversível.`}
+          title={t("edit.deleteTitle")}
+          message={t("edit.deleteMessage", { doenca: formatDate(item.doenca) })}
         />
   </BottomSheet>
 )};

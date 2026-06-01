@@ -1,0 +1,51 @@
+{
+  "notFound": "Animal not found.\nCheck the sync and try again.",
+  "title": "Health Record: {{brinco}}",
+  "tabs": {
+    "info": "Information",
+    "zootechnical": "Zootechnical",
+    "health": "Health"
+  },
+  "emptyZootechnical": "No zootechnical records found.",
+  "emptyHealth": "No health records found.",
+  "card": {
+    "noName": "No Name",
+    "tagLabel": "Tag No.",
+    "active": "Animal active",
+    "inactive": "Animal inactive",
+    "baseData": "Base Data",
+    "birth": "Birth",
+    "sex": "Sex",
+    "male": "Male",
+    "female": "Female",
+    "breed": "Breed",
+    "maturity": "Maturity",
+    "lineage": "Lineage",
+    "father": "Father",
+    "mother": "Mother",
+    "currentGroup": "Current group",
+    "selectGroup": "Select Group",
+    "noGroup": "No group",
+    "location": "Location:",
+    "maturityLabels": {
+      "B": "Calf",
+      "N": "Heifer",
+      "T": "Bull",
+      "V": "Cow"
+    },
+    "selectedGroupFallback": "the selected group",
+    "movedSuccess": "Moved to group \"{{nome}}\"!",
+    "changeGroupError": "Could not change the group.",
+    "confirmGroupTitle": "Confirm Group Change",
+    "confirmGroupMessage": "Do you want to move the animal to \"{{nome}}\"?",
+    "move": "Move",
+    "statusTitle": "Change status",
+    "statusMessage": "Change status to {{status}}?",
+    "statusActive": "ACTIVE",
+    "statusInactive": "INACTIVE",
+    "activate": "Activate",
+    "deactivate": "Deactivate",
+    "alertSuccess": "Success",
+    "alertError": "Error"
+  }
+}

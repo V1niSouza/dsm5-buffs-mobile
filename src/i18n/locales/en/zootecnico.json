@@ -1,0 +1,55 @@
+{
+  "alert": {
+    "error": "Error",
+    "success": "Success"
+  },
+  "add": {
+    "title": "New Zootechnical Record",
+    "dataCollection": "Data Collection",
+    "recordDate": "Record Date:",
+    "weighingType": "Weighing Type",
+    "weighingSelectTitle": "Select the weighing type",
+    "weighingPlaceholder": "Enter the weighing type",
+    "bodyMetrics": "Body Metrics",
+    "weight": "Weight (kg)",
+    "weightPlaceholder": "Enter the animal's weight",
+    "bodyCondition": "Body Condition:",
+    "bodyCharacteristics": "Body Characteristics",
+    "coatColor": "Coat Color",
+    "coatColorPlaceholder": "Enter the coat color",
+    "hornShape": "Horn Shape",
+    "hornShapePlaceholder": "Enter the horn shape",
+    "bodySize": "Body Size",
+    "bodySizePlaceholder": "Enter the body size",
+    "submit": "Add Record",
+    "submitting": "Saving...",
+    "missingFields": "Fill in at least one metric/characteristic field.",
+    "addSuccess": "Zootechnical record added successfully!"
+  },
+  "weighingTypes": {
+    "weekly": "Weekly",
+    "biweekly": "Biweekly",
+    "monthly": "Monthly",
+    "biannual": "Biannual"
+  },
+  "edit": {
+    "title": "Event Details",
+    "recordLabel": "Record {{type}}",
+    "recordDate": "Record Date: {{date}}",
+    "animalDetails": "Animal Details",
+    "weight": "Weight",
+    "bodyCondition": "Body Condition (BC)",
+    "coat": "Coat",
+    "horn": "Horn",
+    "size": "Size",
+    "saveChanges": "Save Changes",
+    "deleteTitle": "Delete Zootechnical Record",
+    "deleteMessage": "Are you sure you want to delete the record from {{date}}? This action is irreversible."
+  },
+  "card": {
+    "weight": "Weight",
+    "size": "Size",
+    "coat": "Coat:",
+    "cc": "BC:"
+  }
+}

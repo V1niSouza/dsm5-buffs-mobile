@@ -22,6 +22,7 @@ import { BottomSheetModal, BottomSheetBackdrop, BottomSheetScrollView } from "@g
 import { formatarDataBR } from "../../utils/date";
 import SelectBottomSheet from "../SelectBottomSheet";
 import { NfcTextInput } from "../NfcTextInput";
+import { useTranslation } from "react-i18next";
 
 
 
@@ -65,6 +66,7 @@ export const AnimalEditBottomSheet: React.FC<AnimalEditBottomSheetProps> = ({ it
     };
 
     const { propriedadeSelecionada } = usePropriedade();
+    const { t } = useTranslation("rebanho");
     
     const sheetRef = useRef<BottomSheetModal>(null);
     const snapPoints = useMemo(() => ["50%", "70%"], []);
@@ -120,7 +122,7 @@ export const AnimalEditBottomSheet: React.FC<AnimalEditBottomSheetProps> = ({ it
         if (Platform.OS === 'android') {
             ToastAndroid.show(message, ToastAndroid.LONG);
         } else {
-            Alert.alert(isError ? "Erro" : "Sucesso", message);
+            Alert.alert(isError ? t("form.alert.error") : t("form.alert.success"), message);
         }
     };
     
@@ -129,13 +131,13 @@ export const AnimalEditBottomSheet: React.FC<AnimalEditBottomSheetProps> = ({ it
         if (isSaving) return;
 
         if (!propriedadeSelecionada) {
-            showToast("ID da Propriedade não encontrado. Não é possível salvar.", true);
+            showToast(t("edit.toast.noProperty"), true);
             return;
         }
         
         // Validação Mínima
         if (!nome || !brinco || !nivelMaturidade) {
-            showToast("Preencha Nome, Brinco e Maturidade.", true);
+            showToast(t("edit.toast.missingFields"), true);
             return;
         }
 
@@ -150,7 +152,7 @@ export const AnimalEditBottomSheet: React.FC<AnimalEditBottomSheetProps> = ({ it
                     propriedadeSelecionada, brincoPai, "M"
                 );
                 if (!paiEncontrado) {
-                    showToast(`Nenhum pai encontrado com brinco '${brincoPai}' (Macho) na propriedade.`, true);
+                    showToast(t("edit.toast.fatherNotFound", { brinco: brincoPai }), true);
                     setIsSaving(false);
                     return;
                 }
@@ -165,7 +167,7 @@ export const AnimalEditBottomSheet: React.FC<AnimalEditBottomSheetProps> = ({ it
                     propriedadeSelecionada, brincoMae, "F"
                 );
                 if (!maeEncontrada) {
-                    showToast(`Nenhuma mãe encontrada com brinco '${brincoMae}' (Fêmea) na propriedade.`, true);
+                    showToast(t("edit.toast.motherNotFound", { brinco: brincoMae }), true);
                     setIsSaving(false);
                     return;
                 }
@@ -183,11 +185,11 @@ export const AnimalEditBottomSheet: React.FC<AnimalEditBottomSheetProps> = ({ it
             };
             // Chama a função passada pela tela pai para persistir e recarregar
             await onEditSave(item.idBufalo, payload); 
-            showToast("Informações atualizadas com sucesso!");
+            showToast(t("edit.toast.success"));
             
         } catch (err) {
             console.error("Erro ao atualizar búfalo:", err);
-            showToast("Não foi possível salvar as alterações.", true);
+            showToast(t("edit.toast.saveError"), true);
         } finally {
             setIsSaving(false);
         }
@@ -207,7 +209,7 @@ export const AnimalEditBottomSheet: React.FC<AnimalEditBottomSheetProps> = ({ it
             >
                 <View style={styles.loadingContainer}>
                     <ActivityIndicator size="large" color={colors.brand.primary} />
-                    <Text style={{ marginTop: 10, color: colors.text.secondary }}>Carregando dados...</Text>
+                    <Text style={{ marginTop: 10, color: colors.text.secondary }}>{t("edit.loading")}</Text>
                 </View>
             </BottomSheetModal>
         );
@@ -239,91 +241,91 @@ export const AnimalEditBottomSheet: React.FC<AnimalEditBottomSheetProps> = ({ it
                 
                 {/* --- HEADER --- */}
                 <View style={styles.header}>
-                    <Text style={styles.headerTitle}>Editar Animal: {item.brinco}</Text>
+                    <Text style={styles.headerTitle}>{t("edit.title", { brinco: item.brinco })}</Text>
                 </View>
                 
                 {/* --- Dados Básicos --- */}
-                <Text style={styles.sectionTitle}>Dados Básicos</Text>
+                <Text style={styles.sectionTitle}>{t("edit.basicData")}</Text>
                 <View style={styles.listContainer}>
-                    <Text style={styles.label}>Nome</Text>
+                    <Text style={styles.label}>{t("edit.name")}</Text>
                     <TextInput
                         style={styles.inputBase}
                         value={nome}
                         onChangeText={setNome}
-                        placeholder="Digite o nome do animal"/>
-                    <Text style={styles.label}>Brinco</Text>
+                        placeholder={t("edit.namePlaceholder")}/>
+                    <Text style={styles.label}>{t("edit.tag")}</Text>
                     <TextInput
                         style={styles.inputBase}
                         value={brinco}
                         onChangeText={setBrinco}
-                        placeholder="Digite o brinco do animal"/>
-                    <Text style={styles.label}>Microchip</Text>
+                        placeholder={t("edit.tagPlaceholder")}/>
+                    <Text style={styles.label}>{t("edit.microchip")}</Text>
                     <NfcTextInput
                         mode="microchip"
                         onResult={setMicrochip}
                         value={microchip}
                         onChangeText={setMicrochip}
-                        placeholder="Digite ou leia via RFID"
+                        placeholder={t("edit.microchipPlaceholder")}
                     />
                 </View>
                 
                 {/* --- Características --- */}
-                <Text style={styles.sectionTitle}>Características</Text>
+                <Text style={styles.sectionTitle}>{t("edit.characteristics")}</Text>
                 <View style={styles.listContainer}>
                     
                     {/* Campo Sexo (Não Editável) */}
-                    <Text style={styles.label}>Sexo</Text>
+                    <Text style={styles.label}>{t("edit.sex")}</Text>
                     <TextInput
                         style={[styles.inputBase, styles.inputDisabled]}
-                        value={item.sexo === 'F' ? 'Fêmea' : 'Macho'}
+                        value={item.sexo === 'F' ? t("edit.female") : t("edit.male")}
                         onChangeText={() => {}}
                         editable={false}
                         pointerEvents="none"
-                        placeholder="Digite o sexo do animal"/>
+                        placeholder={t("edit.sexPlaceholder")}/>
   
                     {/* Data de Nascimento (Não Editável) */}
-                    <Text style={styles.label}>Data de Nascimento</Text>
+                    <Text style={styles.label}>{t("edit.birthDate")}</Text>
                     <TextInput
                         style={[styles.inputBase, styles.inputDisabled]}
-                        value={item.dtNascimento ? formatarDataBR(item.dtNascimento) : "Não informado"}
+                        value={item.dtNascimento ? formatarDataBR(item.dtNascimento) : t("edit.notProvided")}
                         onChangeText={() => {}}
                         editable={false}
-                        placeholder="Digite a data de nascimento do animal"/>
+                        placeholder={t("edit.birthDatePlaceholder")}/>
 
                     {/* Dropdown Maturidade */}
                     <View style={{ zIndex: zIndexMaturidade, marginBottom: 12 }}>
-                        <Text style={styles.dropdownLabel}>Maturidade:</Text>
+                        <Text style={styles.dropdownLabel}>{t("edit.maturity")}</Text>
                         <SelectBottomSheet
                             items={[
-                                { label: "Bezerro", value: "B" },
-                                { label: "Novilha", value: "N" },
-                                { label: "Vaca", value: "V" },
-                                { label: "Touro", value: "T" },
+                                { label: t("maturity.B"), value: "B" },
+                                { label: t("maturity.N"), value: "N" },
+                                { label: t("maturity.V"), value: "V" },
+                                { label: t("maturity.T"), value: "T" },
                             ]}
                             value={nivelMaturidade}
                             onChange={(value) => setNivelMaturidade(value)}
-                            title="Selecionar maturidade"
-                            placeholder="Selecione"/>
+                            title={t("edit.selectMaturity")}
+                            placeholder={t("edit.selectPlaceholder")}/>
                     </View>
                     
                     <View style={{ zIndex: zIndexRaca, marginBottom: 12 }}>
-                        <Text style={styles.dropdownLabel}>Raça:</Text>
+                        <Text style={styles.dropdownLabel}>{t("edit.breed")}</Text>
                         <SelectBottomSheet
                         items={racas}
                         value={idRaca}
                         onChange={(value) => setIdRaca(value)}
-                        title="Selecionar raça"
-                        placeholder="Selecione raça"
+                        title={t("edit.selectBreed")}
+                        placeholder={t("edit.breedPlaceholder")}
                         />
                     </View>
                 </View>
 
                 {/* --- Parentesco --- */}
-                <Text style={styles.sectionTitle}>Parentesco (Brinco)</Text>
+                <Text style={styles.sectionTitle}>{t("edit.parentage")}</Text>
                 <View style={styles.listContainer}>
                     <View style={styles.row}>
                         <View style={styles.halfInput}>
-                            <Text style={styles.label}>Brinco do Pai</Text>
+                            <Text style={styles.label}>{t("edit.fatherTag")}</Text>
                             <NfcTextInput
                                 mode="brinco"
                                 sexo="M"
@@ -331,13 +333,13 @@ export const AnimalEditBottomSheet: React.FC<AnimalEditBottomSheetProps> = ({ it
                                 propriedadeId={propriedadeSelecionada ?? undefined}
                                 value={brincoPai}
                                 onChangeText={setBrincoPai}
-                                placeholder="Brinco ou RFID"
+                                placeholder={t("edit.tagOrRfid")}
                                 containerStyle={{ marginBottom: 0 }}
                             />
                         </View>
 
                         <View style={styles.halfInput}>
-                            <Text style={styles.label}>Brinco da Mãe</Text>
+                            <Text style={styles.label}>{t("edit.motherTag")}</Text>
                             <NfcTextInput
                                 mode="brinco"
                                 sexo="F"
@@ -345,7 +347,7 @@ export const AnimalEditBottomSheet: React.FC<AnimalEditBottomSheetProps> = ({ it
                                 propriedadeId={propriedadeSelecionada ?? undefined}
                                 value={brincoMae}
                                 onChangeText={setBrincoMae}
-                                placeholder="Brinco ou RFID"
+                                placeholder={t("edit.tagOrRfid")}
                                 containerStyle={{ marginBottom: 0 }}
                             />
                         </View>
@@ -355,7 +357,7 @@ export const AnimalEditBottomSheet: React.FC<AnimalEditBottomSheetProps> = ({ it
                 {/* Footer (Botão de ação) */}
                 <View style={styles.footer}>
                     <YellowButton 
-                        title={isSaving ? "Salvando..." : "Salvar Alterações"} 
+                        title={isSaving ? t("edit.submitting") : t("edit.submit")} 
                         onPress={handleSave} 
                         disabled={isSaving}
                     />

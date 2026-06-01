@@ -11,9 +11,10 @@ import {
     Animated,
     Easing 
 } from "react-native";
+import { useTranslation } from "react-i18next";
 import bufaloService from "../../services/bufaloService";
 import { usePropriedade } from "../../context/PropriedadeContext";
-import YellowButton from "../Button"; 
+import YellowButton from "../Button";
 import { colors } from "../../styles/colors";
 import { DatePickerModal } from "../DatePickerModal"; 
 import dayjs from "dayjs";
@@ -29,6 +30,7 @@ interface CadastrarBufaloFormProps {
 }
 
 export const CadastrarBufaloForm: React.FC<CadastrarBufaloFormProps> = ({ onClose, onSuccess }) => {
+    const { t } = useTranslation("rebanho");
     const sheetRef = useRef<BottomSheet>(null);
     // Aumentado o snapPoints para acomodar mais campos
     const snapPoints = useMemo(() => ["50%", "70%"], []); 
@@ -87,7 +89,7 @@ export const CadastrarBufaloForm: React.FC<CadastrarBufaloFormProps> = ({ onClos
         if (RNPlatform.OS === 'android') {
         ToastAndroid.show(message, ToastAndroid.LONG);
         } else {
-        Alert.alert(isError ? "Erro" : "Sucesso", message);
+        Alert.alert(isError ? t("form.alert.error") : t("form.alert.success"), message);
         }
     };
 
@@ -95,16 +97,16 @@ export const CadastrarBufaloForm: React.FC<CadastrarBufaloFormProps> = ({ onClos
         if (isSaving) return;
 
         if (!propriedadeSelecionada) {
-            showToast("Selecione uma propriedade antes de cadastrar.", true);
+            showToast(t("form.toast.noProperty"), true);
             return;
         }
 
         if (!brinco) {
-             showToast("O campo Brinco é obrigatório.", true);
+             showToast(t("form.toast.tagRequired"), true);
              return;
         }
         if (!sexo) {
-             showToast("O campo Sexo é obrigatório.", true);
+             showToast(t("form.toast.sexRequired"), true);
              return;
         }
 
@@ -117,7 +119,7 @@ export const CadastrarBufaloForm: React.FC<CadastrarBufaloFormProps> = ({ onClos
                 propriedadeSelecionada, brincoPai, "M"
                 );
                 if (!paiEncontrado) {
-                    showToast("Nenhum pai encontrado com esse brinco (Macho) na propriedade.", true);
+                    showToast(t("form.toast.fatherNotFound"), true);
                     setIsSaving(false);
                     return;
                 }
@@ -130,7 +132,7 @@ export const CadastrarBufaloForm: React.FC<CadastrarBufaloFormProps> = ({ onClos
                 propriedadeSelecionada, brincoMae, "F"
                 );
                 if (!maeEncontrada) {
-                    showToast("Nenhuma mãe encontrada com esse brinco (Fêmea) na propriedade.", true);
+                    showToast(t("form.toast.motherNotFound"), true);
                     setIsSaving(false);
                     return;
                 }
@@ -160,12 +162,12 @@ export const CadastrarBufaloForm: React.FC<CadastrarBufaloFormProps> = ({ onClos
             );
 
             await bufaloService.createBufalo(cleanedPayload);
-            showToast("Búfalo cadastrado com sucesso!");
+            showToast(t("form.toast.success"));
             onSuccess?.();
             onClose();
-        } catch (err) { 
+        } catch (err) {
             console.error("Erro ao salvar búfalo:", err);
-            showToast("Não foi possível salvar o búfalo.", true);
+            showToast(t("form.toast.saveError"), true);
         } finally {
             setIsSaving(false);
         }
@@ -196,42 +198,42 @@ export const CadastrarBufaloForm: React.FC<CadastrarBufaloFormProps> = ({ onClos
                 
                 {/* Header */}
                 <View style={styles.header}>
-                    <Text style={styles.headerTitle}>Novo Cadastro de Búfalo</Text>
+                    <Text style={styles.headerTitle}>{t("form.title")}</Text>
                 </View>
 
                 {/* Dados Básicos */}
-                <Text style={styles.sectionTitle}>Dados de Identificação</Text>
+                <Text style={styles.sectionTitle}>{t("form.sections.identification")}</Text>
                 <View style={styles.listContainer}>
                     <View style={styles.inputSpacing}>
-                        <Text style={styles.label}>Nome (Opcional)</Text>
+                        <Text style={styles.label}>{t("form.fields.name")}</Text>
                         <TextInput
                             style={styles.inputBase}
                             value={nome}
                             onChangeText={setNome}
-                            placeholder="Digite o nome do animal"/>
+                            placeholder={t("form.fields.namePlaceholder")}/>
                     </View>
                     <View style={styles.inputSpacing}>
-                        <Text style={styles.label}>Brinco (Obrigatório)</Text>
+                        <Text style={styles.label}>{t("form.fields.tag")}</Text>
                         <TextInput
                             style={styles.inputBase}
                             value={brinco}
                             onChangeText={setBrinco}
-                            placeholder="Digite o brinco do animal"/>
+                            placeholder={t("form.fields.tagPlaceholder")}/>
                     </View>
                     <View>
-                        <Text style={styles.label}>Microchip (Opcional)</Text>
+                        <Text style={styles.label}>{t("form.fields.microchip")}</Text>
                         <NfcTextInput
                             mode="microchip"
                             onResult={setMicrochip}
                             value={microchip}
                             onChangeText={setMicrochip}
-                            placeholder="Digite ou leia via RFID"
+                            placeholder={t("form.fields.microchipPlaceholder")}
                         />
                     </View>
                 </View>
 
                 {/* Características */}
-                <Text style={styles.sectionTitle}>Características e Origem</Text>
+                <Text style={styles.sectionTitle}>{t("form.sections.characteristics")}</Text>
                 <View style={styles.listContainer}>
                     
                     {/* Sexo e Maturidade (Dropdowns lado a lado) */}
@@ -239,62 +241,62 @@ export const CadastrarBufaloForm: React.FC<CadastrarBufaloFormProps> = ({ onClos
                         
                         {/* Sexo */}
                         <View style={[styles.halfInput, { zIndex: getDropdownZIndex('sexo') }]}>
-                            <Text style={styles.dropdownLabel}>Sexo:</Text>
+                            <Text style={styles.dropdownLabel}>{t("form.fields.sex")}</Text>
                             <SelectBottomSheet
                                 items={[
-                                    { label: "Macho", value: "M" },
-                                    { label: "Fêmea", value: "F" },
+                                    { label: t("filter.sex.male"), value: "M" },
+                                    { label: t("filter.sex.female"), value: "F" },
                                 ]}
                                 value={sexo}
                                 onChange={(value) => setSexo(value)}
-                                title="Selecionar sexo"
-                                placeholder="Selecione"/>
+                                title={t("form.select.selectSex")}
+                                placeholder={t("form.select.placeholder")}/>
                         </View>
-                        
+
                         {/* Maturidade */}
                         <View style={[styles.halfInput, { zIndex: getDropdownZIndex('maturidade') }]}>
-                            <Text style={styles.dropdownLabel}>Maturidade:</Text>
+                            <Text style={styles.dropdownLabel}>{t("form.fields.maturity")}</Text>
                             <SelectBottomSheet
                                 items={[
-                                    { label: "Bezerro", value: "B" },
-                                    { label: "Novilha", value: "N" },
-                                    { label: "Vaca", value: "V" },
-                                    { label: "Touro", value: "T" },
+                                    { label: t("maturity.B"), value: "B" },
+                                    { label: t("maturity.N"), value: "N" },
+                                    { label: t("maturity.V"), value: "V" },
+                                    { label: t("maturity.T"), value: "T" },
                                 ]}
                                 value={nivelMaturidade}
                                 onChange={(value) => setNivelMaturidade(value)}
-                                title="Selecionar maturidade"
-                                placeholder="Selecione"/>
+                                title={t("form.select.selectMaturity")}
+                                placeholder={t("form.select.placeholder")}/>
                         </View>
                     </View>
 
                     {/* Data de Nascimento (NOVO DESIGN DE DATA) */}
                     <View style={styles.dateFieldContainer}>
-                        <Text style={styles.listLabel}>Data de Nascimento:</Text>
-                        <TouchableOpacity 
+                        <Text style={styles.listLabel}>{t("form.fields.birthDate")}</Text>
+                        <TouchableOpacity
                             onPress={() => setShowDatePicker(true)}
                             style={styles.dateDisplayButton}
                         >
                             <Text style={styles.dateDisplayValue}>
-                                {dtNascimento ? dayjs(dtNascimento).format("DD/MM/YYYY") : "Selecionar"}
+                                {dtNascimento ? dayjs(dtNascimento).format("DD/MM/YYYY") : t("form.select.pickDate")}
                             </Text>
                         </TouchableOpacity>
                     </View>
-                    
+
                     {/* Raça (Dropdown Full Width) */}
                     <View style={[{ zIndex: getDropdownZIndex('raca'), marginBottom: 12 }]}>
-                        <Text style={styles.dropdownLabel}>Raça:</Text>
+                        <Text style={styles.dropdownLabel}>{t("form.fields.breed")}</Text>
                         <SelectBottomSheet
                             items={racas}
                             value={idRaca}
                             onChange={(value) => setIdRaca(value)}
-                            title="Selecionar raça"
-                            placeholder="Selecione raça"
+                            title={t("form.select.selectBreed")}
+                            placeholder={t("form.select.breedPlaceholder")}
                             />
                     </View>
-                </View>                
+                </View>
                 {/* Características */}
-                <Text style={styles.sectionTitle}>Parentesco (Brincos Opcionais)</Text>
+                <Text style={styles.sectionTitle}>{t("form.sections.parentage")}</Text>
                 <View style={styles.listContainer}>
                     
                     {/* Sexo e Maturidade (Dropdowns lado a lado) */}
@@ -304,7 +306,7 @@ export const CadastrarBufaloForm: React.FC<CadastrarBufaloFormProps> = ({ onClos
                     {/* Parentesco (Floating Labels lado a lado) */}
                     <View style={styles.row}>
                         <View style={styles.halfInput}>
-                            <Text style={styles.label}>Brinco do Pai</Text>
+                            <Text style={styles.label}>{t("form.fields.fatherTag")}</Text>
                             <NfcTextInput
                                 mode="brinco"
                                 sexo="M"
@@ -312,12 +314,12 @@ export const CadastrarBufaloForm: React.FC<CadastrarBufaloFormProps> = ({ onClos
                                 propriedadeId={propriedadeSelecionada ?? undefined}
                                 value={brincoPai}
                                 onChangeText={setBrincoPai}
-                                placeholder="Brinco Pai"
+                                placeholder={t("form.fields.fatherTagPlaceholder")}
                             />
                         </View>
 
                         <View style={styles.halfInput}>
-                            <Text style={styles.label}>Brinco da Mãe</Text>
+                            <Text style={styles.label}>{t("form.fields.motherTag")}</Text>
                             <NfcTextInput
                                 mode="brinco"
                                 sexo="F"
@@ -325,7 +327,7 @@ export const CadastrarBufaloForm: React.FC<CadastrarBufaloFormProps> = ({ onClos
                                 propriedadeId={propriedadeSelecionada ?? undefined}
                                 value={brincoMae}
                                 onChangeText={setBrincoMae}
-                                placeholder="Brinco Mae"
+                                placeholder={t("form.fields.motherTagPlaceholder")}
                             />
                         </View>
                     </View>
@@ -334,9 +336,9 @@ export const CadastrarBufaloForm: React.FC<CadastrarBufaloFormProps> = ({ onClos
 
                 {/* Footer (Botão de ação) */}
                 <View style={styles.footer}>
-                    <YellowButton 
-                        title={isSaving ? "Salvando..." : "Salvar Cadastro"} 
-                        onPress={handleSave} 
+                    <YellowButton
+                        title={isSaving ? t("form.submitting") : t("form.submit")}
+                        onPress={handleSave}
                         disabled={isSaving}
                     />
                 </View>

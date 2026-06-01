@@ -13,12 +13,15 @@ import { colors } from "../../styles/colors";
 import { formatarDataBR } from "../../utils/date";
 
 import Calendar from "../../../assets/images/calendar-clock.svg";
+import { useTranslation } from "react-i18next";
 
 export const ZootecnicoCard = ({
   item,
   onDelete,
   onPress,
-}: any) => (
+}: any) => {
+  const { t } = useTranslation("zootecnico");
+  return (
   <TouchableOpacity
     style={styles.card}
     onPress={onPress}
@@ -50,7 +53,7 @@ export const ZootecnicoCard = ({
       <View style={styles.infoSection}>
         <View style={styles.mainInfo}>
           <Text style={styles.label}>
-            Peso
+            {t("card.weight")}
           </Text>
 
           <Text style={styles.value}>
@@ -62,7 +65,7 @@ export const ZootecnicoCard = ({
 
         <View style={styles.mainInfo}>
           <Text style={styles.label}>
-            Porte
+            {t("card.size")}
           </Text>
 
           <Text style={styles.value}>
@@ -74,19 +77,20 @@ export const ZootecnicoCard = ({
       <View style={styles.metaRow}>
         <View style={styles.metaBadge}>
           <Text style={styles.metaText}>
-            Pelagem: {item.corPelagem}
+{t("card.coat")} {item.corPelagem}
           </Text>
         </View>
 
         <View style={styles.metaBadge}>
           <Text style={styles.metaText}>
-            CC: {item.condicaoCorporal}
+{t("card.cc")} {item.condicaoCorporal}
           </Text>
         </View>
       </View>
     </View>
   </TouchableOpacity>
-);
+  );
+};
 
 const styles = StyleSheet.create({
   card: {

@@ -5,6 +5,7 @@ import {
   BottomSheetFlatList,
   BottomSheetBackdrop
 } from "@gorhom/bottom-sheet";
+import { useTranslation } from "react-i18next";
 import { colors } from "../../styles/colors";
 import ArrowBackIcon from "../../../assets/images/arrow-back.svg";
 
@@ -26,8 +27,10 @@ export default function SelectBottomSheet({
   value,
   onChange,
   title,
-  placeholder = "Selecionar",
+  placeholder,
 }: Props) {
+    const { t } = useTranslation("common");
+    const ph = placeholder ?? t("select.placeholder");
     const bottomSheetRef = useRef<BottomSheetModal>(null);
     const snapPoints = useMemo(() => ["45%"], []);
     const safeItems = items ?? [];
@@ -40,7 +43,7 @@ export default function SelectBottomSheet({
     }, []);
 
     const selectedLabel = useMemo(() => {
-      if (!value) return placeholder;
+      if (!value) return ph;
 
       const normalizedValue = value.trim().toUpperCase();
 
@@ -48,8 +51,8 @@ export default function SelectBottomSheet({
         (i) => i.value.trim().toUpperCase() === normalizedValue
       );
 
-      return found?.label || placeholder;
-    }, [value, safeItems, placeholder]);
+      return found?.label || ph;
+    }, [value, safeItems, ph]);
 
     const renderBackdrop = useCallback(
         (props: any) => (
@@ -85,7 +88,7 @@ return (
               contentContainerStyle={styles.listContent}
               keyboardShouldPersistTaps="handled"
               ListEmptyComponent={
-                <Text style={styles.emptyText}>Nenhuma opção disponível</Text>
+                <Text style={styles.emptyText}>{t("select.empty")}</Text>
               }
               renderItem={({ item }: { item: Item }) => {
                 const isSelected = item.value === value;

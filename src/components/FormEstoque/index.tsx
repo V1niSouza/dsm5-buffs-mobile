@@ -16,6 +16,7 @@ import BottomSheet, {
   BottomSheetScrollView,
 } from "@gorhom/bottom-sheet";
 import dayjs from "dayjs";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "../../context/AuthContext";
 
 // Importações do seu projeto (Ajuste os caminhos conforme necessário)
@@ -39,6 +40,7 @@ interface EstoqueAddBottomSheetProps {
 export const EstoqueAddBottomSheet: React.FC<
   EstoqueAddBottomSheetProps
 > = ({ onSuccess, onClose, propriedadeId }) => {
+  const { t } = useTranslation("lactacao");
   const sheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ["50%", "70%"], []);
   const { user } = useAuth();
@@ -66,18 +68,18 @@ export const EstoqueAddBottomSheet: React.FC<
     if (RNPlatform.OS === "android") {
       ToastAndroid.show(message, ToastAndroid.LONG);
     } else {
-      Alert.alert(isError ? "Erro" : "Sucesso", message);
+      Alert.alert(isError ? t("forms.shared.alertError") : t("forms.shared.alertSuccess"), message);
     }
   };
 
   const handleSave = async () => {
     if (isSaving) return;
-    if (!userId) { 
-        return showToast("ID do usuário não encontrado. Faça login novamente.", true); 
-    } 
-    if (!propriedadeId) { return showToast("ID da propriedade não encontrado.", true); }
-    if (!quantidade || isNaN(parseFloat(quantidade)) || parseFloat(quantidade) <= 0) { 
-        return showToast("Informe uma quantidade de estoque válida.", true); 
+    if (!userId) {
+        return showToast(t("forms.estoque.toast.noUser"), true);
+    }
+    if (!propriedadeId) { return showToast(t("forms.shared.noProperty"), true); }
+    if (!quantidade || isNaN(parseFloat(quantidade)) || parseFloat(quantidade) <= 0) {
+        return showToast(t("forms.estoque.toast.invalidQuantity"), true);
     }
     
     // 2. Montar Payload
@@ -99,15 +101,15 @@ export const EstoqueAddBottomSheet: React.FC<
       
       // 3. Chamada à API
       await registrarEstoqueApi(payload);
-      
-      showToast("Estoque registrado com sucesso!");
+
+      showToast(t("forms.estoque.toast.success"));
       setIsSaving(false);
       onSuccess?.();
       onClose();
     } catch (err) {
       console.error("Erro ao salvar estoque:", err);
       setIsSaving(false);
-      showToast("Não foi possível registrar o estoque.", true);
+      showToast(t("forms.estoque.toast.error"), true);
     }
   };
 
@@ -135,24 +137,24 @@ export const EstoqueAddBottomSheet: React.FC<
         contentContainerStyle={styles.container} 
       >
         <View style={styles.header}>
-            <Text style={styles.headerTitle}>Atualizar Estoque de Leite</Text>
+            <Text style={styles.headerTitle}>{t("forms.estoque.title")}</Text>
         </View>
 
-        <Text style={styles.sectionTitle}>Detalhes do Estoque</Text>
+        <Text style={styles.sectionTitle}>{t("forms.estoque.section")}</Text>
 
         <View style={styles.listContainer}>
             {/* Quantidade (FLOATING LABEL) */}
-            <Text style={styles.label}>Quantidade de Leite (Litros)</Text>
+            <Text style={styles.label}>{t("forms.estoque.quantityLabel")}</Text>
             <TextInput
                 style={styles.inputBase}
                 value={quantidade}
                 onChangeText={setQuantidade}
                 keyboardType="numeric"
-                placeholder="Digite a quantidade de leite no estoque"/>
-           
+                placeholder={t("forms.estoque.quantityPlaceholder")}/>
+
             {/* Data do Registro */}
             <View style={styles.dateFieldContainer}>
-                <Text style={styles.listLabel}>Data Registro:</Text>
+                <Text style={styles.listLabel}>{t("forms.estoque.dateLabel")}</Text>
                 <TouchableOpacity 
                     onPress={() => setShowDatePicker(true)}
                     style={styles.dateDisplayButton}
@@ -164,20 +166,20 @@ export const EstoqueAddBottomSheet: React.FC<
             </View>
 
             {/* Observação (FLOATING LABEL e multiline) */}
-            <Text style={styles.label}>Observações (Opcional)</Text>
+            <Text style={styles.label}>{t("forms.shared.notesLabel")}</Text>
             <TextInput
                 style={styles.inputBase}
                 value={observacao}
                 onChangeText={setObservacao}
                 multiline={true}
-                placeholder="Digite as observações (opcional)"/>
-        </View>  
+                placeholder={t("forms.shared.notesPlaceholder")}/>
+        </View>
 
         {/* Footer (Botão de ação) */}
         <View style={styles.footer}>
-            <YellowButton 
-                title={isSaving ? "Salvando..." : "Salvar no Estoque"} 
-                onPress={handleSave} 
+            <YellowButton
+                title={isSaving ? t("forms.shared.saving") : t("forms.estoque.submit")}
+                onPress={handleSave}
                 disabled={isSaving}
             />
         </View>

@@ -1,5 +1,7 @@
 import 'react-native-reanimated';
 import 'react-native-gesture-handler';
+import './src/i18n';
+import { useTranslation } from 'react-i18next';
 import { AuthProvider, useAuth } from './src/context/AuthContext'
 import { PortalProvider } from '@gorhom/portal';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
@@ -60,8 +62,9 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 // TabBar principal
 function MainTab() {
+  const { t } = useTranslation('nav');
   return (
-    <Tab.Navigator 
+    <Tab.Navigator
       screenOptions={{ 
                 // --- CABEÇALHO (HEADER) ---
         headerStyle: {
@@ -94,11 +97,12 @@ function MainTab() {
         tabBarInactiveTintColor: colors.text.muted,
         tabBarHideOnKeyboard: true,
       }}>
-      <Tab.Screen 
-        name="Home" 
-        component={HomeScreen} 
+      <Tab.Screen
+        name="Home"
+        component={HomeScreen}
         options={{
           headerShown: false,
+          tabBarLabel: t('tabs.home'),
           tabBarIcon: ({ focused, color, size }) => (
             <Home
               width={focused ? 30 : 20}         // maior quando ativo
@@ -109,11 +113,12 @@ function MainTab() {
           headerTitle: () => <BuffsLogo width={80} height={80} />,
         }}
       />
-      <Tab.Screen 
-        name="Rebanho" 
-        component={RebanhoScreen} 
+      <Tab.Screen
+        name="Rebanho"
+        component={RebanhoScreen}
         options={{
           headerShown: false,
+          tabBarLabel: t('tabs.herd'),
           tabBarIcon: ({ focused, color, size }) => (
             <Bufalo
               width={focused ? 35 : 25}         // maior quando ativo
@@ -127,6 +132,7 @@ function MainTab() {
         component={LactacaoScreen}
         options={{
           headerShown: false,
+          tabBarLabel: t('tabs.lactation'),
           tabBarIcon: ({ focused, color, size }) => (
             <Lactation
               width={focused ? 35 : 25}         // maior quando ativo
@@ -135,11 +141,12 @@ function MainTab() {
             />
           )
         }} />
-      <Tab.Screen 
-        name="Reprodução" 
-        component={ReproducaoScreen} 
+      <Tab.Screen
+        name="Reprodução"
+        component={ReproducaoScreen}
         options={{
           headerShown: false,
+          tabBarLabel: t('tabs.reproduction'),
           tabBarIcon: ({ focused, color, size }) => (
             <GlobeIcon
               size={focused ? 25 : 22}         // maior quando ativo
@@ -147,11 +154,12 @@ function MainTab() {
             />
           )
         }}/>
-      <Tab.Screen 
-        name="Piquetes" 
-        component={PiquetesScreen}         
+      <Tab.Screen
+        name="Piquetes"
+        component={PiquetesScreen}
         options={{
           headerShown: false,
+          tabBarLabel: t('tabs.paddocks'),
           tabBarIcon: ({ focused, color, size }) => (
             <Fance
               size={focused ? 25 : 22}         // maior quando ativo

@@ -36,6 +36,7 @@ import { useNfcScan } from '../../hooks/useNfcScan';
 import { getBufaloPorMicrochip } from '../../services/bufaloService';
 import { colors } from '../../styles/colors';
 import Scanner from '../../../assets/images/qr-scan.svg'
+import { useTranslation } from 'react-i18next';
 
 interface NfcTextInputProps extends Omit<TextInputProps, 'style'> {
   /** Comportamento do scanner: lê microchip bruto ou resolve para brinco via SQLite */
@@ -59,6 +60,7 @@ export function NfcTextInput({
   ...inputProps
 }: NfcTextInputProps) {
   const { scan, scanning } = useNfcScan();
+  const { t } = useTranslation("nfc");
 
   const handleScan = async () => {
     const microchip = await scan();
@@ -74,11 +76,11 @@ export function NfcTextInput({
       const animal = await getBufaloPorMicrochip(microchip);
 
       if (sexo && animal.sexo !== sexo) {
-        const esperado  = sexo === 'M' ? 'macho' : 'fêmea';
-        const encontrado = animal.sexo === 'M' ? 'macho' : 'fêmea';
+        const esperado  = sexo === 'M' ? t("input.male") : t("input.female");
+        const encontrado = animal.sexo === 'M' ? t("input.male") : t("input.female");
         Alert.alert(
-          'Animal incorreto',
-          `Brinco ${animal.brinco ?? microchip}: este animal é ${encontrado}, mas o campo espera ${esperado}.`,
+          t("input.wrongAnimalTitle"),
+          t("input.wrongAnimalMessage", { brinco: animal.brinco ?? microchip, encontrado, esperado }),
         );
         return;
       }
@@ -86,8 +88,8 @@ export function NfcTextInput({
       onResult(animal.brinco ?? animal.brinco_original ?? microchip);
     } catch {
       Alert.alert(
-        'Não encontrado',
-        `Nenhum animal com microchip ${microchip} encontrado. Sincronize os dados ou verifique o brinco.`,
+        t("input.notFoundTitle"),
+        t("input.notFoundMessage", { microchip }),
       );
     }
   };
@@ -105,7 +107,7 @@ export function NfcTextInput({
         onPress={handleScan}
         disabled={scanning}
         activeOpacity={0.6}
-        accessibilityLabel={scanning ? 'Lendo tag RFID…' : 'Ler tag RFID'}
+        accessibilityLabel={scanning ? t("input.scanning") : t("input.scan")}
       >
         {scanning
           ? <ActivityIndicator size="small" color={colors.brand.primary} />

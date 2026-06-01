@@ -8,6 +8,8 @@ import {
   Switch,
 } from "react-native";
 
+import { useTranslation } from "react-i18next";
+
 import { colors } from "../../styles/colors";
 
 import { ConfirmModal } from "../ModalStatus";
@@ -37,6 +39,8 @@ export const CardLactacao: React.FC<
   onPress,
   onStatusChanged,
 }) => {
+  const { t } = useTranslation("lactacao");
+  // Compara contra o valor cru da API — NÃO traduzir este literal.
   const isLactando =
     animal.status === "Em Lactação";
 
@@ -102,14 +106,13 @@ export const CardLactacao: React.FC<
             <View style={styles.info}>
               <Text style={styles.title}>
                 {animal.nome ||
-                  "Sem nome"}
+                  t("card.noName")}
               </Text>
 
               <Text
                 style={styles.subtitle}
               >
-                Brinco Nº{" "}
-                {animal.brinco}
+                {t("card.tag", { brinco: animal.brinco })}
               </Text>
             </View>
 
@@ -124,8 +127,8 @@ export const CardLactacao: React.FC<
             >
               <Text style={styles.statusText} >
                 {isEnabled
-                  ? "Em Lactação"
-                  : "Seca"}
+                  ? t("card.statusLactating")
+                  : t("card.statusDry")}
               </Text>
             </View>
           </View>
@@ -135,7 +138,7 @@ export const CardLactacao: React.FC<
               <Text
                 style={styles.detailLabel}
               >
-                Raça:
+                {t("card.breedLabel")}
               </Text>
 
               <Text
@@ -147,7 +150,7 @@ export const CardLactacao: React.FC<
               <Text
                 style={styles.detailLabel}
               >
-                Ciclo:
+                {t("card.cycleLabel")}
               </Text>
 
               <Text
@@ -161,7 +164,7 @@ export const CardLactacao: React.FC<
               <Text
                 style={styles.detailLabel}
               >
-                Dias Lactação:
+                {t("card.daysLabel")}
               </Text>
 
               <Text
@@ -177,7 +180,7 @@ export const CardLactacao: React.FC<
               <Text
                 style={styles.switchLabel}
               >
-                Encerrar lactação
+                {t("card.endLactation")}
               </Text>
 
               <Switch
@@ -213,10 +216,10 @@ export const CardLactacao: React.FC<
 
       <ConfirmModal
         visible={modalVisible}
-        title="Confirmar Secagem"
-        message={`Deseja marcar ${animal.nome} como seca?`}
-        confirmText="Sim, Secar"
-        cancelText="Cancelar"
+        title={t("confirmDry.title")}
+        message={t("confirmDry.message", { nome: animal.nome })}
+        confirmText={t("confirmDry.confirm")}
+        cancelText={t("confirmDry.cancel")}
         onCancel={() =>
           setModalVisible(false)
         }

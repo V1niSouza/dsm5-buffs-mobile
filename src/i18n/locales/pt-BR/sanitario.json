@@ -1,0 +1,45 @@
+{
+  "alert": {
+    "error": "Erro",
+    "success": "Sucesso"
+  },
+  "medicationLabel": "Medicação:",
+  "loadingMedications": "Carregando medicações...",
+  "selectMedicationPlaceholder": "Selecione a Medicação",
+  "add": {
+    "title": "Novo Registro Sanitário",
+    "applicationDate": "Data Aplicação:",
+    "treatmentDetails": "Detalhes do Tratamento",
+    "disease": "Doença (Opcional)",
+    "diseasePlaceholder": "Digite a doenca do animal",
+    "medicationSelectTitle": "Selecionar medicação",
+    "medicationPlaceholder": "Selecione medicação",
+    "dosage": "Dosagem",
+    "dosagePlaceholder": "Digite a dosagem aplicada",
+    "unit": "Unidade Md.",
+    "unitPlaceholder": "Digite a unidade de medida",
+    "needsReturn": "Necessita retorno",
+    "returnDate": "Data Retorno:",
+    "submit": "Adicionar Registro",
+    "submitting": "Salvando...",
+    "missingFields": "Preencha o nome da Doença ou selecione uma Medicação.",
+    "addSuccess": "Registro sanitário adicionado com sucesso!"
+  },
+  "edit": {
+    "title": "Tratamento Sanitário",
+    "diseaseLabel": "Doença: {{value}}",
+    "appliedOn": "Aplicado em: {{date}}",
+    "treatmentDetails": "Detalhes do Tratamento:",
+    "dosageLabel": "Dosagem:",
+    "needsReturnLabel": "Necessita retorno:",
+    "returnLabel": "Retorno:",
+    "deleteTitle": "Excluir Registro Sanitário",
+    "deleteMessage": "Tem certeza que deseja excluir o registro da doença {{doenca}}? Esta ação é irreversível."
+  },
+  "card": {
+    "noDiagnosis": "Sem diagnóstico",
+    "medication": "Medicação",
+    "dosage": "Dosagem",
+    "returnLabel": "Retorno:"
+  }
+}

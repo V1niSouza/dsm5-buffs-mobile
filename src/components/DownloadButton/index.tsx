@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { colors } from '../../styles/colors';
 import { useSyncStatus } from '../../context/SyncContext';
 
@@ -25,6 +26,7 @@ interface DownloadButtonProps {
 }
 
 export function DownloadButton({ propertyName }: DownloadButtonProps) {
+  const { t } = useTranslation('home');
   const { isFirstSyncNeeded, isDownloading, isSyncing, triggerDownload } = useSyncStatus();
 
   const pulseAnim = useRef(new Animated.Value(1)).current;
@@ -68,10 +70,10 @@ export function DownloadButton({ propertyName }: DownloadButtonProps) {
         disabled={isActive}
         accessibilityLabel={
           isActive
-            ? 'Sincronizando...'
+            ? t('sync.syncing')
             : isFirstSyncNeeded
-              ? 'Baixar dados da propriedade'
-              : 'Sincronizar dados'
+              ? t('sync.downloadData')
+              : t('sync.syncData')
         }
       >
         {isActive ? (
@@ -95,6 +97,7 @@ interface SyncProgressBarProps {
 }
 
 export function SyncProgressBar({ onRetry }: SyncProgressBarProps) {
+  const { t } = useTranslation('home');
   // Aparece apenas no download MANUAL. O sync automático em background
   // é indicado só pelo spinner do botão e pela notificação Android.
   const { isDownloading, downloadProgress, downloadFailed } = useSyncStatus();
@@ -144,10 +147,10 @@ export function SyncProgressBar({ onRetry }: SyncProgressBarProps) {
   const isError = downloadFailed;
 
   const label = isDone
-    ? '✓ Concluído'
+    ? t('sync.done')
     : isError
-      ? '⚠ Falha — Toque para tentar novamente'
-      : `Baixando dados... ${Math.round(downloadProgress * 100)}%`;
+      ? t('sync.failedRetry')
+      : t('sync.downloading', { percent: Math.round(downloadProgress * 100) });
 
   const containerBg = isDone
     ? colors.status.successBg

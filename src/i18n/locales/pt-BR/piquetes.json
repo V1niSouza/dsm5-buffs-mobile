@@ -1,0 +1,62 @@
+{
+  "header": "GRUPOS | PIQUETES",
+  "empty": "Nenhum grupo encontrado",
+  "dash": {
+    "title": "Organização do Rebanho",
+    "subtitle": "Distribuição em piquetes e grupos de manejo",
+    "paddocks": "Piquetes",
+    "groups": "Grupos"
+  },
+  "card": {
+    "location": "Localização: {{piquete}}",
+    "noLocation": "Sem localização",
+    "headCount": "{{n}} Cabeças",
+    "occupancy": "Ocupação"
+  },
+  "detail": {
+    "stats": {
+      "animals": "Animais",
+      "capacity": "Capacidade",
+      "occupancy": "Ocupação",
+      "paddock": "Piquete",
+      "noPaddock": "Sem piquete"
+    },
+    "map": {
+      "title": "PIQUETE DO GRUPO",
+      "offlineUnavailable": "Mapa indisponível offline\nBaixe o mapa enquanto tiver conexão",
+      "noGeometry": "Piquete sem geometria definida",
+      "noPaddockAssociated": "Grupo sem piquete associado",
+      "saving": "Salvando mapa offline… {{pct}}%",
+      "saved": "🗺 Mapa salvo — Atualizar",
+      "save": "⬇ Salvar mapa offline",
+      "mbSuffix": " (~{{mb}} MB)"
+    },
+    "inUse": "Em uso",
+    "capacityAnimals": "Cap. {{qtd}} animais",
+    "animalsTitle": "ANIMAIS DO GRUPO",
+    "groupTitle": "GRUPO: {{nome}}",
+    "noName": "Sem nome",
+    "emptyAnimals": "Nenhum animal neste grupo",
+    "loadingMore": "Carregando mais...",
+    "moveGroup": "Mover Grupo",
+    "maturity": {
+      "B": "Bezerro",
+      "N": "Novilha",
+      "T": "Touro",
+      "V": "Vaca"
+    }
+  },
+  "move": {
+    "selectDestination": "Selecione o lote de destino.",
+    "success": "Grupo movido com sucesso!",
+    "error": "Erro ao mover grupo.",
+    "destinationLabel": "Lote de Destino",
+    "selectLotTitle": "Selecione o Lote",
+    "selectLotPlaceholder": "Selecione o lote de destino",
+    "confirmButton": "Confirmar Movimentação",
+    "confirmTitle": "Confirmar Movimentação",
+    "confirmMessage": "Mover o grupo \"{{grupo}}\" para o lote \"{{lote}}\"?",
+    "confirmAction": "Mover",
+    "empty": "Nenhum lote disponível para movimentação."
+  }
+}

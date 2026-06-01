@@ -1,0 +1,45 @@
+{
+  "alert": {
+    "error": "Error",
+    "success": "Success"
+  },
+  "medicationLabel": "Medication:",
+  "loadingMedications": "Loading medications...",
+  "selectMedicationPlaceholder": "Select medication",
+  "add": {
+    "title": "New Health Record",
+    "applicationDate": "Application Date:",
+    "treatmentDetails": "Treatment Details",
+    "disease": "Disease (Optional)",
+    "diseasePlaceholder": "Enter the animal's disease",
+    "medicationSelectTitle": "Select medication",
+    "medicationPlaceholder": "Select medication",
+    "dosage": "Dosage",
+    "dosagePlaceholder": "Enter the applied dosage",
+    "unit": "Unit",
+    "unitPlaceholder": "Enter the unit of measure",
+    "needsReturn": "Needs follow-up",
+    "returnDate": "Follow-up Date:",
+    "submit": "Add Record",
+    "submitting": "Saving...",
+    "missingFields": "Enter the disease name or select a medication.",
+    "addSuccess": "Health record added successfully!"
+  },
+  "edit": {
+    "title": "Health Treatment",
+    "diseaseLabel": "Disease: {{value}}",
+    "appliedOn": "Applied on: {{date}}",
+    "treatmentDetails": "Treatment Details:",
+    "dosageLabel": "Dosage:",
+    "needsReturnLabel": "Needs follow-up:",
+    "returnLabel": "Follow-up:",
+    "deleteTitle": "Delete Health Record",
+    "deleteMessage": "Are you sure you want to delete the record for disease {{doenca}}? This action is irreversible."
+  },
+  "card": {
+    "noDiagnosis": "No diagnosis",
+    "medication": "Medication",
+    "dosage": "Dosage",
+    "returnLabel": "Follow-up:"
+  }
+}

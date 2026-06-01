@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { View, TextInput, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { useTranslation } from "react-i18next";
 import { colors } from "../styles/colors";
 import BuffsLogo from "../../assets/images/logoBuffs.svg";
 import YellowButton from "../components/Button";
@@ -7,7 +8,8 @@ import { useAuth } from "../context/AuthContext";
 import BuffaloLoader from "../components/BufaloLoader";
 
 export const LoginScreen = () => {
-  const { login, authenticating } = useAuth(); 
+  const { t } = useTranslation("auth");
+  const { login, authenticating } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -16,16 +18,15 @@ export const LoginScreen = () => {
   const handleLogin = async () => {
     setError(null);
     if (!email || !password) {
-      setError("Por favor, preencha e-mail e senha.");
+      setError(t("errors.emptyFields"));
       return;
     }
 
     try {
       setLocalLoading(true);
-      await login(email, password);   
+      await login(email, password);
     } catch (err: any) {
-      setError(err.message || "Erro ao tentar entrar.");
-      setError(err.message || "Erro ao tentar entrar.");
+      setError(err.message || t("errors.generic"));
     } finally {
       console.log("⏹ Finalizou tentativa");
       setLocalLoading(false);
@@ -38,11 +39,11 @@ export const LoginScreen = () => {
         <BuffsLogo width={200} height={200} />
       </View>
 
-      <Text style={styles.title}>Login</Text>
+      <Text style={styles.title}>{t("login.title")}</Text>
 
       <TextInput
         style={styles.input}
-        placeholder="Email"
+        placeholder={t("login.emailPlaceholder")}
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
@@ -50,7 +51,7 @@ export const LoginScreen = () => {
       />
       <TextInput
         style={styles.input}
-        placeholder="Senha"
+        placeholder={t("login.passwordPlaceholder")}
         value={password}
         onChangeText={setPassword}
         secureTextEntry
@@ -59,7 +60,7 @@ export const LoginScreen = () => {
       {error && <Text style={styles.error}>{error}</Text>}
 
       <YellowButton
-        title={authenticating ? "Entrando..." : "Entrar"}
+        title={authenticating ? t("login.submitting") : t("login.submit")}
         onPress={handleLogin}
         loading={authenticating}
       />

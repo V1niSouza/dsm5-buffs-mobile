@@ -26,6 +26,7 @@ import { ConfirmModal } from "../ModalStatus";
 import { formatarDataBR } from "../../utils/date";
 
 import SelectBottomSheet from "../SelectBottomSheet";
+import { useTranslation } from "react-i18next";
 
 interface Grupo {
   id: string;
@@ -42,14 +43,15 @@ export const AnimalInfoCard = ({
   onEdit: () => void;
   onRefresh: () => void;
 }) => {
+  const { t } = useTranslation("animalDetail");
   const maturidadeMap: Record<
     string,
     string
   > = {
-    B: "Bezerro",
-    N: "Novilha",
-    T: "Touro",
-    V: "Vaca",
+    B: t("card.maturityLabels.B"),
+    N: t("card.maturityLabels.N"),
+    T: t("card.maturityLabels.T"),
+    V: t("card.maturityLabels.V"),
   };
 
   const maturidadeTexto =
@@ -165,8 +167,8 @@ export const AnimalInfoCard = ({
         );
 
         Alert.alert(
-          "Sucesso",
-          `Movido para o grupo "${nomeGrupoParaMudar}"!`
+          t("card.alertSuccess"),
+          t("card.movedSuccess", { nome: nomeGrupoParaMudar })
         );
 
         onRefresh();
@@ -177,8 +179,8 @@ export const AnimalInfoCard = ({
         );
 
         Alert.alert(
-          "Erro",
-          "Não foi possível alterar o grupo."
+          t("card.alertError"),
+          t("card.changeGroupError")
         );
 
         setNovoGrupoSelecionado(
@@ -210,7 +212,7 @@ export const AnimalInfoCard = ({
           grupos.find(
             (g) => g.id === idGrupo
           )?.nome ||
-          "o grupo selecionado";
+          t("card.selectedGroupFallback");
 
         setIdGrupoParaMudar(
           idGrupo
@@ -273,7 +275,7 @@ export const AnimalInfoCard = ({
                 style={styles.name}
               >
                 {detalhes?.nome ||
-                  "Sem Nome"}
+                  t("card.noName")}
               </Text>
 
               {detalhes?.categoria && (
@@ -300,7 +302,7 @@ export const AnimalInfoCard = ({
                 styles.brinco
               }
             >
-              Brinco Nº{" "}
+              {t("card.tagLabel")}{" "}
               {detalhes?.brinco ||
                 "-"}
             </Text>
@@ -350,8 +352,8 @@ export const AnimalInfoCard = ({
               }
             >
               {isEnabled
-                ? "Animal ativo"
-                : "Animal inativo"}
+                ? t("card.active")
+                : t("card.inactive")}
             </Text>
           </View>
 
@@ -382,14 +384,12 @@ export const AnimalInfoCard = ({
 
         <View style={styles.grid}>
             <Text style={styles.sectionTitle}>
-              Dados Base
-            </Text>
+              {t("card.baseData")}</Text>
           <View style={styles.section}>
           <View style={styles.row}>
             <View style={styles.infoCard}>
               <Text style={styles.label}>
-                Nascimento
-              </Text>
+                {t("card.birth")}</Text>
 
               <Text style={styles.value}>
                 {formatarDataBR(
@@ -400,11 +400,10 @@ export const AnimalInfoCard = ({
 
             <View style={styles.infoCard}>
               <Text style={styles.label}>
-                Sexo
-              </Text>
+                {t("card.sex")}</Text>
 
               <Text style={styles.value}>
-                {detalhes?.sexo === "F"? "Fêmea" : "Macho"}
+                {detalhes?.sexo === "F"? t("card.female") : t("card.male")}
               </Text>
             </View>
           </View>
@@ -412,8 +411,7 @@ export const AnimalInfoCard = ({
           <View style={styles.row}>
             <View style={styles.infoCard}>
               <Text style={styles.label}>
-                Raça
-              </Text>
+                {t("card.breed")}</Text>
 
               <Text style={styles.value}>
                 {detalhes?.racaNome || "-"}
@@ -422,8 +420,7 @@ export const AnimalInfoCard = ({
 
             <View style={styles.infoCard}>
               <Text style={styles.label}>
-                Maturidade
-              </Text>
+                {t("card.maturity")}</Text>
 
               <Text style={styles.value}>
                 {maturidadeTexto ||
@@ -433,15 +430,13 @@ export const AnimalInfoCard = ({
           </View>
         </View>
             <Text style={styles.sectionTitle}>
-              Linhagem
-            </Text>
+              {t("card.lineage")}</Text>
           <View style={styles.section}>
 
             <View style={styles.row}>
               <View style={styles.infoCard}>
                 <Text style={styles.label}>
-                  Pai
-                </Text>
+                  {t("card.father")}</Text>
 
                 <Text style={styles.value}>
                   {detalhes?.paiNome || "-"}
@@ -450,8 +445,7 @@ export const AnimalInfoCard = ({
 
               <View style={ styles.infoCard}>
                 <Text style={styles.label}>
-                  Mãe
-                </Text>
+                  {t("card.mother")}</Text>
 
                 <Text style={styles.value}>
                   {detalhes?.maeNome || "-"}
@@ -461,8 +455,7 @@ export const AnimalInfoCard = ({
           </View>
 
             <Text style={styles.sectionTitle}>
-              Grupo atual
-            </Text>
+              {t("card.currentGroup")}</Text>
           <View style={styles.section}>
             <View style={styles.groupContainer}>
               <SelectBottomSheet
@@ -473,17 +466,17 @@ export const AnimalInfoCard = ({
                 onChange={
                   handleMudarGrupo
                 }
-                title="Selecionar Grupo"
+                title={t("card.selectGroup")}
                 placeholder={
                   detalhes?.grupo
                     ?.nomeGrupo ||
-                  "Sem grupo"
+                  t("card.noGroup")
                 }
               />
             </View>
           <View style={styles.locationBadge}>
             <Text style={styles.locationText}>
-              Localização: {" "} {detalhes?.coords?.nome || "-"}
+              {t("card.location")} {" "} {detalhes?.coords?.nome || "-"}
             </Text>
           </View>
           </View>
@@ -494,8 +487,8 @@ export const AnimalInfoCard = ({
         visible={
           modalMudarGrupoVisible
         }
-        title="Confirmar Mudança de Grupo"
-        message={`Deseja mover o animal para "${nomeGrupoParaMudar}"?`}
+        title={t("card.confirmGroupTitle")}
+        message={t("card.confirmGroupMessage", { nome: nomeGrupoParaMudar })}
         onConfirm={
           confirmarMudancaGrupo
         }
@@ -508,17 +501,13 @@ export const AnimalInfoCard = ({
             grupoAtualId
           );
         }}
-        confirmText="Mover"
+        confirmText={t("card.move")}
       />
 
       <ConfirmModal
         visible={modalVisible}
-        title="Alterar status"
-        message={`Deseja mudar o status para ${
-          novoStatus
-            ? "ATIVO"
-            : "INATIVO"
-        }?`}
+        title={t("card.statusTitle")}
+        message={t("card.statusMessage", { status: novoStatus ? t("card.statusActive") : t("card.statusInactive") })}
         onConfirm={
           confirmarAlteracaoStatus
         }
@@ -527,8 +516,8 @@ export const AnimalInfoCard = ({
         }
         confirmText={
           novoStatus
-            ? "Ativar"
-            : "Inativar"
+            ? t("card.activate")
+            : t("card.deactivate")
         }
         variant={
           novoStatus

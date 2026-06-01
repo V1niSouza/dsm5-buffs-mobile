@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { Modal } from "../Modal";
+import { useTranslation } from "react-i18next";
 import { colors } from "../../styles/colors";
 
 type Variant = "default" | "danger" | "success";
@@ -22,10 +23,11 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
   message,
   onConfirm,
   onCancel,
-  confirmText = "Confirmar",
-  cancelText = "Cancelar",
+  confirmText,
+  cancelText,
   variant = "default",
 }) => {
+  const { t } = useTranslation("common");
   const variantStyles = getVariantStyles(variant);
 
   return (
@@ -41,7 +43,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
             onPress={onCancel ?? (() => {})}
             activeOpacity={0.7}
           >
-            <Text style={styles.cancelText}>{cancelText}</Text>
+            <Text style={styles.cancelText}>{cancelText ?? t("actions.cancel")}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -50,7 +52,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
             activeOpacity={0.7}
           >
             <Text style={[styles.confirmText, { color: variantStyles.text }]}>
-              {confirmText}
+              {confirmText ?? t("actions.confirm")}
             </Text>
           </TouchableOpacity>
         </View>
