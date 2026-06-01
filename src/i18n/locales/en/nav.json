@@ -1,0 +1,14 @@
+{
+  "tabs": {
+    "home": "Home",
+    "herd": "Herd",
+    "lactation": "Lactation",
+    "reproduction": "Reproduction",
+    "paddocks": "Paddocks"
+  },
+  "screens": {
+    "nfcScanner": "NFC Scanner",
+    "notifications": "Notifications"
+  },
+  "alerts": "ALERTS"
+}

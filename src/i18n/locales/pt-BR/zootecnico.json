@@ -1,0 +1,55 @@
+{
+  "alert": {
+    "error": "Erro",
+    "success": "Sucesso"
+  },
+  "add": {
+    "title": "Novo Registro Zootécnico",
+    "dataCollection": "Coleta de dados",
+    "recordDate": "Data Registro:",
+    "weighingType": "Tipo Pesagem",
+    "weighingSelectTitle": "Selecionar o tipo de pesagem",
+    "weighingPlaceholder": "Digite o tipo de pesagem",
+    "bodyMetrics": "Métricas Corporais",
+    "weight": "Peso (kg)",
+    "weightPlaceholder": "Digite o peso do animal",
+    "bodyCondition": "Cond. Corporal:",
+    "bodyCharacteristics": "Características Corporais",
+    "coatColor": "Cor Pelagem",
+    "coatColorPlaceholder": "Digite a cor da pelagem",
+    "hornShape": "Formato Chifre",
+    "hornShapePlaceholder": "Digite o formato do chifre",
+    "bodySize": "Porte Corporal",
+    "bodySizePlaceholder": "Digite o porte corporal",
+    "submit": "Adicionar Registro",
+    "submitting": "Salvando...",
+    "missingFields": "Preencha ao menos um campo de métrica/característica.",
+    "addSuccess": "Registro zootécnico adicionado com sucesso!"
+  },
+  "weighingTypes": {
+    "weekly": "Semanal",
+    "biweekly": "Quinzenal",
+    "monthly": "Mensal",
+    "biannual": "Semestral"
+  },
+  "edit": {
+    "title": "Detalhes do Evento",
+    "recordLabel": "Registro {{type}}",
+    "recordDate": "Data do Registro: {{date}}",
+    "animalDetails": "Detalhes do Animal",
+    "weight": "Peso",
+    "bodyCondition": "Condição Corporal (CC)",
+    "coat": "Pelagem",
+    "horn": "Chifre",
+    "size": "Porte",
+    "saveChanges": "Salvar Alterações",
+    "deleteTitle": "Excluir Registro Zootécnico",
+    "deleteMessage": "Tem certeza que deseja excluir o registro da data {{date}}? Esta ação é irreversível."
+  },
+  "card": {
+    "weight": "Peso",
+    "size": "Porte",
+    "coat": "Pelagem:",
+    "cc": "CC:"
+  }
+}

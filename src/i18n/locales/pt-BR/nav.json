@@ -1,0 +1,14 @@
+{
+  "tabs": {
+    "home": "Home",
+    "herd": "Rebanho",
+    "lactation": "Lactação",
+    "reproduction": "Reprodução",
+    "paddocks": "Piquetes"
+  },
+  "screens": {
+    "nfcScanner": "Scanner NFC",
+    "notifications": "Notificações"
+  },
+  "alerts": "ALERTAS"
+}

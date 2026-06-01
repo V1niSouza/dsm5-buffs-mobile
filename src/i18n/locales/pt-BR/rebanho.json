@@ -1,0 +1,134 @@
+{
+  "header": "REBANHO",
+  "searchPlaceholder": "Buscar brinco...",
+  "updating": "Atualizando rebanho...",
+  "empty": "Nenhum animal encontrado",
+  "fab": {
+    "newAnimal": "Novo Animal",
+    "nfcScanner": "Scanner NFC"
+  },
+  "card": {
+    "tag": "Brinco Nº {{brinco}}",
+    "sexLabel": "Sexo:",
+    "maturityLabel": "| Maturidade:",
+    "breedLabel": "| Raça:",
+    "female": "♀ Fêmea",
+    "male": "♂ Macho"
+  },
+  "maturity": {
+    "B": "Bezerro",
+    "N": "Novilha",
+    "T": "Touro",
+    "V": "Vaca"
+  },
+  "fallback": {
+    "noBreed": "Sem raça definida",
+    "unknownMaturity": "Desconhecida"
+  },
+  "filter": {
+    "title": "Filtros Avançados",
+    "clear": "Limpar",
+    "categoriesLabel": "CATEGORIAS",
+    "apply": "Aplicar Filtros",
+    "categories": {
+      "sexo": "Sexo",
+      "raca": "Raça",
+      "maturidade": "Maturidade",
+      "status": "Status"
+    },
+    "sex": {
+      "male": "Macho",
+      "female": "Fêmea"
+    },
+    "status": {
+      "active": "Ativo",
+      "inactive": "Inativo"
+    }
+  },
+  "form": {
+    "title": "Novo Cadastro de Búfalo",
+    "sections": {
+      "identification": "Dados de Identificação",
+      "characteristics": "Características e Origem",
+      "parentage": "Parentesco (Brincos Opcionais)"
+    },
+    "fields": {
+      "name": "Nome (Opcional)",
+      "namePlaceholder": "Digite o nome do animal",
+      "tag": "Brinco (Obrigatório)",
+      "tagPlaceholder": "Digite o brinco do animal",
+      "microchip": "Microchip (Opcional)",
+      "microchipPlaceholder": "Digite ou leia via RFID",
+      "sex": "Sexo:",
+      "maturity": "Maturidade:",
+      "birthDate": "Data de Nascimento:",
+      "breed": "Raça:",
+      "fatherTag": "Brinco do Pai",
+      "fatherTagPlaceholder": "Brinco Pai",
+      "motherTag": "Brinco da Mãe",
+      "motherTagPlaceholder": "Brinco Mae"
+    },
+    "select": {
+      "placeholder": "Selecione",
+      "selectSex": "Selecionar sexo",
+      "selectMaturity": "Selecionar maturidade",
+      "selectBreed": "Selecionar raça",
+      "breedPlaceholder": "Selecione raça",
+      "pickDate": "Selecionar"
+    },
+    "submit": "Salvar Cadastro",
+    "submitting": "Salvando...",
+    "toast": {
+      "noProperty": "Selecione uma propriedade antes de cadastrar.",
+      "tagRequired": "O campo Brinco é obrigatório.",
+      "sexRequired": "O campo Sexo é obrigatório.",
+      "fatherNotFound": "Nenhum pai encontrado com esse brinco (Macho) na propriedade.",
+      "motherNotFound": "Nenhuma mãe encontrada com esse brinco (Fêmea) na propriedade.",
+      "success": "Búfalo cadastrado com sucesso!",
+      "saveError": "Não foi possível salvar o búfalo."
+    },
+    "alert": {
+      "error": "Erro",
+      "success": "Sucesso"
+    }
+  },
+  "edit": {
+    "title": "Editar Animal: {{brinco}}",
+    "basicData": "Dados Básicos",
+    "name": "Nome",
+    "namePlaceholder": "Digite o nome do animal",
+    "tag": "Brinco",
+    "tagPlaceholder": "Digite o brinco do animal",
+    "microchip": "Microchip",
+    "microchipPlaceholder": "Digite ou leia via RFID",
+    "characteristics": "Características",
+    "sex": "Sexo",
+    "sexPlaceholder": "Digite o sexo do animal",
+    "male": "Macho",
+    "female": "Fêmea",
+    "birthDate": "Data de Nascimento",
+    "birthDatePlaceholder": "Digite a data de nascimento do animal",
+    "maturity": "Maturidade:",
+    "selectMaturity": "Selecionar maturidade",
+    "selectPlaceholder": "Selecione",
+    "breed": "Raça:",
+    "selectBreed": "Selecionar raça",
+    "breedPlaceholder": "Selecione raça",
+    "parentage": "Parentesco (Brinco)",
+    "fatherTag": "Brinco do Pai",
+    "motherTag": "Brinco da Mãe",
+    "tagOrRfid": "Brinco ou RFID",
+    "notProvided": "Não informado",
+    "loading": "Carregando dados...",
+    "submit": "Salvar Alterações",
+    "submitting": "Salvando...",
+    "toast": {
+      "noProperty": "ID da Propriedade não encontrado. Não é possível salvar.",
+      "missingFields": "Preencha Nome, Brinco e Maturidade.",
+      "fatherNotFound": "Nenhum pai encontrado com brinco '{{brinco}}' (Macho) na propriedade.",
+      "motherNotFound": "Nenhuma mãe encontrada com brinco '{{brinco}}' (Fêmea) na propriedade.",
+      "success": "Informações atualizadas com sucesso!",
+      "saveError": "Não foi possível salvar as alterações."
+    }
+  }
+}

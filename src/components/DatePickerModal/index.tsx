@@ -4,6 +4,7 @@ import DateTimePicker, { DateType, useDefaultStyles} from "react-native-ui-datep
 import dayjs from "dayjs";
 import { Modal } from "../Modal";
 import { colors } from "../../styles/colors";
+import { useTranslation } from "react-i18next";
 
 interface DatePickerModalProps {
   visible: boolean;
@@ -16,11 +17,12 @@ export function DatePickerModal({ visible, date, onClose, onSelectDate }: DatePi
     let today = new Date();
     const defaultStyles = useDefaultStyles();
     const [selectedDate, setSelectedDate] = useState<DateType>();
+    const { t } = useTranslation("common");
     
   return (
     <Modal visible={visible} onClose={onClose}>
       <View style={styles.container}>
-        <Text style={styles.title}>Selecionar Data</Text>
+        <Text style={styles.title}>{t("selectDate")}</Text>
 
         <DateTimePicker
           mode="single"
@@ -41,7 +43,7 @@ export function DatePickerModal({ visible, date, onClose, onSelectDate }: DatePi
             style={[styles.button, styles.cancelButton]}
             onPress={onClose}
           >
-            <Text style={styles.cancelText}>Cancelar</Text>
+            <Text style={styles.cancelText}>{t("actions.cancel")}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -51,7 +53,7 @@ export function DatePickerModal({ visible, date, onClose, onSelectDate }: DatePi
               onClose();
             }}
           >
-            <Text style={styles.confirmText}>Confirmar</Text>
+            <Text style={styles.confirmText}>{t("actions.confirm")}</Text>
           </TouchableOpacity>
         </View>
       </View>

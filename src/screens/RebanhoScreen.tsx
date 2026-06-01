@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl, F
 import { useNavigation, useRoute, RouteProp, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { FloatingAction } from 'react-native-floating-action';
+import { useTranslation } from 'react-i18next';
 
 import { MainLayout } from '../layouts/MainLayout';
 import { useDimensions } from '../utils/useDimensions';
@@ -45,6 +46,8 @@ type RootStackParamList = {
 
 
 export const RebanhoScreen = () => {
+  const { t } = useTranslation('rebanho');
+  const { t: tc } = useTranslation('common');
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const route = useRoute<RouteProp<RootStackParamList, 'RebanhoScreen'>>();
   const { wp, hp } = useDimensions();
@@ -91,7 +94,7 @@ export const RebanhoScreen = () => {
         status: b.status,
         brinco: b.brinco,
         nome: b.nome,
-        raca: b.raca?.nome ?? "Sem raça definida",
+        raca: b.raca?.nome ?? t("fallback.noBreed"),
         sexo: b.sexo,
         maturidade: b.nivelMaturidade,
         categoria: b.categoria
@@ -147,14 +150,14 @@ export const RebanhoScreen = () => {
 
   const actions = [
     {
-      text: "Novo Animal",
+      text: t("fab.newAnimal"),
       icon: <Plus width={24} height={24} fill="black" />, // Use seu SVG aqui
       name: "NovoAnimal",
       position: 1,
       color: colors.brand.primary,
     },
     {
-      text: "Scanner NFC",
+      text: t("fab.nfcScanner"),
       icon: <Scanner width={24} height={24} fill="black" />,
       name: "NfcScanner",
       position: 2,
@@ -197,7 +200,7 @@ export const RebanhoScreen = () => {
       {/* Header */}
       <View style={styles.header}>
         <View style={{ alignItems: 'center' }}>
-          <Text style={styles.header1Text}>REBANHO</Text>
+          <Text style={styles.header1Text}>{t("header")}</Text>
         </View>
       </View>
 
@@ -222,8 +225,8 @@ export const RebanhoScreen = () => {
             <View style={styles.card}>
               <View style={styles.searchBarRow}>
                 <View style={styles.searchContainer}>
-                  <TextInput 
-                    placeholder="Buscar brinco..." 
+                  <TextInput
+                    placeholder={t("searchPlaceholder")}
                     value={searchText}
                     onChangeText={handleQuickSearch}
                     style={styles.searchInput}
@@ -246,7 +249,7 @@ export const RebanhoScreen = () => {
                 brinco={item.brinco}
                 status={item.status}
                 sexo={item.sexo}
-                maturidade={item.maturidade || "Desconhecida"}
+                maturidade={item.maturidade || t("fallback.unknownMaturity")}
                 raca={item.raca}
                 categoria={item.categoria}
                 onPress={() =>
@@ -262,12 +265,12 @@ export const RebanhoScreen = () => {
               <View style={styles.inlineLoader}>
                 <ActivityIndicator size="large" color={colors.brand.primary} />
                 <Text style={{ marginTop: 8 }}>
-                  Atualizando rebanho...
+                  {t("updating")}
                 </Text>
               </View>
             ) : (
               <Text style={{ textAlign: "center", marginTop: 20 }}>
-                Nenhum animal encontrado
+                {t("empty")}
               </Text>
             )
           }
@@ -276,17 +279,17 @@ export const RebanhoScreen = () => {
             listLoading ? null : (
               <View style={styles.pagination}>
                 <Button
-                  title="Anterior"
+                  title={tc("pagination.previous")}
                   onPress={() => handlePageChange(paginaAtual - 1)}
                   disabled={paginaAtual === 1}
                 />
 
                 <Text style={styles.pageInfo}>
-                  Página {paginaAtual} de {totalPaginas}
+                  {tc("pagination.pageOf", { current: paginaAtual, total: totalPaginas })}
                 </Text>
 
                 <Button
-                  title="Próxima"
+                  title={tc("pagination.next")}
                   onPress={() => handlePageChange(paginaAtual + 1)}
                   disabled={paginaAtual === totalPaginas}
                 />

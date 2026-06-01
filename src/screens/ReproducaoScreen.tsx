@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 import {
   View,
   Text,
@@ -27,6 +28,8 @@ import { ReproducaoAttBottomSheet } from '../components/FormReproductionAtt';
 import BuffaloLoader from '../components/BufaloLoader';
 
 export const ReproducaoScreen = () => {
+  const { t } = useTranslation('reproducao');
+  const { t: tc } = useTranslation('common');
   const { propriedadeSelecionada } = usePropriedade();
 
   const [refreshing, setRefreshing] = useState(false);
@@ -121,7 +124,7 @@ export const ReproducaoScreen = () => {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.header1Text}>REPRODUÇÃO</Text>
+        <Text style={styles.header1Text}>{t('header')}</Text>
       </View>
 
       <MainLayout>
@@ -176,12 +179,12 @@ export const ReproducaoScreen = () => {
                   color={colors.brand.primary}
                 />
                 <Text style={{ marginTop: 8 }}>
-                  Atualizando reproduções...
+                  {t('updating')}
                 </Text>
               </View>
             ) : (
               <Text style={{ textAlign: 'center', marginTop: 20 }}>
-                Nenhum registro encontrado
+                {t('empty')}
               </Text>
             )
           }
@@ -190,15 +193,15 @@ export const ReproducaoScreen = () => {
             totalPaginas > 1 && !listLoading ? (
               <View style={styles.pagination}>
                 <Button
-                  title="Anterior"
+                  title={tc('pagination.previous')}
                   onPress={() => handlePageChange(paginaAtual - 1)}
                   disabled={paginaAtual === 1}
                 />
                 <Text style={styles.pageInfo}>
-                  Página {paginaAtual} de {totalPaginas}
+                  {tc('pagination.pageOf', { current: paginaAtual, total: totalPaginas })}
                 </Text>
                 <Button
-                  title="Próxima"
+                  title={tc('pagination.next')}
                   onPress={() => handlePageChange(paginaAtual + 1)}
                   disabled={paginaAtual === totalPaginas}
                 />

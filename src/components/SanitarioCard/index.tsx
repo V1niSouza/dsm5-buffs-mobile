@@ -13,12 +13,16 @@ import { colors } from "../../styles/colors";
 import { formatarDataBR } from "../../utils/date";
 
 import Calendar from "../../../assets/images/calendar-clock.svg";
+import { useTranslation } from "react-i18next";
 
 export const SanitarioCard = ({
   item,
   onDelete,
   onPress,
-}: any) => (
+}: any) => {
+  const { t } = useTranslation("sanitario");
+  const { t: tc } = useTranslation("common");
+  return (
   <TouchableOpacity
     style={styles.card}
     onPress={onPress}
@@ -31,7 +35,7 @@ export const SanitarioCard = ({
         <View style={styles.diseaseContainer}>
           <Text style={styles.diseaseText}>
             {item.doenca ??
-              "Sem diagnóstico"}
+              t("card.noDiagnosis")}
           </Text>
         </View>
 
@@ -53,7 +57,7 @@ export const SanitarioCard = ({
       <View style={styles.infoSection}>
         <View style={styles.mainInfo}>
           <Text style={styles.label}>
-            Medicação
+            {t("card.medication")}
           </Text>
 
           <Text
@@ -69,7 +73,7 @@ export const SanitarioCard = ({
 
         <View style={styles.mainInfo}>
           <Text style={styles.label}>
-            Dosagem
+            {t("card.dosage")}
           </Text>
 
           <Text
@@ -86,16 +90,17 @@ export const SanitarioCard = ({
       <View style={styles.metaRow}>
         <View style={styles.metaBadge}>
           <Text style={styles.metaText}>
-            Retorno:{" "}
+            {t("card.returnLabel")}{" "}
             {item.necessitaRetorno
-              ? "Sim"
-              : "Não"}
+              ? tc("yes")
+              : tc("no")}
           </Text>
         </View>
       </View>
     </View>
   </TouchableOpacity>
-);
+  );
+};
 
 const styles = StyleSheet.create({
   card: {

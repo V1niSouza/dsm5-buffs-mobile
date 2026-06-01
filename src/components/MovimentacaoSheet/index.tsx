@@ -10,6 +10,7 @@ import { piqueteService } from "../../services/piqueteService";
 import { movLoteService } from "../../services/movLoteService";
 import SelectBottomSheet from "../SelectBottomSheet";
 import { ConfirmModal } from "../ModalStatus";
+import { useTranslation } from "react-i18next";
 
 type MovimentacaoSheetProps = {
   grupo: Grupo;
@@ -31,6 +32,8 @@ export const MovimentacaoSheet: React.FC<MovimentacaoSheetProps> = ({
 }) => {
   const sheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ["60%"], []);
+  const { t } = useTranslation("piquetes");
+  const { t: tc } = useTranslation("common");
   const [lotes, setLotes] = useState<{ label: string; value: string }[]>([]);
   const [loteDestinoId, setLoteDestinoId] = useState<string | null>(null);
   const [loteDestinoNome, setLoteDestinoNome] = useState<string>("");
@@ -61,7 +64,7 @@ export const MovimentacaoSheet: React.FC<MovimentacaoSheetProps> = ({
 
   const handlePressBotao = () => {
     if (!loteDestinoId) {
-      showFeedback("Selecione o lote de destino.");
+      showFeedback(t("move.selectDestination"));
       return;
     }
     const nome = lotes.find((l) => l.value === loteDestinoId)?.label ?? loteDestinoId;
@@ -79,11 +82,11 @@ export const MovimentacaoSheet: React.FC<MovimentacaoSheetProps> = ({
         idLoteAtual: loteDestinoId!,
         dtEntrada: new Date().toISOString(),
       });
-      showFeedback("Grupo movido com sucesso!");
+      showFeedback(t("move.success"));
       onSuccess();
       onClose();
     } catch (err: any) {
-      showFeedback(err?.message || "Erro ao mover grupo.");
+      showFeedback(err?.message || t("move.error"));
     } finally {
       setSubmitting(false);
     }
@@ -105,7 +108,7 @@ export const MovimentacaoSheet: React.FC<MovimentacaoSheetProps> = ({
         handleIndicatorStyle={{ backgroundColor: colors.border.light, height: 4, width: 36 }}
       >
         <View style={styles.header}>
-          <Text style={styles.title}>Mover Grupo</Text>
+          <Text style={styles.title}>{t("detail.moveGroup")}</Text>
           <Text style={styles.subtitle}>{grupo.nome}</Text>
         </View>
 
@@ -116,18 +119,18 @@ export const MovimentacaoSheet: React.FC<MovimentacaoSheetProps> = ({
           {lotes.length === 0 ? (
             <View style={styles.emptyBox}>
               <Text style={styles.emptyText}>
-                Nenhum lote disponível para movimentação.
+                {t("move.empty")}
               </Text>
             </View>
           ) : (
             <>
-              <Text style={styles.label}>Lote de Destino</Text>
+              <Text style={styles.label}>{t("move.destinationLabel")}</Text>
               <SelectBottomSheet
                 items={lotes}
                 value={loteDestinoId}
                 onChange={setLoteDestinoId}
-                title="Selecione o Lote"
-                placeholder="Selecione o lote de destino"
+                title={t("move.selectLotTitle")}
+                placeholder={t("move.selectLotPlaceholder")}
               />
             </>
           )}
@@ -140,7 +143,7 @@ export const MovimentacaoSheet: React.FC<MovimentacaoSheetProps> = ({
             {submitting ? (
               <ActivityIndicator color={colors.text.accent} />
             ) : (
-              <Text style={styles.btnText}>Confirmar Movimentação</Text>
+              <Text style={styles.btnText}>{t("move.confirmButton")}</Text>
             )}
           </TouchableOpacity>
         </BottomSheetScrollView>
@@ -148,10 +151,10 @@ export const MovimentacaoSheet: React.FC<MovimentacaoSheetProps> = ({
 
       <ConfirmModal
         visible={confirmVisible}
-        title="Confirmar Movimentação"
-        message={`Mover o grupo "${grupo.nome}" para o lote "${loteDestinoNome}"?`}
-        confirmText="Mover"
-        cancelText="Cancelar"
+        title={t("move.confirmTitle")}
+        message={t("move.confirmMessage", { grupo: grupo.nome, lote: loteDestinoNome })}
+        confirmText={t("move.confirmAction")}
+        cancelText={tc("actions.cancel")}
         variant="default"
         onConfirm={handleConfirmar}
         onCancel={() => setConfirmVisible(false)}

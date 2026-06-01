@@ -20,6 +20,7 @@ import DropDownPicker from "react-native-dropdown-picker";
 import sanitarioService from "../../services/sanitarioService"; 
 import YellowButton from "../Button"; // Assumindo o componente de botão padrão
 import SelectBottomSheet from "../SelectBottomSheet";
+import { useTranslation } from "react-i18next";
 
 
 // ==========================================================
@@ -57,6 +58,8 @@ const initialFormData: Omit<SanitarioPayload, 'id_bufalo'> = {
 export const SanitarioAddBottomSheet: React.FC<SanitarioAddBottomSheetProps> = ({ id_bufalo, onAddSave, onClose, propriedadeId}) => {
     const sheetRef = useRef<BottomSheet>(null);
     const snapPoints = useMemo(() => ["50%", "70%"], []);
+    const { t } = useTranslation("sanitario");
+    const { t: tc } = useTranslation("common");
     
     const [formData, setFormData] = useState<Omit<SanitarioPayload, 'id_bufalo'>>({ ...initialFormData });
     const [showDatePicker, setShowDatePicker] = useState(false);
@@ -117,7 +120,7 @@ export const SanitarioAddBottomSheet: React.FC<SanitarioAddBottomSheetProps> = (
         if (Platform.OS === 'android') {
             ToastAndroid.show(message, ToastAndroid.LONG);
         } else {
-            Alert.alert(isError ? "Erro" : "Sucesso", message);
+            Alert.alert(isError ? t("alert.error") : t("alert.success"), message);
         }
     };
 
@@ -126,7 +129,7 @@ export const SanitarioAddBottomSheet: React.FC<SanitarioAddBottomSheetProps> = (
         if (isSaving) return;
         
         if (!formData.doenca && !formData.id_medicao) {
-            return showToast("Preencha o nome da Doença ou selecione uma Medicação.", true);
+            return showToast(t("add.missingFields"), true);
         }
 
         setIsSaving(true); 
@@ -151,13 +154,13 @@ export const SanitarioAddBottomSheet: React.FC<SanitarioAddBottomSheetProps> = (
         setTimeout(() => {
             onAddSave(cleanedPayload); 
             setIsSaving(false);
-            showToast("Registro sanitário adicionado com sucesso!");
+            showToast(t("add.addSuccess"));
             onClose();
         }, 800);
     };
     
     const formatDate = (dateString?: string | null) => {
-        if (!dateString) return "Selecionar";
+        if (!dateString) return tc("select.placeholder");
         return dayjs(dateString).format("DD/MM/YYYY"); 
     };
 
@@ -203,12 +206,12 @@ return (
 
                 {/* Header */}
                 <View style={styles.header}>
-                    <Text style={styles.headerTitle}>Novo Registro Sanitário</Text>
+                    <Text style={styles.headerTitle}>{t("add.title")}</Text>
                 </View>
 
                 {/* Data de Aplicação (NOVO DESIGN DE DATA - Fora do Container Principal) */}
                 <View style={styles.listContainerHeader}>
-                    <Text style={styles.listLabel}>Data Aplicação:</Text>
+                    <Text style={styles.listLabel}>{t("add.applicationDate")}</Text>
                     <TouchableOpacity 
                         onPress={() => setShowDatePicker(true)}
                         style={styles.dateDisplayButton}
@@ -219,49 +222,49 @@ return (
                     </TouchableOpacity>
                 </View>
                 
-                <Text style={styles.sectionTitle}>Detalhes do Tratamento</Text>
+                <Text style={styles.sectionTitle}>{t("add.treatmentDetails")}</Text>
 
                 {/* Lista */}
                 <View style={styles.listContainer}>
 
                     {/* Doença (FLOATING LABEL) */}
-                     <Text style={styles.label}>Doença (Opcional)</Text>
+                     <Text style={styles.label}>{t("add.disease")}</Text>
                      <TextInput
                          style={styles.inputBase}
                          value={formData.doenca ?? ""}
                          onChangeText={(t) => handleChange("doenca", t)}
-                         placeholder="Digite a doenca do animal"/>      
+                         placeholder={t("add.diseasePlaceholder")}/>      
                     
                     {/* Medicação (Dropdown) */}
-                        <Text style={styles.dropdownLabel}>Medicação:</Text>
+                        <Text style={styles.dropdownLabel}>{t("medicationLabel")}</Text>
                         <SelectBottomSheet
                         items={medicacoes}
                         value={medicacaoSelecionada}
                         onChange={(value) => setMedicacaoSelecionada(value)}
-                        title="Selecionar medicação"
-                        placeholder="Selecione medicação"
+                        title={t("add.medicationSelectTitle")}
+                        placeholder={t("add.medicationPlaceholder")}
                         />
 
                     {/* Dosagem (Campos lado a lado com FLOATING LABEL) */}
                     <View style={styles.dosagemGroup}>
                         {/* Dosagem (Input 1) */}
                         <View style={{ flex: 1 }}>
-                            <Text style={styles.label}>Dosagem</Text>
+                            <Text style={styles.label}>{t("add.dosage")}</Text>
                             <TextInput
                                 style={styles.inputBase}
                                 value={String(formData.dosagem ?? "")}
                                 onChangeText={(t) => handleChange("dosagem", t)}
                                 keyboardType="numeric"
-                                placeholder="Digite a dosagem aplicada"/>    
+                                placeholder={t("add.dosagePlaceholder")}/>    
                         </View>
                         {/* Unidade de Medida (Input 2) */}
                         <View style={{ flex: 1 }}>
-                        <Text style={styles.label}>Unidade Md.</Text>
+                        <Text style={styles.label}>{t("add.unit")}</Text>
                         <TextInput
                             style={styles.inputBase}
                             value={formData.unidade_medida ?? ""}
                             onChangeText={(t) => handleChange("unidade_medida", t)}
-                            placeholder="Digite a unidade de medida"/>  
+                            placeholder={t("add.unitPlaceholder")}/>  
                         </View>
                     </View>
 
@@ -271,7 +274,7 @@ return (
                         formData.necessita_retorno && styles.switchActive
                     ]}>
                         <Text style={styles.switchText}>
-                            Necessita retorno
+                            {t("add.needsReturn")}
                         </Text>
 
                         <Switch
@@ -288,7 +291,7 @@ return (
                     {/* Data Retorno (NOVO DESIGN DE DATA - Condicional) */}
                     {formData.necessita_retorno && (
                       <View style={styles.dateFieldContainer}>
-                        <Text style={styles.listLabel}>Data Retorno:</Text>
+                        <Text style={styles.listLabel}>{t("add.returnDate")}</Text>
                         <TouchableOpacity 
                             // Abre o DatePicker focado na data de retorno
                             onPress={() => setShowDatePicker(true)}
@@ -305,7 +308,7 @@ return (
                 {/* Footer (Botão de ação) */}
                 <View style={styles.footer}>
                     <YellowButton
-                        title={isSaving ? "Salvando..." : "Adicionar Registro"}
+                        title={isSaving ? t("add.submitting") : t("add.submit")}
                         onPress={handleSave}
                         disabled={isSaving}
                     />

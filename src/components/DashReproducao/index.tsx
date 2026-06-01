@@ -6,6 +6,8 @@ import {
   StyleSheet,
 } from "react-native";
 
+import { useTranslation } from "react-i18next";
+
 import { colors } from "../../styles/colors";
 
 import TextTitle from "../TextTitle";
@@ -25,16 +27,17 @@ export default function DashReproduction({
   falhas,
   ultimaData,
 }: DashReproductionProps) {
+  const { t } = useTranslation("reproducao");
   return (
     <View style={styles.card}>
       <View style={styles.header}>
         <View>
           <TextTitle>
-            Resumo Reprodutivo
+            {t("dash.title")}
           </TextTitle>
 
           <Text style={styles.subtitle}>
-            Acompanhamento das coberturas e inseminações
+            {t("dash.subtitle")}
           </Text>
         </View>
       </View>
@@ -43,7 +46,7 @@ export default function DashReproduction({
         <View style={styles.statsRow}>
           <View style={styles.statCard}>
             <Text style={styles.statLabel}>
-              Em processo
+              {t("dash.inProcess")}
             </Text>
             <Text style={styles.statValue}>
               {emProcesso}
@@ -54,7 +57,7 @@ export default function DashReproduction({
 
           <View style={styles.statCard}>
             <Text style={styles.statLabel}>
-              Confirmadas
+              {t("dash.confirmed")}
             </Text>
             <Text style={styles.statValue}>
               {confirmadas}
@@ -65,7 +68,7 @@ export default function DashReproduction({
         <View style={styles.statsRow}>
           <View style={styles.statCard}>
             <Text style={styles.statLabel}>
-              Concluídas
+              {t("dash.completed")}
             </Text>
             <Text style={styles.statValue}>
               {concluidas}
@@ -76,7 +79,7 @@ export default function DashReproduction({
 
           <View style={styles.statCard}>
             <Text style={styles.statLabel}>
-              Falhas
+              {t("dash.failures")}
             </Text>
             <Text style={styles.statValue}>
               {falhas}
@@ -87,7 +90,7 @@ export default function DashReproduction({
 
       <View style={styles.footer}>
         <Text style={styles.footerText}>
-          Atualizado em {ultimaData}
+          {t("dash.updatedAt", { date: ultimaData })}
         </Text>
       </View>
     </View>

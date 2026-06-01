@@ -4,6 +4,7 @@ import { colors } from "../../styles/colors"; // ajuste para seu projeto
 import BuffsLogo from '../../../assets/images/buffs.svg'; 
 import Prontuario from '../../../assets/images/prontuario.svg'; 
 import Button from "../Button";
+import { useTranslation } from "react-i18next";
 
 export type AnimalLac = {
   id: string | number;
@@ -22,6 +23,8 @@ type Props = {
 export default function TableLactation({ data, onVerMais }: Props) {
   const itensPorPagina = 15;
   const [paginaAtual, setPaginaAtual] = useState(0);
+  const { t } = useTranslation("lactacao");
+  const { t: tc } = useTranslation("common");
 
   // range da página atual
   const startIndex = paginaAtual * itensPorPagina;
@@ -37,10 +40,10 @@ export default function TableLactation({ data, onVerMais }: Props) {
         <View style={{ flex: 0.3, alignItems: 'center', justifyContent: 'center' }}>
           <BuffsLogo width={18} height={18} />
         </View>
-        <Text style={[styles.listHeaderText, { flex: 1 }]}>Brinco</Text>
-        <Text style={[styles.listHeaderText, { flex: 1 }]}>Nome</Text>
-        <Text style={[styles.listHeaderText, { flex: 1 }]}>Raça</Text>
-        <Text style={[styles.listHeaderText, { flex: 1 }]}>Ver Mais</Text>
+        <Text style={[styles.listHeaderText, { flex: 1 }]}>{t("table.tag")}</Text>
+        <Text style={[styles.listHeaderText, { flex: 1 }]}>{t("table.name")}</Text>
+        <Text style={[styles.listHeaderText, { flex: 1 }]}>{t("table.breed")}</Text>
+        <Text style={[styles.listHeaderText, { flex: 1 }]}>{t("table.seeMore")}</Text>
       </View>
 
       {/* Lista */}
@@ -84,17 +87,17 @@ export default function TableLactation({ data, onVerMais }: Props) {
             {/* Paginação */}
             <View style={styles.pagination}>
               <Button
-                title="Anterior"
+                title={tc("pagination.previous")}
                 onPress={() => setPaginaAtual(paginaAtual - 1)}
                 disabled={paginaAtual === 0}
               />
       
               <Text style={styles.pageInfo}>
-                Página {paginaAtual + 1} de {totalPaginas}
+                {tc("pagination.pageOf", { current: paginaAtual + 1, total: totalPaginas })}
               </Text>
       
               <Button
-                title="Próxima"
+                title={tc("pagination.next")}
                 onPress={() => setPaginaAtual(paginaAtual + 1)}
                 disabled={paginaAtual + 1 >= totalPaginas}
               />

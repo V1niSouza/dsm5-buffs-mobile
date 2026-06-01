@@ -7,6 +7,8 @@ import {
   StyleSheet,
 } from "react-native";
 
+import { useTranslation } from "react-i18next";
+
 import { colors } from "../../styles/colors";
 
 import IconBuffs from "../../icons/agroCore";
@@ -34,16 +36,17 @@ export const CardBufalo: React.FC<
   categoria,
   onPress,
 }) => {
+  const { t } = useTranslation("rebanho");
   const isAtivo = status === true;
 
   const maturidadeMap: Record<
     string,
     string
   > = {
-    B: "Bezerro",
-    N: "Novilha",
-    T: "Touro",
-    V: "Vaca",
+    B: t("maturity.B"),
+    N: t("maturity.N"),
+    T: t("maturity.T"),
+    V: t("maturity.V"),
   };
 
   const maturidadeTexto =
@@ -87,7 +90,7 @@ export const CardBufalo: React.FC<
             </Text>
 
             <Text style={styles.subtitle}>
-              Brinco Nº {brinco}
+              {t("card.tag", { brinco })}
             </Text>
           </View>
 
@@ -103,26 +106,23 @@ export const CardBufalo: React.FC<
         <View style={styles.details}>
           <View style={styles.detailItem}>
             <Text style={styles.detailLabel}>
-              Sexo:
-            </Text>
+              {t("card.sexLabel")}</Text>
 
             <Text style={styles.detailValue}>
               {sexo === "F"
-                ? "♀ Fêmea"
-                : "♂ Macho"}
+                ? t("card.female")
+                : t("card.male")}
             </Text>
 
             <Text style={styles.detailLabel}>
-              | Maturidade:
-            </Text>
+              {t("card.maturityLabel")}</Text>
 
             <Text style={styles.detailValue}>
               {maturidadeTexto}
             </Text>
             
             <Text style={styles.detailLabel}>
-              | Raça:
-            </Text>
+              {t("card.breedLabel")}</Text>
 
             <Text style={styles.detailValue}>
               {raca ?? "—"}

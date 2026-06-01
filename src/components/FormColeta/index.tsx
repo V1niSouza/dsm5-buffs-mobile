@@ -19,6 +19,7 @@ import BottomSheet, {
 } from "@gorhom/bottom-sheet";
 
 // Importações de componentes e serviços
+import { useTranslation } from "react-i18next";
 import { colors } from "../../styles/colors";
 import { DatePickerModal } from "../DatePickerModal"; 
 import YellowButton from "../Button"; 
@@ -42,6 +43,7 @@ interface ColetaAddBottomSheetProps {
 export const ColetaAddBottomSheet: React.FC<
   ColetaAddBottomSheetProps
 > = ({ industrias, onSuccess, onClose, propriedadeId }) => {
+  const { t } = useTranslation("lactacao");
   const sheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ["50%", "70%"], []);
 
@@ -69,18 +71,18 @@ export const ColetaAddBottomSheet: React.FC<
     if (RNPlatform.OS === "android") {
       ToastAndroid.show(message, ToastAndroid.LONG);
     } else {
-      Alert.alert(isError ? "Erro" : "Sucesso", message);
+      Alert.alert(isError ? t("forms.shared.alertError") : t("forms.shared.alertSuccess"), message);
     }
   };
 
   const handleSave = async () => {
     // 1. Validações
-    if (!idIndustria) { return showToast("Selecione a indústria.", true); }
-    if (!quantidade || isNaN(parseFloat(quantidade)) || parseFloat(quantidade) <= 0) { 
-        return showToast("Informe uma quantidade coletada válida.", true); 
+    if (!idIndustria) { return showToast(t("forms.coleta.toast.noIndustry"), true); }
+    if (!quantidade || isNaN(parseFloat(quantidade)) || parseFloat(quantidade) <= 0) {
+        return showToast(t("forms.coleta.toast.invalidQuantity"), true);
     }
-    if (!propriedadeId) { return showToast("ID da propriedade não encontrado.", true); }
-    if (resultadoTeste === null) { return showToast("Informe o resultado do teste.", true); }
+    if (!propriedadeId) { return showToast(t("forms.shared.noProperty"), true); }
+    if (resultadoTeste === null) { return showToast(t("forms.coleta.toast.noTestResult"), true); }
     
     // 2. Montar Payload
     try {
@@ -99,12 +101,12 @@ export const ColetaAddBottomSheet: React.FC<
       // 3. Chamada à API
       await registrarColetaApi(payload);
       
-      showToast("Coleta registrada com sucesso!");
+      showToast(t("forms.coleta.toast.success"));
       onSuccess?.();
       onClose();
     } catch (err) {
       console.error("Erro ao salvar coleta:", err);
-      showToast("Não foi possível registrar a coleta.", true);
+      showToast(t("forms.coleta.toast.error"), true);
     }
   };
 
@@ -139,36 +141,36 @@ export const ColetaAddBottomSheet: React.FC<
         scrollEnabled={!openIndustria} 
       >
         <View style={styles.header}>
-            <Text style={styles.headerTitle}>Registro de Coleta</Text>
+            <Text style={styles.headerTitle}>{t("forms.coleta.title")}</Text>
         </View>
 
-        <Text style={styles.sectionTitle}>Dados da Coleta</Text>
+        <Text style={styles.sectionTitle}>{t("forms.coleta.section")}</Text>
 
         <View style={styles.listContainer}>
           <View style={{ marginBottom: 12 }}>
             {/* Dropdown de Indústrias */}
-            <Text style={styles.label}>Indústria:</Text>
+            <Text style={styles.label}>{t("forms.coleta.industryLabel")}</Text>
             <SelectBottomSheet
                 items={industriaItems}
                 value={idIndustria}
                 onChange={(value) => setIdIndustria(value)}
-                title="Selecionar Industria"
-                placeholder="Selecione uma indústria"
+                title={t("forms.coleta.industrySelectTitle")}
+                placeholder={t("forms.coleta.industryPlaceholder")}
                 />
           </View>
-            
+
             {/* Quantidade */}
-            <Text style={styles.label}>Quantidade Coletada (L)</Text>
+            <Text style={styles.label}>{t("forms.coleta.quantityLabel")}</Text>
             <TextInput
                 style={styles.inputBase}
                 value={quantidade}
                 onChangeText={setQuantidade}
                 keyboardType="numeric"
-                placeholder="Digite a quantidade coletada (L)"/>
-            
+                placeholder={t("forms.coleta.quantityPlaceholder")}/>
+
             {/* Data da Coleta */}
             <View style={styles.dateFieldContainer}>
-                <Text style={styles.label}>Data Coleta:</Text>
+                <Text style={styles.label}>{t("forms.coleta.dateLabel")}</Text>
                 <TouchableOpacity 
                     onPress={() => setShowDatePicker(true)}
                     style={styles.dateDisplayButton}
@@ -181,11 +183,11 @@ export const ColetaAddBottomSheet: React.FC<
 
             {/* Resultado do Teste (RÁDIO BUTTONS) */}
             <View style={styles.radioGroupContainer}>
-                <Text style={styles.label}>Resultado do Teste:</Text>
+                <Text style={styles.label}>{t("forms.coleta.testLabel")}</Text>
                 <View style={styles.radioGroupRow}>
                     {[
-                        { label: 'Aprovado', value: true },
-                        { label: 'Reprovado', value: false },
+                        { label: t("forms.coleta.approved"), value: true },
+                        { label: t("forms.coleta.rejected"), value: false },
                     ].map((item) => (
                         <TouchableOpacity
                             key={String(item.value)}
@@ -204,18 +206,18 @@ export const ColetaAddBottomSheet: React.FC<
             </View>
 
             {/* Observação */}
-            <Text style={styles.label}>Observações (Opcional)</Text>
+            <Text style={styles.label}>{t("forms.shared.notesLabel")}</Text>
             <TextInput
                 style={styles.inputBase}
                 value={observacao}
                 onChangeText={setObservacao}
                 multiline={true}
-                placeholder="Digite as observações (opcional)"/>
-        </View>  
+                placeholder={t("forms.shared.notesPlaceholder")}/>
+        </View>
 
         {/* Footer (Botão de ação) */}
         <View style={styles.footer}>
-            <YellowButton title="Registrar Coleta" onPress={handleSave} />
+            <YellowButton title={t("forms.coleta.submit")} onPress={handleSave} />
         </View>
 
         {/* Modal de Data */}

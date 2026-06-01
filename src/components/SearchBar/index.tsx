@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo, useRef, useState, useEffect } from "react";
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView } from "react-native";
 import BottomSheet, { BottomSheetScrollView, BottomSheetBackdrop } from "@gorhom/bottom-sheet";
+import { useTranslation } from "react-i18next";
 import { colors } from "../../styles/colors";
 import YellowButton from "../Button";
 import bufaloService from "../../services/bufaloService";
@@ -21,6 +22,7 @@ interface Props {
 }
 
 export default function FiltroRebanhoBottomSheet({ filtros, onFiltrar, onClose }: Props) {
+  const { t } = useTranslation("rebanho");
   const sheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ["50%", "70%"], []);
 
@@ -31,12 +33,30 @@ export default function FiltroRebanhoBottomSheet({ filtros, onFiltrar, onClose }
   const [maturidade, setMaturidade] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
 
-  const categorias = ["Sexo", "Raça", "Maturidade", "Status"];
-  const opcoes: Record<string, string[]> = {
-    Sexo: ["Macho", "Fêmea"],
-    Raça: racas.map((r) => r.nome),
-    Maturidade: ["Bezerro", "Novilha", "Vaca", "Touro"],
-    Status: ["Ativo", "Inativo"],
+  // Categorias e opções: `value` é o código estável (PT) usado na lógica/payload;
+  // `label` é apenas o texto traduzido exibido. Nunca comparar pelo label.
+  const categorias = [
+    { value: "Sexo", label: t("filter.categories.sexo") },
+    { value: "Raça", label: t("filter.categories.raca") },
+    { value: "Maturidade", label: t("filter.categories.maturidade") },
+    { value: "Status", label: t("filter.categories.status") },
+  ];
+  const opcoes: Record<string, { value: string; label: string }[]> = {
+    Sexo: [
+      { value: "Macho", label: t("filter.sex.male") },
+      { value: "Fêmea", label: t("filter.sex.female") },
+    ],
+    Raça: racas.map((r) => ({ value: r.nome, label: r.nome })),
+    Maturidade: [
+      { value: "Bezerro", label: t("maturity.B") },
+      { value: "Novilha", label: t("maturity.N") },
+      { value: "Vaca", label: t("maturity.V") },
+      { value: "Touro", label: t("maturity.T") },
+    ],
+    Status: [
+      { value: "Ativo", label: t("filter.status.active") },
+      { value: "Inativo", label: t("filter.status.inactive") },
+    ],
   };
 
   useEffect(() => {
@@ -89,46 +109,46 @@ export default function FiltroRebanhoBottomSheet({ filtros, onFiltrar, onClose }
     >
       <BottomSheetScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
         <View style={styles.header}>
-          <Text style={styles.title}>Filtros Avançados</Text>
+          <Text style={styles.title}>{t("filter.title")}</Text>
           <TouchableOpacity onPress={() => { setSexo(null); setRaca(null); setMaturidade(null); setStatus(null); }}>
-            <Text style={{ color: colors.status.error }}>Limpar</Text>
+            <Text style={{ color: colors.status.error }}>{t("filter.clear")}</Text>
           </TouchableOpacity>
         </View>
 
-        <Text style={styles.label}>CATEGORIAS</Text>
+        <Text style={styles.label}>{t("filter.categoriesLabel")}</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 20 }}>
           {categorias.map(cat => (
             <TouchableOpacity
-              key={cat}
-              style={[styles.chip, categoriaAtiva === cat && styles.chipAtivo]}
-              onPress={() => setCategoriaAtiva(cat)}
+              key={cat.value}
+              style={[styles.chip, categoriaAtiva === cat.value && styles.chipAtivo]}
+              onPress={() => setCategoriaAtiva(cat.value)}
             >
-              <Text style={[styles.chipText, categoriaAtiva === cat && styles.chipTextAtivo]}>{cat}</Text>
+              <Text style={[styles.chipText, categoriaAtiva === cat.value && styles.chipTextAtivo]}>{cat.label}</Text>
             </TouchableOpacity>
           ))}
         </ScrollView>
 
         <View style={styles.optionsGrid}>
           {opcoes[categoriaAtiva!]?.map(opcao => {
-            const isSel = [sexo, raca, maturidade, status].includes(opcao);
+            const isSel = [sexo, raca, maturidade, status].includes(opcao.value);
             return (
               <TouchableOpacity
-                key={opcao}
+                key={opcao.value}
                 style={[styles.opt, isSel && styles.optAtivo]}
                 onPress={() => {
-                  if (categoriaAtiva === "Sexo") setSexo(sexo === opcao ? null : opcao);
-                  if (categoriaAtiva === "Raça") setRaca(raca === opcao ? null : opcao);
-                  if (categoriaAtiva === "Maturidade") setMaturidade(maturidade === opcao ? null : opcao);
-                  if (categoriaAtiva === "Status") setStatus(status === opcao ? null : opcao);
+                  if (categoriaAtiva === "Sexo") setSexo(sexo === opcao.value ? null : opcao.value);
+                  if (categoriaAtiva === "Raça") setRaca(raca === opcao.value ? null : opcao.value);
+                  if (categoriaAtiva === "Maturidade") setMaturidade(maturidade === opcao.value ? null : opcao.value);
+                  if (categoriaAtiva === "Status") setStatus(status === opcao.value ? null : opcao.value);
                 }}
               >
-                <Text style={[styles.optText, isSel && styles.optTextAtivo]}>{opcao}</Text>
+                <Text style={[styles.optText, isSel && styles.optTextAtivo]}>{opcao.label}</Text>
               </TouchableOpacity>
             );
           })}
         </View>
 
-        <YellowButton title="Aplicar Filtros" onPress={aplicar} />
+        <YellowButton title={t("filter.apply")} onPress={aplicar} />
       </BottomSheetScrollView>
     </BottomSheet>
   );

@@ -1,0 +1,25 @@
+{
+  "starting": "Starting the scanner...",
+  "approach": "Bring the tag close to the reader...",
+  "reading": "Microchip {{microchip}} read. Searching animal...",
+  "found": "Buffalo found! Redirecting...",
+  "notFound": "Microchip {{microchip}} not found. Keep reading...",
+  "searchError": "Error searching the animal. Keep reading...",
+  "timeout": "Timed out or cancelled. Trying again...",
+  "criticalError": "Critical NFC error. Stopping.",
+  "unavailable": "NFC unavailable or disabled on this device.",
+  "waiting": "Waiting for approach...",
+  "initError": "Initialization error. Check the permissions.",
+  "title": "NFC Scanning",
+  "finish": "Finish and Go Back",
+  "input": {
+    "scanning": "Reading RFID tag…",
+    "scan": "Read RFID tag",
+    "wrongAnimalTitle": "Wrong animal",
+    "wrongAnimalMessage": "Tag {{brinco}}: this animal is {{encontrado}}, but the field expects {{esperado}}.",
+    "notFoundTitle": "Not found",
+    "notFoundMessage": "No animal with microchip {{microchip}} found. Sync the data or check the tag.",
+    "male": "male",
+    "female": "female"
+  }
+}

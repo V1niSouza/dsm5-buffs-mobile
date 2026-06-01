@@ -1,0 +1,34 @@
+{
+  "propriedades": {
+    "title": "Propriedades",
+    "selectTitle": "Selecionar propriedade",
+    "selectPlaceholder": "Selecione uma propriedade"
+  },
+  "dashboard": {
+    "title": "Resumo do Rebanho",
+    "activeCount": "{{total}} búfalos ativos",
+    "males": "♂ Machos",
+    "females": "♀ Fêmeas",
+    "maturityDistribution": "Distribuição por Maturidade",
+    "milkStock": "Estoque de Leite (L)",
+    "noData": "Sem registros ainda"
+  },
+  "maturity": {
+    "calvesShort": "Bez.",
+    "heifersShort": "Nov.",
+    "cowsShort": "Vac.",
+    "bullsShort": "Tou.",
+    "calves": "Bezerros",
+    "heifers": "Novilhas",
+    "cows": "Vacas",
+    "bulls": "Touros"
+  },
+  "sync": {
+    "syncing": "Sincronizando...",
+    "downloadData": "Baixar dados da propriedade",
+    "syncData": "Sincronizar dados",
+    "done": "✓ Concluído",
+    "failedRetry": "⚠ Falha — Toque para tentar novamente",
+    "downloading": "Baixando dados... {{percent}}%"
+  }
+}

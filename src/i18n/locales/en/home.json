@@ -1,0 +1,34 @@
+{
+  "propriedades": {
+    "title": "Properties",
+    "selectTitle": "Select property",
+    "selectPlaceholder": "Select a property"
+  },
+  "dashboard": {
+    "title": "Herd Summary",
+    "activeCount": "{{total}} active buffaloes",
+    "males": "♂ Males",
+    "females": "♀ Females",
+    "maturityDistribution": "Distribution by Maturity",
+    "milkStock": "Milk Stock (L)",
+    "noData": "No records yet"
+  },
+  "maturity": {
+    "calvesShort": "Calf",
+    "heifersShort": "Heif.",
+    "cowsShort": "Cow",
+    "bullsShort": "Bull",
+    "calves": "Calves",
+    "heifers": "Heifers",
+    "cows": "Cows",
+    "bulls": "Bulls"
+  },
+  "sync": {
+    "syncing": "Syncing...",
+    "downloadData": "Download property data",
+    "syncData": "Sync data",
+    "done": "✓ Done",
+    "failedRetry": "⚠ Failed — Tap to retry",
+    "downloading": "Downloading data... {{percent}}%"
+  }
+}

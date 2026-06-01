@@ -1,0 +1,110 @@
+{
+  "header": "REPRODUCTION",
+  "updating": "Updating reproductions...",
+  "empty": "No records found",
+  "dash": {
+    "title": "Reproductive Summary",
+    "subtitle": "Tracking of coverings and inseminations",
+    "inProcess": "In process",
+    "confirmed": "Confirmed",
+    "completed": "Completed",
+    "failures": "Failures",
+    "updatedAt": "Updated on {{date}}"
+  },
+  "card": {
+    "noId": "No identification",
+    "sire": "Sire:",
+    "inseminationLabel": "Insemination:",
+    "crossingLabel": "Crossing:",
+    "resultLabel": "Result:",
+    "materialLabel": "Material",
+    "status": {
+      "inProgress": "In progress",
+      "confirmed": "Confirmed",
+      "completed": "Completed",
+      "failed": "Failed"
+    },
+    "result": {
+      "failed": "No, failed",
+      "pregnant": "Pregnant",
+      "tracking": "Tracking",
+      "success": "Success",
+      "birth": "Birth {{tipo}}"
+    }
+  },
+  "forms": {
+    "shared": {
+      "alertError": "Error",
+      "alertSuccess": "Success",
+      "cancel": "Cancel",
+      "nfcPlaceholder": "Type or read via RFID"
+    },
+    "add": {
+      "title": "New Reproduction",
+      "typeSection": "Insemination Type",
+      "typeSelect": "Select the Insemination Type",
+      "animalsSection": "Animals",
+      "maleTag": "Male Buffalo Tag",
+      "femaleTag": "Buffalo (female) Tag",
+      "femaleReceptorNatural": "(Receptor Female)",
+      "femaleReceptorOther": "(Receptor/Carrier)",
+      "geneticSection": "Genetic Material",
+      "semenLabel": "Semen",
+      "noSemen": "No semen registered — sync first.",
+      "semenSelect": "Select Semen",
+      "semenPlaceholder": "Select the Semen",
+      "embryoLabel": "Embryo",
+      "noEmbryo": "No embryo registered — sync first.",
+      "embryoSelect": "Select Embryo",
+      "embryoPlaceholder": "Select the Embryo",
+      "donor": "Donor: {{nome}}",
+      "submit": "Save Reproduction",
+      "types": {
+        "iatf": "IATF",
+        "ia": "AI (Artificial Insemination)",
+        "te": "ET (Embryo Transfer)",
+        "natural": "Natural Mating"
+      },
+      "toast": {
+        "noProperty": "Select an active property before registering.",
+        "missingFields": "Fill in the Buffalo Tag and the Insemination Type.",
+        "semenRequired": "{{tipo}} requires selecting a Semen.",
+        "embryoRequired": "ET requires selecting an Embryo.",
+        "maleRequired": "The Male Buffalo is required for Natural Mating.",
+        "femaleNotFound": "Receptor buffalo (Tag: {{tag}}) not found or is not female.",
+        "maleNotFound": "Male buffalo (Tag: {{tag}}) not found or is not male.",
+        "success": "Reproduction registered successfully!",
+        "validationFail": "Animal validation failed. Check tag {{tag}}.",
+        "error": "Could not register the reproduction. Check the data."
+      }
+    },
+    "att": {
+      "title": "Update Reproduction",
+      "detailsSection": "Details",
+      "eventDate": "Event Date",
+      "statusLabel": "Status:",
+      "statusSelect": "Select the Status",
+      "birthTypeLabel": "Birth Type:",
+      "birthTypeSelect": "Select the Birth Type",
+      "submit": "Save",
+      "status": {
+        "inProgress": "In progress",
+        "confirmed": "Confirmed (Pregnant)",
+        "completed": "Completed (Birth)",
+        "failed": "Failed"
+      },
+      "birthType": {
+        "normal": "Normal",
+        "cesarean": "Cesarean",
+        "abortion": "Abortion"
+      },
+      "toast": {
+        "noProperty": "Property not selected.",
+        "birthTypeRequired": "To complete the reproduction, the birth type is required.",
+        "birthSuccess": "Birth recorded successfully!",
+        "updateSuccess": "Reproduction updated successfully!",
+        "error": "Error updating reproduction."
+      }
+    }
+  }
+}

@@ -33,6 +33,7 @@ import Plus from '../../assets/images/plus.svg';
 import { FloatingAction } from "react-native-floating-action";
 import RotateLeftIcon from "../icons/arrow";
 import { MovimentacaoSheet } from "../components/MovimentacaoSheet";
+import { useTranslation } from "react-i18next";
 
 type RouteProps = RouteProp<RootStackParamList, "GrupoDetailScreen">;
 
@@ -47,31 +48,34 @@ interface StatsRowProps {
   nomeLote: string;
 }
 
-const StatsRow = ({ total, qtdMax, ocupacao, nomeLote }: StatsRowProps) => (
+const StatsRow = ({ total, qtdMax, ocupacao, nomeLote }: StatsRowProps) => {
+  const { t } = useTranslation("piquetes");
+  return (
   <View style={styles.statsRow}>
     <View style={styles.statItem}>
       <Text style={styles.statValue}>{total}</Text>
-      <Text style={styles.statLabel}>Animais</Text>
+      <Text style={styles.statLabel}>{t("detail.stats.animals")}</Text>
     </View>
     <View style={styles.statDivider} />
     <View style={styles.statItem}>
       <Text style={styles.statValue}>{qtdMax || "—"}</Text>
-      <Text style={styles.statLabel}>Capacidade</Text>
+      <Text style={styles.statLabel}>{t("detail.stats.capacity")}</Text>
     </View>
     <View style={styles.statDivider} />
     <View style={styles.statItem}>
       <Text style={[styles.statValue, ocupacao >= 90 && { color: colors.status.error }]}>
         {ocupacao}%
       </Text>
-      <Text style={styles.statLabel}>Ocupação</Text>
+      <Text style={styles.statLabel}>{t("detail.stats.occupancy")}</Text>
     </View>
     <View style={styles.statDivider} />
     <View style={[styles.statItem, { flex: 1.6 }]}>
-      <Text style={styles.statValue} numberOfLines={1}>{nomeLote || "Sem piquete"}</Text>
-      <Text style={styles.statLabel}>Piquete</Text>
+      <Text style={styles.statValue} numberOfLines={1}>{nomeLote || t("detail.stats.noPaddock")}</Text>
+      <Text style={styles.statLabel}>{t("detail.stats.paddock")}</Text>
     </View>
   </View>
-);
+  );
+};
 
 interface LoteMapSectionProps {
   lotes: Piquete[];
@@ -100,6 +104,7 @@ const LoteMapSection = ({
   onDownloadTiles,
   getTile,
 }: LoteMapSectionProps) => {
+  const { t } = useTranslation("piquetes");
   const lotesDoGrupo = useMemo(
     () => lotes.filter((l) => l.idGrupo === grupoId),
     [lotes, grupoId],
@@ -130,7 +135,7 @@ const LoteMapSection = ({
 
   return (
     <View style={styles.section}>
-      <Text style={styles.sectionTitle}>PIQUETE DO GRUPO</Text>
+      <Text style={styles.sectionTitle}>{t("detail.map.title")}</Text>
 
       {canShowMap ? (
         <View style={styles.mapContainer}>
@@ -145,10 +150,10 @@ const LoteMapSection = ({
         <View style={styles.mapPlaceholder}>
           <Text style={styles.mapPlaceholderText}>
             {!isOnline
-              ? "Mapa indisponível offline\nBaixe o mapa enquanto tiver conexão"
+              ? t("detail.map.offlineUnavailable")
               : lotesDoGrupo.length > 0
-              ? "Piquete sem geometria definida"
-              : "Grupo sem piquete associado"}
+              ? t("detail.map.noGeometry")
+              : t("detail.map.noPaddockAssociated")}
           </Text>
         </View>
       )}
@@ -161,15 +166,15 @@ const LoteMapSection = ({
               <View style={[styles.tileFill, { width: `${Math.round(tileProgress * 100)}%` as any }]} />
             </View>
             <Text style={styles.tileBarLabel}>
-              Salvando mapa offline… {Math.round(tileProgress * 100)}%
+              {t("detail.map.saving", { pct: Math.round(tileProgress * 100) })}
             </Text>
           </View>
         ) : (
           <TouchableOpacity style={styles.tileBar} onPress={onDownloadTiles} activeOpacity={0.7}>
             <Text style={styles.tileBarLabel}>
               {tilesDownloadDate
-                ? `🗺 Mapa salvo — Atualizar${estMB ? ` (~${estMB} MB)` : ''}`
-                : `⬇ Salvar mapa offline${estMB ? ` (~${estMB} MB)` : ''}`}
+                ? `${t("detail.map.saved")}${estMB ? t("detail.map.mbSuffix", { mb: estMB }) : ''}`
+                : `${t("detail.map.save")}${estMB ? t("detail.map.mbSuffix", { mb: estMB }) : ''}`}
             </Text>
           </TouchableOpacity>
         )
@@ -183,7 +188,7 @@ const LoteMapSection = ({
             <View style={styles.loteHeader}>
               <Text style={styles.loteNome}>{loteAtual.nome}</Text>
               <View style={[styles.chip, { backgroundColor: colors.status.successBg }]}>
-                <Text style={[styles.chipText, { color: colors.status.successText }]}>Em uso</Text>
+                <Text style={[styles.chipText, { color: colors.status.successText }]}>{t("detail.inUse")}</Text>
               </View>
             </View>
 
@@ -208,7 +213,7 @@ const LoteMapSection = ({
               )}
               {Number(loteAtual.qtdMax) > 0 && (
                 <View style={styles.chip}>
-                  <Text style={styles.chipText}>Cap. {loteAtual.qtdMax} animais</Text>
+                  <Text style={styles.chipText}>{t("detail.capacityAnimals", { qtd: loteAtual.qtdMax })}</Text>
                 </View>
               )}
             </View>
@@ -216,7 +221,7 @@ const LoteMapSection = ({
         </View>
       ) : (
         <View style={styles.loteInfoCard}>
-          <Text style={styles.emptyText}>Grupo sem piquete associado</Text>
+          <Text style={styles.emptyText}>{t("detail.map.noPaddockAssociated")}</Text>
         </View>
       )}
     </View>
@@ -232,6 +237,7 @@ export const GrupoDetailScreen = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { grupoId, nomeGrupo, color } = route.params;
   const { propriedadeSelecionada } = usePropriedade();
+  const { t } = useTranslation("piquetes");
 
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -373,10 +379,10 @@ export const GrupoDetailScreen = () => {
   }
 
   const maturidadeMap: Record<string, string> = {
-    B: "Bezerro",
-    N: "Novilha",
-    T: "Touro",
-    V: "Vaca",
+    B: t("detail.maturity.B"),
+    N: t("detail.maturity.N"),
+    T: t("detail.maturity.T"),
+    V: t("detail.maturity.V"),
   };
 
   const ListHeader = (
@@ -407,7 +413,7 @@ export const GrupoDetailScreen = () => {
       {/* Título da lista de animais */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>
-          ANIMAIS DO GRUPO
+          {t("detail.animalsTitle")}
           <Text style={styles.sectionCount}> ({totalBufalos})</Text>
         </Text>
       </View>
@@ -423,7 +429,7 @@ export const GrupoDetailScreen = () => {
             <ArrowLeftIcon width={24} height={24} />
           </TouchableOpacity>
           <Text style={[styles.header1Text, { flex: 1 }]} numberOfLines={1} ellipsizeMode="tail">
-            GRUPO: {nomeGrupo || 'N/A'}
+            {t("detail.groupTitle", { nome: nomeGrupo || 'N/A' })}
           </Text>
         </View>
       </View>
@@ -443,7 +449,7 @@ export const GrupoDetailScreen = () => {
         ListHeaderComponent={ListHeader}
         renderItem={({ item }) => (
           <CardBufalo
-            nome={item.nome ?? "Sem nome"}
+            nome={item.nome ?? t("detail.noName")}
             brinco={item.brinco ?? "—"}
             status={item.status === true || item.status === 1}
             sexo={item.sexo ?? "F"}
@@ -453,14 +459,14 @@ export const GrupoDetailScreen = () => {
           />
         )}
         ListEmptyComponent={
-          <Text style={styles.emptyText}>Nenhum animal neste grupo</Text>
+          <Text style={styles.emptyText}>{t("detail.emptyAnimals")}</Text>
         }
         onEndReached={onLoadMore}
         onEndReachedThreshold={0.3}
         ListFooterComponent={
           loadingMore ? (
             <View style={styles.footerLoader}>
-              <Text style={styles.footerLoaderText}>Carregando mais...</Text>
+              <Text style={styles.footerLoaderText}>{t("detail.loadingMore")}</Text>
             </View>
           ) : null
         }
@@ -470,7 +476,7 @@ export const GrupoDetailScreen = () => {
       <FloatingAction
         actions={[
           {
-            text: "Mover Grupo",
+            text: t("detail.moveGroup"),
             icon: <Mov width={20} height={20}/>,
             name: "mover_grupo",
             color: colors.brand.primary,

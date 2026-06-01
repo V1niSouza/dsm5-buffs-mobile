@@ -6,6 +6,8 @@ import {
   StyleSheet,
 } from "react-native";
 
+import { useTranslation } from "react-i18next";
+
 import { colors } from "../../styles/colors";
 import IconBuffs from "../../icons/agroCore";
 
@@ -44,9 +46,19 @@ const normalizeStatus = (
 export const CardReproducao: React.FC<
   CardReproducaoProps
 > = ({ reproducao, onPress }) => {
+  const { t } = useTranslation("reproducao");
+  // `status` é o código estável (igual ao valor da API) — usado como chave de map.
   const status = normalizeStatus(
     reproducao.status
   );
+
+  // Rótulo só de exibição, derivado do código estável.
+  const statusLabels: Record<StatusType, string> = {
+    "Em andamento": t("card.status.inProgress"),
+    "Confirmada": t("card.status.confirmed"),
+    "Concluída": t("card.status.completed"),
+    "Falhou": t("card.status.failed"),
+  };
 
   const statusColors: Record<
     StatusType,
@@ -96,14 +108,14 @@ export const CardReproducao: React.FC<
 
   const concluidaValue =
     status === "Falhou"
-      ? "Não, falhou"
+      ? t("card.result.failed")
       : status === "Concluída"
       ? reproducao.tipo_parto
-        ? `Parto ${reproducao.tipo_parto.toLowerCase()}`
-        : "Sucesso"
+        ? t("card.result.birth", { tipo: reproducao.tipo_parto.toLowerCase() })
+        : t("card.result.success")
       : status === "Confirmada"
-      ? "Prenha"
-      : "Acompanhamento";
+      ? t("card.result.pregnant")
+      : t("card.result.tracking");
 
   return (
     <TouchableOpacity
@@ -126,12 +138,12 @@ export const CardReproducao: React.FC<
           <View style={styles.info}>
             <Text style={styles.title}>
               {reproducao.brincoBufala ||
-                "Sem identificação"}
+                t("card.noId")}
             </Text>
 
             {!!reproducao.brincoTouro && (
               <Text style={styles.subtitle}>
-                Reprodutor:{" "}
+                {t("card.sire")}{" "}
                 {
                   reproducao.brincoTouro
                 }
@@ -149,7 +161,7 @@ export const CardReproducao: React.FC<
             ]}
           >
             <Text style={styles.statusText}>
-              {status}
+              {statusLabels[status]}
             </Text>
           </View>
         </View>
@@ -157,7 +169,7 @@ export const CardReproducao: React.FC<
         <View style={styles.details}>
           <View style={styles.detailItem}>
             <Text style={styles.detailLabel}>
-              Inseminação:
+              {t("card.inseminationLabel")}
             </Text>
 
             <Text style={styles.detailValue}>
@@ -166,7 +178,7 @@ export const CardReproducao: React.FC<
             </Text>
 
             <Text style={styles.detailLabel}>
-              Cruzamento:
+              {t("card.crossingLabel")}
             </Text>
 
             <Text style={styles.detailValue}>
@@ -177,7 +189,7 @@ export const CardReproducao: React.FC<
 
           <View style={styles.detailItemFoolter}>
             <Text style={styles.detailLabel}>
-              Resultado:
+              {t("card.resultLabel")}
             </Text>
 
             <Text style={styles.detailValue}>
@@ -190,7 +202,7 @@ export const CardReproducao: React.FC<
               <Text
                 style={styles.detailLabel}
               >
-                Material
+                {t("card.materialLabel")}
               </Text>
 
               <Text

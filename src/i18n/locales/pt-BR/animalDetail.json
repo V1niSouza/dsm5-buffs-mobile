@@ -1,0 +1,51 @@
+{
+  "notFound": "Animal não encontrado.\nVerifique a sincronização e tente novamente.",
+  "title": "Prontuário: {{brinco}}",
+  "tabs": {
+    "info": "Informações",
+    "zootechnical": "Zootécnico",
+    "health": "Sanitário"
+  },
+  "emptyZootechnical": "Nenhum registro Zootécnico encontrado.",
+  "emptyHealth": "Nenhum registro Sanitário encontrado.",
+  "card": {
+    "noName": "Sem Nome",
+    "tagLabel": "Brinco Nº",
+    "active": "Animal ativo",
+    "inactive": "Animal inativo",
+    "baseData": "Dados Base",
+    "birth": "Nascimento",
+    "sex": "Sexo",
+    "male": "Macho",
+    "female": "Fêmea",
+    "breed": "Raça",
+    "maturity": "Maturidade",
+    "lineage": "Linhagem",
+    "father": "Pai",
+    "mother": "Mãe",
+    "currentGroup": "Grupo atual",
+    "selectGroup": "Selecionar Grupo",
+    "noGroup": "Sem grupo",
+    "location": "Localização:",
+    "maturityLabels": {
+      "B": "Bezerro",
+      "N": "Novilha",
+      "T": "Touro",
+      "V": "Vaca"
+    },
+    "selectedGroupFallback": "o grupo selecionado",
+    "movedSuccess": "Movido para o grupo \"{{nome}}\"!",
+    "changeGroupError": "Não foi possível alterar o grupo.",
+    "confirmGroupTitle": "Confirmar Mudança de Grupo",
+    "confirmGroupMessage": "Deseja mover o animal para \"{{nome}}\"?",
+    "move": "Mover",
+    "statusTitle": "Alterar status",
+    "statusMessage": "Deseja mudar o status para {{status}}?",
+    "statusActive": "ATIVO",
+    "statusInactive": "INATIVO",
+    "activate": "Ativar",
+    "deactivate": "Inativar",
+    "alertSuccess": "Sucesso",
+    "alertError": "Erro"
+  }
+}

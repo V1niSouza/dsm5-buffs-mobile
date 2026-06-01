@@ -1,0 +1,107 @@
+{
+  "header": "LACTAÇÃO",
+  "updating": "Atualizando lactação...",
+  "empty": "Nenhum registro encontrado",
+  "notAvailable": "N/D",
+  "fab": {
+    "updateStock": "Atualizar Estoque",
+    "registerCollection": "Registrar Coleta"
+  },
+  "dash": {
+    "title": "Produção de Leite",
+    "subtitle": "Resumo geral da lactação",
+    "totalProduced": "Total produzido",
+    "lactatingCows": "Vacas lactando",
+    "inProduction": "em produção",
+    "updatedAt": "Atualizado em {{date}}"
+  },
+  "card": {
+    "noName": "Sem nome",
+    "tag": "Brinco Nº {{brinco}}",
+    "statusLactating": "Em Lactação",
+    "statusDry": "Seca",
+    "breedLabel": "Raça:",
+    "cycleLabel": "Ciclo:",
+    "daysLabel": "Dias Lactação:",
+    "endLactation": "Encerrar lactação"
+  },
+  "confirmDry": {
+    "title": "Confirmar Secagem",
+    "message": "Deseja marcar {{nome}} como seca?",
+    "confirm": "Sim, Secar",
+    "cancel": "Cancelar"
+  },
+  "forms": {
+    "shared": {
+      "saving": "Salvando...",
+      "alertError": "Erro",
+      "alertSuccess": "Sucesso",
+      "notesLabel": "Observações (Opcional)",
+      "notesPlaceholder": "Digite as observações (opcional)",
+      "noProperty": "ID da propriedade não encontrado."
+    },
+    "estoque": {
+      "title": "Atualizar Estoque de Leite",
+      "section": "Detalhes do Estoque",
+      "quantityLabel": "Quantidade de Leite (Litros)",
+      "quantityPlaceholder": "Digite a quantidade de leite no estoque",
+      "dateLabel": "Data Registro:",
+      "submit": "Salvar no Estoque",
+      "toast": {
+        "noUser": "ID do usuário não encontrado. Faça login novamente.",
+        "invalidQuantity": "Informe uma quantidade de estoque válida.",
+        "success": "Estoque registrado com sucesso!",
+        "error": "Não foi possível registrar o estoque."
+      }
+    },
+    "coleta": {
+      "title": "Registro de Coleta",
+      "section": "Dados da Coleta",
+      "industryLabel": "Indústria:",
+      "industrySelectTitle": "Selecionar Industria",
+      "industryPlaceholder": "Selecione uma indústria",
+      "quantityLabel": "Quantidade Coletada (L)",
+      "quantityPlaceholder": "Digite a quantidade coletada (L)",
+      "dateLabel": "Data Coleta:",
+      "testLabel": "Resultado do Teste:",
+      "approved": "Aprovado",
+      "rejected": "Reprovado",
+      "submit": "Registrar Coleta",
+      "toast": {
+        "noIndustry": "Selecione a indústria.",
+        "invalidQuantity": "Informe uma quantidade coletada válida.",
+        "noTestResult": "Informe o resultado do teste.",
+        "success": "Coleta registrada com sucesso!",
+        "error": "Não foi possível registrar a coleta."
+      }
+    },
+    "lactacao": {
+      "title": "Novo Registro de Lactação",
+      "tagLabel": "BRINCO BÚFALA:",
+      "section": "Detalhes da Ordenha",
+      "quantityLabel": "Quantidade de Ordenha (L)",
+      "quantityPlaceholder": "Digite a quantidade ordenhada",
+      "periodLabel": "Período:",
+      "morning": "Manhã",
+      "afternoon": "Tarde",
+      "dateLabel": "Data Ordenha:",
+      "occurrenceLabel": "Ocorrência (Opcional)",
+      "occurrencePlaceholder": "Digite alguma observação",
+      "submit": "Registrar Lactação",
+      "toast": {
+        "invalidQuantity": "Informe uma quantidade de ordenha válida.",
+        "noPeriod": "Selecione o período da ordenha.",
+        "noBuffalo": "ID da búfala não encontrado.",
+        "noCycle": "Ciclo de lactação não encontrado. Tente recarregar a tela.",
+        "success": "Lactação registrada com sucesso!",
+        "error": "Não foi possível registrar a lactação."
+      }
+    }
+  },
+  "table": {
+    "tag": "Brinco",
+    "name": "Nome",
+    "breed": "Raça",
+    "seeMore": "Ver Mais"
+  }
+}

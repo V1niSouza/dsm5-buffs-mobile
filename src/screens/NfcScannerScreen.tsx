@@ -7,6 +7,7 @@ import Button from '../components/Button';
 import { colors } from '../styles/colors'; 
 import bufaloService from '../services/bufaloService';
 import { usePropriedade } from '../context/PropriedadeContext';
+import { useTranslation } from 'react-i18next';
 
 
 type RootStackParamList = {
@@ -17,9 +18,10 @@ type RootStackParamList = {
 export const NfcScannerScreen = () => {
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
     const { propriedadeSelecionada } = usePropriedade();
+    const { t } = useTranslation("nfc");
 
     const [lidas, setLidas] = useState<string[]>([]);
-    const [statusText, setStatusText] = useState("Iniciando o scanner...");
+    const [statusText, setStatusText] = useState(t("starting"));
     
     const isScanningRef = useRef(false);
 
@@ -37,7 +39,7 @@ export const NfcScannerScreen = () => {
         if (!isScanningRef.current) return; 
 
         try {
-            setStatusText("Aproxime o brinco do leitor...");
+            setStatusText(t("approach"));
             
             await NfcManager.requestTechnology(NfcTech.NfcA);
             const tag = await NfcManager.getTag();
@@ -45,7 +47,7 @@ export const NfcScannerScreen = () => {
             if (tag?.id) {
                 const microchip = tag.id.toUpperCase();
                 console.log(`✅ TAG CAPTURADA: ${microchip}`);
-                setStatusText(`Microchip ${microchip} lido. Pesquisando animal...`);
+                setStatusText(t("reading", { microchip }));
                 try {
                     const bufalo = await bufaloService.getBufaloPorMicrochip(microchip);
 
@@ -54,16 +56,16 @@ export const NfcScannerScreen = () => {
                     
                     const bufaloId = bufalo?.id ?? bufalo?.idBufalo;
                     if (bufalo && bufaloId) {
-                        setStatusText(`Búfalo encontrado! Redirecionando...`);
+                        setStatusText(t("found"));
 
                         navigation.replace("AnimalDetail", { id: bufaloId });
                         return; 
                     } else {
-                        setStatusText(`Microchip ${microchip} não encontrado. Continue lendo...`);
+                        setStatusText(t("notFound", { microchip }));
                     }
                 } catch (searchError) {
                     console.error("Erro ao pesquisar búfalo após leitura:", searchError);
-                    setStatusText(`Erro ao buscar o animal. Continue lendo...`);
+                    setStatusText(t("searchError"));
                 }
                 
                 setLidas((prev) => {
@@ -82,14 +84,14 @@ export const NfcScannerScreen = () => {
             
             if (errorString.includes('cancelled') || errorString.includes('timeout')) {
                 if (isScanningRef.current) {
-                    setStatusText("Tempo esgotado ou cancelado. Tentando novamente...");
+                    setStatusText(t("timeout"));
                     lerProximaTag(); 
                 } else {
                     console.log("Ciclo de leitura finalizado.");
                 }
                 return;
             }
-            setStatusText("Erro crítico no NFC. Parando.");
+            setStatusText(t("criticalError"));
             isScanningRef.current = false;
         }
     };
@@ -103,18 +105,18 @@ export const NfcScannerScreen = () => {
                 const enabled = await NfcManager.isEnabled();
 
                 if (!supported || !enabled) {
-                    setStatusText("NFC não disponível ou desativado neste dispositivo.");
+                    setStatusText(t("unavailable"));
                     isScanningRef.current = false;
                     return;
                 }
                 
                 setLidas([]);
-                setStatusText("Aguardando aproximação...");
+                setStatusText(t("waiting"));
                 lerProximaTag(); 
 
             } catch (err) {
                 console.error("Erro fatal ao iniciar NFC:", err);
-                setStatusText("Erro de inicialização. Verifique as permissões.");
+                setStatusText(t("initError"));
                 isScanningRef.current = false;
             }
         };
@@ -133,7 +135,7 @@ export const NfcScannerScreen = () => {
     return (
         <View style={styles.container}>
             <View style={styles.content}>
-                <Text style={styles.title}>Escaneamento NFC</Text>
+                <Text style={styles.title}>{t("title")}</Text>
                 <Text style={styles.status}>{statusText}</Text>
                 
                 {lidas.length === 0 && isScanningRef.current && (
@@ -141,7 +143,7 @@ export const NfcScannerScreen = () => {
                 )}
 
                 <Button 
-                    title="Finalizar e Voltar" 
+                    title={t("finish")} 
                     onPress={finalizarScanner} 
                 />
             </View>

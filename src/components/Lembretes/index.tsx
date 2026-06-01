@@ -41,6 +41,7 @@ import {
 import {
   ConfirmModal,
 } from "../ModalStatus";
+import { useTranslation } from "react-i18next";
 
 type MainTabParamList = {
   Home: undefined;
@@ -73,6 +74,9 @@ export default function AlertasPendentes({
 
   const [filtro, setFiltro] =
     useState<Filtro>("PENDENTES");
+
+  const { t } = useTranslation("alertas");
+  const { t: tc } = useTranslation("common");
 
   const [alertas, setAlertas] =
     useState<Alerta[]>([]);
@@ -344,7 +348,7 @@ export default function AlertasPendentes({
               </View>
               {item.visto && (
                 <View style={styles.vistoBadge}>
-                  <Text style={styles.vistoText}>✓ Visto</Text>
+                  <Text style={styles.vistoText}>{t("seen")}</Text>
                 </View>
               )}
             </View>
@@ -361,7 +365,7 @@ export default function AlertasPendentes({
                 }}
               >
                 <Text style={styles.resolveText}>
-                  Marcar visto
+                  {t("markSeen")}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -375,7 +379,7 @@ export default function AlertasPendentes({
     <View style={{ flex: 1 }}>
       <ConfirmModal
         visible={modalVisible}
-        title="Resolver alerta?"
+        title={t("resolveTitle")}
         message={
           alertaSelecionado?.motivo ||
           ""
@@ -384,8 +388,8 @@ export default function AlertasPendentes({
         onCancel={() =>
           setModalVisible(false)
         }
-        confirmText="Confirmar"
-        cancelText="Cancelar"
+        confirmText={tc("actions.confirm")}
+        cancelText={tc("actions.cancel")}
         variant="success"
       />
 
@@ -394,12 +398,12 @@ export default function AlertasPendentes({
           tabs={[
             {
               key: "TODOS",
-              label: "Todas",
+              label: t("tabs.all"),
             },
 
             {
               key: "PENDENTES",
-              label: "Não vistas",
+              label: t("tabs.unseen"),
             },
           ]}
           activeTab={filtro}

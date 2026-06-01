@@ -1,0 +1,9 @@
+{
+  "resolveTitle": "Resolver alerta?",
+  "seen": "✓ Visto",
+  "markSeen": "Marcar visto",
+  "tabs": {
+    "all": "Todas",
+    "unseen": "Não vistas"
+  }
+}

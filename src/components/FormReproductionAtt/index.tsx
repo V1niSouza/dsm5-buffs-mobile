@@ -14,7 +14,8 @@ import BottomSheet, {
   BottomSheetScrollView,
 } from "@gorhom/bottom-sheet";
 import DropDownPicker from "react-native-dropdown-picker";
-import "dayjs/locale/pt-br"; 
+import "dayjs/locale/pt-br";
+import { useTranslation } from "react-i18next";
 import { usePropriedade } from "../../context/PropriedadeContext";
 import { colors } from "../../styles/colors";
 import { updateReproducao, ReproducaoUpdatePayload, createCicloLactacao, registrarParto } from "../../services/reproducaoService";
@@ -31,6 +32,7 @@ interface ReproducaoAttBottomSheetProps {
 export const ReproducaoAttBottomSheet: React.FC<
   ReproducaoAttBottomSheetProps
 > = ({ initialData, onClose, onSuccess }) => {
+  const { t } = useTranslation("reproducao");
   const sheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ["50%", "70%"], []); 
   const { propriedadeSelecionada } = usePropriedade();
@@ -46,19 +48,20 @@ export const ReproducaoAttBottomSheet: React.FC<
   const zIndexParto = openParto ? 200 : 90;
 
   // Mapeamentos para DropDownPicker (Inalterado)
+  // `value` é enviado à API e usado em comparações — NÃO traduzir; só o `label`.
   const statusItems = useMemo(() => [
-    { label: "Em andamento", value: "Em andamento" },
-    { label: "Confirmada (Prenha)", value: "Confirmada" },
-    { label: "Concluída (Parto)", value: "Concluida" },
-    { label: "Falhou", value: "Falhou" },
-  ], []);
+    { label: t("forms.att.status.inProgress"), value: "Em andamento" },
+    { label: t("forms.att.status.confirmed"), value: "Confirmada" },
+    { label: t("forms.att.status.completed"), value: "Concluida" },
+    { label: t("forms.att.status.failed"), value: "Falhou" },
+  ], [t]);
 
 
   const partoItems = useMemo(() => [
-    { label: "Normal", value: "Normal" },
-    { label: "Cesárea", value: "Cesárea" },
-    { label: "Aborto", value: "Aborto" },
-  ], []);
+    { label: t("forms.att.birthType.normal"), value: "Normal" },
+    { label: t("forms.att.birthType.cesarean"), value: "Cesárea" },
+    { label: t("forms.att.birthType.abortion"), value: "Aborto" },
+  ], [t]);
 
   const handleChange = (field: "status" | "tipo_parto", value: string) => {
     setForm({ ...form, [field]: value });
@@ -77,21 +80,21 @@ export const ReproducaoAttBottomSheet: React.FC<
     if (RNPlatform.OS === "android") {
       ToastAndroid.show(message, ToastAndroid.LONG);
     } else {
-      Alert.alert(isError ? "Erro" : "Sucesso", message);
+      Alert.alert(isError ? t("forms.shared.alertError") : t("forms.shared.alertSuccess"), message);
     }
   };
 
 
   const handleSave = async () => {
     if (!propriedadeSelecionada) {
-      return showToast("Propriedade não selecionada.", true);
+      return showToast(t("forms.att.toast.noProperty"), true);
     }
 
     const reproducaoId = initialData.id;
 
     if (form.status === "Concluida" && !form.tipo_parto) {
       return showToast(
-        "Para concluir a reprodução, o tipo de parto é obrigatório.",
+        t("forms.att.toast.birthTypeRequired"),
         true
       );
     }
@@ -109,7 +112,7 @@ export const ReproducaoAttBottomSheet: React.FC<
           padrao_dias_lactacao: 305,
         });
 
-        showToast("Parto registrado com sucesso!");
+        showToast(t("forms.att.toast.birthSuccess"));
         onSuccess();
         onClose();
         return;
@@ -119,13 +122,13 @@ export const ReproducaoAttBottomSheet: React.FC<
         status: form.status,
       });
 
-      showToast("Reprodução atualizada com sucesso!");
+      showToast(t("forms.att.toast.updateSuccess"));
       onSuccess();
       onClose();
     } catch (error: any) {
       console.error("Erro ao atualizar reprodução:", error);
       showToast(
-        error?.message || "Erro ao atualizar reprodução.",
+        error?.message || t("forms.att.toast.error"),
         true
       );
     }
@@ -157,53 +160,53 @@ export const ReproducaoAttBottomSheet: React.FC<
         scrollEnabled={!openStatus && !openParto}
       >
         <View style={styles.header}>
-            <Text style={styles.headerTitle}>Atualizar Reprodução</Text>
+            <Text style={styles.headerTitle}>{t("forms.att.title")}</Text>
         </View>
 
-        <Text style={styles.sectionTitle}>Detalhes</Text>
+        <Text style={styles.sectionTitle}>{t("forms.att.detailsSection")}</Text>
 
         <View style={styles.listContainer}>
-            
+
             {/* Campo Não Editável: Data do Evento */}
-            <Text style={styles.label}>Data do Evento</Text>
+            <Text style={styles.label}>{t("forms.att.eventDate")}</Text>
             <TextInput
                 style={[styles.inputBase, styles.inputDisabled]}
                 value={initialData?.dtEvento || "-"}
                 onChangeText={() => {}}
                 editable={false}/>
-         
+
             {/* Dropdown Status (Inalterado) */}
             <View style={{ zIndex: zIndexStatus, marginBottom: 12 }}>
-                <Text style={styles.label}>Status:</Text>
+                <Text style={styles.label}>{t("forms.att.statusLabel")}</Text>
                 <SelectBottomSheet
                     items={statusItems}
                     value={form.status}
                     onChange={(val: any) => handleChange("status", val)}
-                    title="Selecione o Status"
-                    placeholder="Selecione o Status"
+                    title={t("forms.att.statusSelect")}
+                    placeholder={t("forms.att.statusSelect")}
                 />
             </View>
 
             {/* Dropdown Tipo de Parto (Removida a lógica de desabilitação) */}
             <View style={{ zIndex: zIndexParto, marginBottom: 12 }}>
-                <Text style={styles.label}>Tipo Parto:</Text>
+                <Text style={styles.label}>{t("forms.att.birthTypeLabel")}</Text>
                 <SelectBottomSheet
                     items={partoItems}
                     value={form.tipo_parto}
                     onChange={(val: any) => handleChange("tipo_parto", val)}
-                    title="Selecione o Tipo de Parto"
-                    placeholder="Selecione o Tipo de Parto"
+                    title={t("forms.att.birthTypeSelect")}
+                    placeholder={t("forms.att.birthTypeSelect")}
                 />
             </View>
-            
-        </View>  
+
+        </View>
 
         {/* Footer (Inalterado) */}
         <View style={styles.footer}>
             <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
-                <Text style={styles.cancelText}>Cancelar</Text>
+                <Text style={styles.cancelText}>{t("forms.shared.cancel")}</Text>
             </TouchableOpacity>
-            <YellowButton title="Salvar" onPress={handleSave} />
+            <YellowButton title={t("forms.att.submit")} onPress={handleSave} />
         </View>
       </BottomSheetScrollView>
     </BottomSheet>

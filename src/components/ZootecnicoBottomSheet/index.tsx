@@ -4,6 +4,7 @@ import BottomSheet, { BottomSheetScrollView, BottomSheetBackdrop } from "@gorhom
 import { colors } from "../../styles/colors";
 import { ConfirmarExclusaoModal } from "../ModalAlertaDelete";
 import { formatarDataBR } from "../../utils/date";
+import { useTranslation } from "react-i18next";
 
 interface ZootecnicoItem {
     idZootec: string;
@@ -28,6 +29,8 @@ export const ZootecnicoBottomSheet: React.FC<ZootecnicoBottomSheetProps> = ({ it
     const sheetRef = useRef<BottomSheet>(null);
     const snapPoints = useMemo(() => ["50%", "70%"], []);
     const [isEditing, setIsEditing] = useState(false);
+    const { t } = useTranslation("zootecnico");
+    const { t: tc } = useTranslation("common");
     const [formData, setFormData] = useState<ZootecnicoItem>({ ...item });
     const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
 
@@ -109,23 +112,23 @@ return (
       
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Detalhes do Evento</Text>
+        <Text style={styles.headerTitle}>{t("edit.title")}</Text>
       </View>
 
       {/* Card Principal */}
       <View style={styles.mainCard}>
         <View style={styles.cardRow}>
             <Text style={styles.cardTitle}>
-              Registro {String(formData.tipoPesagem ?? "")}
+              {t("edit.recordLabel", { type: String(formData.tipoPesagem ?? "") })}
             </Text>
             <Text style={styles.cardSubtitle}>
-              Data do Registro: {formatarDataBR(formData?.dtRegistro)}
+              {t("edit.recordDate", { date: formatarDataBR(formData?.dtRegistro) })}
             </Text>
         </View>
       </View>
 
       {/* Título da seção */}
-      <Text style={styles.sectionTitle}>Detalhes do Animal</Text>
+      <Text style={styles.sectionTitle}>{t("edit.animalDetails")}</Text>
 
       {/* Lista */}
 {/* Lista */}
@@ -133,7 +136,7 @@ return (
     
     {/* Peso */}
     <View style={styles.listItem}>
-      <Text style={styles.listLabel}>Peso</Text>
+      <Text style={styles.listLabel}>{t("edit.weight")}</Text>
 
       {!isEditing ? (
         <Text style={styles.listValue}>{String(formData.peso ?? "-")}</Text>
@@ -148,7 +151,7 @@ return (
     </View>
 
     <View style={styles.listItem}>
-      <Text style={styles.listLabel}>Condição Corporal (CC)</Text>
+      <Text style={styles.listLabel}>{t("edit.bodyCondition")}</Text>
 
       {!isEditing ? (
         <Text style={styles.listValue}>
@@ -176,7 +179,7 @@ return (
 
     {/* Pelagem */}
     <View style={styles.listItem}>
-      <Text style={styles.listLabel}>Pelagem</Text>
+      <Text style={styles.listLabel}>{t("edit.coat")}</Text>
 
       {!isEditing ? (
         <Text style={styles.listValue}>{formData.corPelagem ?? "-"}</Text>
@@ -191,7 +194,7 @@ return (
 
     {/* Formato Chifre */}
     <View style={styles.listItem}>
-      <Text style={styles.listLabel}>Chifre</Text>
+      <Text style={styles.listLabel}>{t("edit.horn")}</Text>
 
       {!isEditing ? (
         <Text style={styles.listValue}>{formData.formatoChifre ?? "-"}</Text>
@@ -206,7 +209,7 @@ return (
 
     {/* Porte Corporal */}
     <View style={[styles.listItem, styles.listItemLast]}>
-      <Text style={styles.listLabel}>Porte</Text>
+      <Text style={styles.listLabel}>{t("edit.size")}</Text>
 
       {!isEditing ? (
         <Text style={styles.listValue}>{formData.porteCorporal ?? "-"}</Text>
@@ -228,7 +231,7 @@ return (
             style={[styles.footerBtn, styles.deleteBtn]}
             onPress={handleDelete}
           >
-            <Text style={styles.deleteText}>Excluir</Text>
+            <Text style={styles.deleteText}>{tc("actions.delete")}</Text>
           </TouchableOpacity>
         )}
 
@@ -237,7 +240,7 @@ return (
           onPress={toggleEdit}
         >
           <Text style={styles.editText}>
-            {isEditing ? "Salvar Alterações" : "Editar"}
+            {isEditing ? t("edit.saveChanges") : tc("actions.edit")}
           </Text>
         </TouchableOpacity>
       </View>
@@ -246,8 +249,8 @@ return (
         visible={isDeleteModalVisible}
         onClose={() => setIsDeleteModalVisible(false)}
         onConfirm={handleConfirmDelete}
-        title="Excluir Registro Zootécnico"
-        message={`Tem certeza que deseja excluir o registro da data ${formatarDataBR(item.dtRegistro)}? Esta ação é irreversível.`}
+        title={t("edit.deleteTitle")}
+        message={t("edit.deleteMessage", { date: formatarDataBR(item.dtRegistro) })}
       />
   </BottomSheet>
 )};
