@@ -18,9 +18,10 @@ import BottomSheet, {
   BottomSheetBackdrop,
   BottomSheetScrollView,
 } from "@gorhom/bottom-sheet";
+import { useTranslation } from "react-i18next";
 import { colors } from "../../styles/colors";
-import { DatePickerModal } from "../DatePickerModal"; 
-import YellowButton from "../Button"; 
+import { DatePickerModal } from "../DatePickerModal";
+import YellowButton from "../Button";
 import { LactacaoRegistroPayload, registrarLactacaoApi } from "../../services/lactacaoService";
 
 interface LactacaoPayload {
@@ -41,6 +42,7 @@ interface LactacaoAddBottomSheetProps {
 export const LactacaoAddBottomSheet: React.FC<
   LactacaoAddBottomSheetProps
 > = ({ animais, onSuccess, onClose, propriedadeId }) => {
+  const { t } = useTranslation("lactacao");
   const sheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ["50%", "70%"], []);
 
@@ -66,27 +68,27 @@ export const LactacaoAddBottomSheet: React.FC<
     if (RNPlatform.OS === "android") {
       ToastAndroid.show(message, ToastAndroid.LONG);
     } else {
-      Alert.alert(isError ? "Erro" : "Sucesso", message);
+      Alert.alert(isError ? t("forms.shared.alertError") : t("forms.shared.alertSuccess"), message);
     }
   };
 
   const handleSave = async () => {
     if (!qtOrdenha || isNaN(parseFloat(qtOrdenha))) {
-      showToast("Informe uma quantidade de ordenha válida.", true);
+      showToast(t("forms.lactacao.toast.invalidQuantity"), true);
       return;
     }
     if (!periodo) {
-      showToast("Selecione o período da ordenha.", true);
+      showToast(t("forms.lactacao.toast.noPeriod"), true);
       return;
     }
     if (!animais[0]?.id_bufala) {
-      showToast("ID da búfala não encontrado.", true);
+      showToast(t("forms.lactacao.toast.noBuffalo"), true);
       return;
     }
     const idCicloLactacao = animais[0]?.id_ciclo_lactacao;
-    
+
     if (!idCicloLactacao) {
-      showToast("Ciclo de lactação não encontrado. Tente recarregar a tela.", true);
+      showToast(t("forms.lactacao.toast.noCycle"), true);
       return;
     }
 
@@ -103,12 +105,12 @@ export const LactacaoAddBottomSheet: React.FC<
 
           await registrarLactacaoApi(payload); 
           
-          showToast("Lactação registrada com sucesso!");
+          showToast(t("forms.lactacao.toast.success"));
           onSuccess?.();
           onClose();
         } catch (err) {
       console.error("Erro ao salvar lactação:", err);
-      showToast("Não foi possível registrar a lactação.", true);
+      showToast(t("forms.lactacao.toast.error"), true);
     }
   };
 
@@ -141,36 +143,36 @@ export const LactacaoAddBottomSheet: React.FC<
         scrollEnabled={!openPeriodo} // Desabilita o scroll ao abrir o dropdown
       >
         <View style={styles.header}>
-            <Text style={styles.headerTitle}>Novo Registro de Lactação</Text>
+            <Text style={styles.headerTitle}>{t("forms.lactacao.title")}</Text>
         </View>
 
         {/* Informação da Búfala */}
         <View style={styles.listContainerHeader}>
-            <Text style={styles.listLabel}>BRINCO BÚFALA:</Text>
+            <Text style={styles.listLabel}>{t("forms.lactacao.tagLabel")}</Text>
             <Text style={styles.dateDisplayValue}>
                 {animais[0].brinco}
             </Text>
         </View>
 
-        <Text style={styles.sectionTitle}>Detalhes da Ordenha</Text>
+        <Text style={styles.sectionTitle}>{t("forms.lactacao.section")}</Text>
 
         <View style={styles.listContainer}>
             {/* Quantidade de Ordenha (FLOATING LABEL) */}
-            <Text style={styles.label}>Quantidade de Ordenha (L)</Text>
+            <Text style={styles.label}>{t("forms.lactacao.quantityLabel")}</Text>
             <TextInput
               style={styles.inputBase}
               value={qtOrdenha}
               onChangeText={setQtOrdenha}
               keyboardType="numeric"
-              placeholder="Digite a quantidade ordenhada"/> 
+              placeholder={t("forms.lactacao.quantityPlaceholder")}/>
 
           {/* Período */}
           <View style={styles.radioGroupContainer}>
-              <Text style={styles.listLabel}>Período:</Text>
+              <Text style={styles.listLabel}>{t("forms.lactacao.periodLabel")}</Text>
               <View style={styles.radioGroupRow}>
                   {[
-                      { label: 'Manhã', value: 'M' },
-                      { label: 'Tarde', value: 'T' },
+                      { label: t("forms.lactacao.morning"), value: 'M' },
+                      { label: t("forms.lactacao.afternoon"), value: 'T' },
                   ].map((item) => (
                       <TouchableOpacity
                           key={item.value}
@@ -191,7 +193,7 @@ export const LactacaoAddBottomSheet: React.FC<
 
             {/* Data da Ordenha (NOVO DESIGN DE DATA) */}
             <View style={styles.dateFieldContainer}>
-                <Text style={styles.listLabel}>Data Ordenha:</Text>
+                <Text style={styles.listLabel}>{t("forms.lactacao.dateLabel")}</Text>
                 <TouchableOpacity 
                     onPress={() => setShowDatePicker(true)}
                     style={styles.dateDisplayButton}
@@ -203,18 +205,18 @@ export const LactacaoAddBottomSheet: React.FC<
             </View>
 
             {/* Ocorrência (FLOATING LABEL e multiline) */}
-            <Text style={styles.label}>Ocorrência (Opcional)</Text>
+            <Text style={styles.label}>{t("forms.lactacao.occurrenceLabel")}</Text>
             <TextInput
               style={styles.inputBase}
               value={ocorrencia}
               onChangeText={setOcorrencia}
               multiline={true}
-              placeholder="Digite alguma observação"/> 
-        </View>  
+              placeholder={t("forms.lactacao.occurrencePlaceholder")}/>
+        </View>
 
         {/* Footer (Botão de ação) */}
         <View style={styles.footer}>
-            <YellowButton title="Registrar Lactação" onPress={handleSave} />
+            <YellowButton title={t("forms.lactacao.submit")} onPress={handleSave} />
         </View>
 
         {/* Modal de Data */}

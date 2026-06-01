@@ -6,6 +6,8 @@ import {
   StyleSheet,
 } from "react-native";
 
+import { useTranslation } from "react-i18next";
+
 import { colors } from "../../styles/colors";
 
 import TextTitle from "../TextTitle";
@@ -19,16 +21,18 @@ export default function DashGrupoPiquetes({
   qtdPiquetes,
   qtdGrupos,
 }: DashGrupoPiqueteProps) {
+  const { t } = useTranslation("piquetes");
+
   return (
     <View style={styles.card}>
       <View style={styles.header}>
         <View>
           <TextTitle>
-            Organização do Rebanho
+            {t("dash.title")}
           </TextTitle>
 
           <Text style={styles.subtitle}>
-            Distribuição em piquetes e grupos de manejo
+            {t("dash.subtitle")}
           </Text>
         </View>
       </View>
@@ -36,7 +40,7 @@ export default function DashGrupoPiquetes({
         <View style={styles.statsRow}>
           <View style={styles.statCard}>
             <Text style={styles.statLabel}>
-              Piquetes
+              {t("dash.paddocks")}
             </Text>
             <Text style={styles.statValue}>
               {qtdPiquetes}
@@ -47,7 +51,7 @@ export default function DashGrupoPiquetes({
 
           <View style={styles.statCard}>
             <Text style={styles.statLabel}>
-              Grupos
+              {t("dash.groups")}
             </Text>
             <Text style={styles.statValue}>
               {qtdGrupos}

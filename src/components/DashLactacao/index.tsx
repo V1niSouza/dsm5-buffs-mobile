@@ -6,6 +6,8 @@ import {
   StyleSheet,
 } from "react-native";
 
+import { useTranslation } from "react-i18next";
+
 import { colors } from "../../styles/colors";
 
 import TextTitle from "../TextTitle";
@@ -21,16 +23,17 @@ export default function DashLactation({
   vacasLactando,
   dataAtualizacao,
 }: DashLactationProps) {
+  const { t } = useTranslation("lactacao");
   return (
     <View style={styles.card}>
       <View style={styles.header}>
         <View>
           <TextTitle>
-            Produção de Leite
+            {t("dash.title")}
           </TextTitle>
 
           <Text style={styles.subtitle}>
-            Resumo geral da lactação
+            {t("dash.subtitle")}
           </Text>
         </View>
       </View>
@@ -38,7 +41,7 @@ export default function DashLactation({
       <View style={styles.statsRow}>
         <View style={styles.statCard}>
           <Text style={styles.statLabel}>
-            Total produzido
+            {t("dash.totalProduced")}
           </Text>
 
           <Text style={styles.statValue}>
@@ -53,7 +56,7 @@ export default function DashLactation({
 
         <View style={styles.statCard}>
           <Text style={styles.statLabel}>
-            Vacas lactando
+            {t("dash.lactatingCows")}
           </Text>
 
           <Text style={styles.statValue}>
@@ -61,14 +64,14 @@ export default function DashLactation({
           </Text>
 
           <Text style={styles.helperText}>
-            em produção
+            {t("dash.inProduction")}
           </Text>
         </View>
       </View>
 
       <View style={styles.footer}>
         <Text style={styles.footerText}>
-          Atualizado em {dataAtualizacao}
+          {t("dash.updatedAt", { date: dataAtualizacao })}
         </Text>
       </View>
     </View>

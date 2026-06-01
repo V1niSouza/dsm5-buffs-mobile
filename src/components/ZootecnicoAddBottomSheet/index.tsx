@@ -18,6 +18,7 @@ import dayjs from "dayjs";
 import YellowButton from "../Button"; // Assumindo que o YellowButton é o componente de botão padrão
 import { formatarDataBR } from "../../utils/date";
 import SelectBottomSheet from "../SelectBottomSheet";
+import { useTranslation } from "react-i18next";
 
 
 // ==========================================================
@@ -53,6 +54,7 @@ const initialFormData: ZootecnicoPayload = {
 export const ZootecnicoAddBottomSheet: React.FC<ZootecnicoAddBottomSheetProps> = ({ id_bufalo, onClose, onAddSave}) => {
     const sheetRef = useRef<BottomSheet>(null);
     const snapPoints = useMemo(() => ["50%", "70%"], []);
+    const { t } = useTranslation("zootecnico");
     
     const [formData, setFormData] = useState<ZootecnicoPayload>({ ...initialFormData });
     const [showDatePicker, setShowDatePicker] = useState(false);
@@ -72,7 +74,7 @@ export const ZootecnicoAddBottomSheet: React.FC<ZootecnicoAddBottomSheetProps> =
         if (Platform.OS === 'android') {
             ToastAndroid.show(message, ToastAndroid.LONG);
         } else {
-            Alert.alert(isError ? "Erro" : "Sucesso", message);
+            Alert.alert(isError ? t("alert.error") : t("alert.success"), message);
         }
     };
 
@@ -80,7 +82,7 @@ export const ZootecnicoAddBottomSheet: React.FC<ZootecnicoAddBottomSheetProps> =
     const handleSave = () => {
         // Validação básica para evitar save vazio
         if (!formData.peso && !formData.condicaoCorporal && !formData.corPelagem && !formData.formatoChifre && !formData.porteCorporal) {
-             showToast("Preencha ao menos um campo de métrica/característica.", true);
+             showToast(t("add.missingFields"), true);
              return;
         }
 
@@ -101,7 +103,7 @@ export const ZootecnicoAddBottomSheet: React.FC<ZootecnicoAddBottomSheetProps> =
         setTimeout(() => {
             onAddSave(cleanedPayload); 
             setIsSaving(false);
-            showToast("Registro zootécnico adicionado com sucesso!");
+            showToast(t("add.addSuccess"));
             onClose();
         }, 800);
     };
@@ -138,13 +140,13 @@ return (
 
                 {/* Header */}
                 <View style={styles.header}>
-                    <Text style={styles.headerTitle}>Novo Registro Zootécnico</Text>
+                    <Text style={styles.headerTitle}>{t("add.title")}</Text>
                 </View>
-                    <Text style={styles.sectionTitle}>Coleta de dados</Text>
+                    <Text style={styles.sectionTitle}>{t("add.dataCollection")}</Text>
                     <View style={styles.listContainer}>
                         {/* Data de Registro (Ajustado ao padrão dateFieldContainer) */}
                         <View style={styles.dateFieldContainer}>
-                            <Text style={styles.listLabel}>Data Registro:</Text>
+                            <Text style={styles.listLabel}>{t("add.recordDate")}</Text>
                             <TouchableOpacity style={styles.dateDisplayButton} onPress={() => setShowDatePicker(true)}>
                                 <Text style={styles.dateDisplayValue}>
                                     {formatarDataBR(formData.dtRegistro)}
@@ -152,35 +154,35 @@ return (
                             </TouchableOpacity>
                         </View>
                     {/* INPUT: Tipo Pesagem */}
-                     <Text style={styles.label}>Tipo Pesagem</Text>
+                     <Text style={styles.label}>{t("add.weighingType")}</Text>
                         <SelectBottomSheet
                             items={[
-                                { label: "Semanal", value: "Semanal" },
-                                { label: "Quinzenal", value: "Quinzenal" },
-                                { label: "Mensal", value: "Mensal" },
-                                { label: "Semestral", value: "Semestral" },
+                                { label: t("weighingTypes.weekly"), value: "Semanal" },
+                                { label: t("weighingTypes.biweekly"), value: "Quinzenal" },
+                                { label: t("weighingTypes.monthly"), value: "Mensal" },
+                                { label: t("weighingTypes.biannual"), value: "Semestral" },
                             ]}
                             value={formData.tipoPesagem ?? ""}
                             onChange={(t) => handleChange("tipoPesagem", t)}
-                            title="Selecionar o tipo de pesagem"
-                            placeholder="Digite o tipo de pesagem"/>
+                            title={t("add.weighingSelectTitle")}
+                            placeholder={t("add.weighingPlaceholder")}/>
                     </View>                
 
 
                 {/* Lista */}
-                <Text style={styles.sectionTitle}>Métricas Corporais</Text>
+                <Text style={styles.sectionTitle}>{t("add.bodyMetrics")}</Text>
                 <View style={styles.listContainer}>
                      {/* INPUT: Peso (com Floating Label) */}
-                     <Text style={styles.label}>Peso (kg)</Text>
+                     <Text style={styles.label}>{t("add.weight")}</Text>
                      <TextInput
                          style={styles.inputBase}
                          value={String(formData.peso ?? "")}
                          onChangeText={(t) => handleChange("peso", t)}
                          keyboardType="numeric"
-                         placeholder="Digite o peso do animal"/>                   
+                         placeholder={t("add.weightPlaceholder")}/>                   
                          
                     {/* Condição Corporal */}
-                        <Text style={styles.listLabel}>Cond. Corporal:</Text>
+                        <Text style={styles.listLabel}>{t("add.bodyCondition")}</Text>
                         <View style={styles.radioGroupRow}>
                         {[1, 2, 3, 4, 5].map((n) => (
                             <TouchableOpacity
@@ -199,37 +201,37 @@ return (
                         </View>
                     </View>
 
-                    <Text style={styles.sectionTitle}>Características Corporais</Text>
+                    <Text style={styles.sectionTitle}>{t("add.bodyCharacteristics")}</Text>
                     <View style={styles.listContainer}>
                     {/* INPUT: Cor Pelagem (com Floating Label) */}
-                     <Text style={styles.label}>Cor Pelagem</Text>
+                     <Text style={styles.label}>{t("add.coatColor")}</Text>
                      <TextInput
                          style={styles.inputBase}
                          value={formData.corPelagem ?? ""}
                          onChangeText={(t) => handleChange("corPelagem", t)}
-                         placeholder="Digite a cor da pelagem"/>    
+                         placeholder={t("add.coatColorPlaceholder")}/>    
 
                     {/* INPUT: Formato Chifre (com Floating Label) */}
-                     <Text style={styles.label}>Formato Chifre</Text>
+                     <Text style={styles.label}>{t("add.hornShape")}</Text>
                      <TextInput
                          style={styles.inputBase}
                          value={formData.formatoChifre ?? ""}
                          onChangeText={(t) => handleChange("formatoChifre", t)}
-                         placeholder="Digite o formato do chifre"/>  
+                         placeholder={t("add.hornShapePlaceholder")}/>  
 
                     {/* INPUT: Porte Corporal (com Floating Label) */}
-                     <Text style={styles.label}>Porte Corporal</Text>
+                     <Text style={styles.label}>{t("add.bodySize")}</Text>
                      <TextInput
                          style={styles.inputBase}
                          value={formData.porteCorporal ?? ""}
                          onChangeText={(t) => handleChange("porteCorporal", t)}
-                         placeholder="Digite o porte corporal"/> 
+                         placeholder={t("add.bodySizePlaceholder")}/> 
                     </View>
 
                 {/* Footer */}
                 <View style={styles.footer}>
                     <YellowButton
-                        title={isSaving ? "Salvando..." : "Adicionar Registro"}
+                        title={isSaving ? t("add.submitting") : t("add.submit")}
                         onPress={handleSave}
                         disabled={isSaving}
                     />

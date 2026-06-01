@@ -8,6 +8,8 @@ import {
 } from "react-native";
 import { colors } from "../../styles/colors"; 
 
+import { useTranslation } from "react-i18next";
+
 type Props = {
   visible: boolean;
   onClose: () => void;
@@ -23,6 +25,7 @@ export const ConfirmarExclusaoModal = ({
   title,
   message,
 }: Props) => {
+  const { t } = useTranslation("common");
 
   return (
     <Modal visible={visible} animationType="fade" transparent>
@@ -36,11 +39,11 @@ export const ConfirmarExclusaoModal = ({
 
           <View style={styles.modalActions}>
             <TouchableOpacity style={styles.btnCancelar} onPress={onClose}>
-              <Text style={styles.btnTextCancelar}>Cancelar</Text>
+              <Text style={styles.btnTextCancelar}>{t("actions.cancel")}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.btnConfirmar} onPress={onConfirm}>
-              <Text style={styles.btnTextConfirmar}>Excluir</Text>
+              <Text style={styles.btnTextConfirmar}>{t("actions.delete")}</Text>
             </TouchableOpacity>
           </View>
         </View>

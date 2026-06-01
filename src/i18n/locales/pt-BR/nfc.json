@@ -1,0 +1,25 @@
+{
+  "starting": "Iniciando o scanner...",
+  "approach": "Aproxime o brinco do leitor...",
+  "reading": "Microchip {{microchip}} lido. Pesquisando animal...",
+  "found": "Búfalo encontrado! Redirecionando...",
+  "notFound": "Microchip {{microchip}} não encontrado. Continue lendo...",
+  "searchError": "Erro ao buscar o animal. Continue lendo...",
+  "timeout": "Tempo esgotado ou cancelado. Tentando novamente...",
+  "criticalError": "Erro crítico no NFC. Parando.",
+  "unavailable": "NFC não disponível ou desativado neste dispositivo.",
+  "waiting": "Aguardando aproximação...",
+  "initError": "Erro de inicialização. Verifique as permissões.",
+  "title": "Escaneamento NFC",
+  "finish": "Finalizar e Voltar",
+  "input": {
+    "scanning": "Lendo tag RFID…",
+    "scan": "Ler tag RFID",
+    "wrongAnimalTitle": "Animal incorreto",
+    "wrongAnimalMessage": "Brinco {{brinco}}: este animal é {{encontrado}}, mas o campo espera {{esperado}}.",
+    "notFoundTitle": "Não encontrado",
+    "notFoundMessage": "Nenhum animal com microchip {{microchip}} encontrado. Sincronize os dados ou verifique o brinco.",
+    "male": "macho",
+    "female": "fêmea"
+  }
+}

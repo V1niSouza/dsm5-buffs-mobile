@@ -1,0 +1,62 @@
+{
+  "header": "GROUPS | PADDOCKS",
+  "empty": "No groups found",
+  "dash": {
+    "title": "Herd Organization",
+    "subtitle": "Distribution across paddocks and management groups",
+    "paddocks": "Paddocks",
+    "groups": "Groups"
+  },
+  "card": {
+    "location": "Location: {{piquete}}",
+    "noLocation": "No location",
+    "headCount": "{{n}} head",
+    "occupancy": "Occupancy"
+  },
+  "detail": {
+    "stats": {
+      "animals": "Animals",
+      "capacity": "Capacity",
+      "occupancy": "Occupancy",
+      "paddock": "Paddock",
+      "noPaddock": "No paddock"
+    },
+    "map": {
+      "title": "GROUP PADDOCK",
+      "offlineUnavailable": "Map unavailable offline\nDownload the map while you have a connection",
+      "noGeometry": "Paddock without defined geometry",
+      "noPaddockAssociated": "Group without associated paddock",
+      "saving": "Saving offline map… {{pct}}%",
+      "saved": "🗺 Map saved — Update",
+      "save": "⬇ Save map offline",
+      "mbSuffix": " (~{{mb}} MB)"
+    },
+    "inUse": "In use",
+    "capacityAnimals": "Cap. {{qtd}} animals",
+    "animalsTitle": "GROUP ANIMALS",
+    "groupTitle": "GROUP: {{nome}}",
+    "noName": "No name",
+    "emptyAnimals": "No animals in this group",
+    "loadingMore": "Loading more...",
+    "moveGroup": "Move Group",
+    "maturity": {
+      "B": "Calf",
+      "N": "Heifer",
+      "T": "Bull",
+      "V": "Cow"
+    }
+  },
+  "move": {
+    "selectDestination": "Select the destination lot.",
+    "success": "Group moved successfully!",
+    "error": "Error moving group.",
+    "destinationLabel": "Destination Lot",
+    "selectLotTitle": "Select the Lot",
+    "selectLotPlaceholder": "Select the destination lot",
+    "confirmButton": "Confirm Movement",
+    "confirmTitle": "Confirm Movement",
+    "confirmMessage": "Move group \"{{grupo}}\" to lot \"{{lote}}\"?",
+    "confirmAction": "Move",
+    "empty": "No lot available for movement."
+  }
+}

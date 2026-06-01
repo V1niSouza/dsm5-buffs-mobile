@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet, Dimensions } from "react-native";
 import { BarChart, LineChart } from "react-native-gifted-charts";
+import { useTranslation } from "react-i18next";
 import { colors } from "../../styles/colors";
 import TextTitle from "../TextTitle";
 import { ProducaoDiariaPoint } from "../../services/lactacaoService";
@@ -30,12 +31,14 @@ export default function DashPropriedade({
   touros,
   historicoLeite,
 }: DashPropriedadeProps) {
+  const { t } = useTranslation("home");
+
   // --- Dados para o gráfico de maturidade ---
   const maturidadeData = [
-    { value: bezerros, label: "Bez.", frontColor: colors.brand.primary },
-    { value: novilhas, label: "Nov.", frontColor: colors.status.warning },
-    { value: vacas,    label: "Vac.", frontColor: colors.status.success },
-    { value: touros,   label: "Tou.", frontColor: colors.status.error },
+    { value: bezerros, label: t("maturity.calvesShort"),  frontColor: colors.brand.primary },
+    { value: novilhas, label: t("maturity.heifersShort"), frontColor: colors.status.warning },
+    { value: vacas,    label: t("maturity.cowsShort"),    frontColor: colors.status.success },
+    { value: touros,   label: t("maturity.bullsShort"),   frontColor: colors.status.error },
   ];
 
   // --- Dados para gráfico de linha (leite) ---
@@ -52,26 +55,26 @@ export default function DashPropriedade({
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TextTitle>Resumo do Rebanho</TextTitle>
-        <Text style={styles.subtitle}>{total} búfalos ativos</Text>
+        <TextTitle>{t("dashboard.title")}</TextTitle>
+        <Text style={styles.subtitle}>{t("dashboard.activeCount", { total })}</Text>
       </View>
 
       {/* Linha sexo */}
       <View style={styles.sexRow}>
         <View style={styles.sexCard}>
           <Text style={styles.sexValue}>{machos}</Text>
-          <Text style={styles.sexLabel}>♂ Machos</Text>
+          <Text style={styles.sexLabel}>{t("dashboard.males")}</Text>
         </View>
         <View style={styles.sexDivider} />
         <View style={styles.sexCard}>
           <Text style={styles.sexValue}>{femeas}</Text>
-          <Text style={styles.sexLabel}>♀ Fêmeas</Text>
+          <Text style={styles.sexLabel}>{t("dashboard.females")}</Text>
         </View>
       </View>
 
       {/* Gráfico maturidade */}
       <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>Distribuição por Maturidade</Text>
+        <Text style={styles.sectionTitle}>{t("dashboard.maturityDistribution")}</Text>
       </View>
 
       <View style={styles.chartWrap}>
@@ -96,10 +99,10 @@ export default function DashPropriedade({
       {/* Legenda maturidade */}
       <View style={styles.legend}>
         {[
-          { label: "Bezerros", color: colors.brand.primary },
-          { label: "Novilhas", color: colors.status.warning },
-          { label: "Vacas",    color: colors.status.success },
-          { label: "Touros",   color: colors.status.error },
+          { label: t("maturity.calves"),  color: colors.brand.primary },
+          { label: t("maturity.heifers"), color: colors.status.warning },
+          { label: t("maturity.cows"),    color: colors.status.success },
+          { label: t("maturity.bulls"),   color: colors.status.error },
         ].map((item) => (
           <View key={item.label} style={styles.legendItem}>
             <View style={[styles.legendDot, { backgroundColor: item.color }]} />
@@ -110,9 +113,9 @@ export default function DashPropriedade({
 
       {/* Gráfico evolução do leite */}
       <View style={[styles.sectionHeader, { marginTop: 20 }]}>
-        <Text style={styles.sectionTitle}>Estoque de Leite (L)</Text>
+        <Text style={styles.sectionTitle}>{t("dashboard.milkStock")}</Text>
         {historicoLeite.length === 0 && (
-          <Text style={styles.noData}>Sem registros ainda</Text>
+          <Text style={styles.noData}>{t("dashboard.noData")}</Text>
         )}
       </View>
 

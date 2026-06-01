@@ -1,0 +1,22 @@
+{
+  "actions": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "back": "Back",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "edit": "Edit"
+  },
+  "pagination": {
+    "previous": "Previous",
+    "next": "Next",
+    "pageOf": "Page {{current}} of {{total}}"
+  },
+  "select": {
+    "placeholder": "Select",
+    "empty": "No options available"
+  },
+  "yes": "Yes",
+  "no": "No",
+  "selectDate": "Select Date"
+}

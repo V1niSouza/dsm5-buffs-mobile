@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useTranslation } from "react-i18next";
 
 import { MainLayout } from "../layouts/MainLayout";
 import { colors } from "../styles/colors";
@@ -28,6 +29,7 @@ export const PiquetesScreen = () => {
 
   const { propriedadeSelecionada } = usePropriedade();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const { t } = useTranslation("piquetes");
 
   const fetchGrupos = async () => {
     try {
@@ -71,7 +73,7 @@ export const PiquetesScreen = () => {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.header1Text}>GRUPOS | PIQUETES</Text>
+        <Text style={styles.header1Text}>{t("header")}</Text>
       </View>
 
       <MainLayout>
@@ -111,7 +113,7 @@ export const PiquetesScreen = () => {
           )}
           ListEmptyComponent={
             <Text style={styles.emptyText}>
-              Nenhum grupo encontrado
+              {t("empty")}
             </Text>
           }
         />

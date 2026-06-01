@@ -1,0 +1,134 @@
+{
+  "header": "HERD",
+  "searchPlaceholder": "Search tag...",
+  "updating": "Updating herd...",
+  "empty": "No animals found",
+  "fab": {
+    "newAnimal": "New Animal",
+    "nfcScanner": "NFC Scanner"
+  },
+  "card": {
+    "tag": "Tag No. {{brinco}}",
+    "sexLabel": "Sex:",
+    "maturityLabel": "| Maturity:",
+    "breedLabel": "| Breed:",
+    "female": "♀ Female",
+    "male": "♂ Male"
+  },
+  "maturity": {
+    "B": "Calf",
+    "N": "Heifer",
+    "T": "Bull",
+    "V": "Cow"
+  },
+  "fallback": {
+    "noBreed": "No breed defined",
+    "unknownMaturity": "Unknown"
+  },
+  "filter": {
+    "title": "Advanced Filters",
+    "clear": "Clear",
+    "categoriesLabel": "CATEGORIES",
+    "apply": "Apply Filters",
+    "categories": {
+      "sexo": "Sex",
+      "raca": "Breed",
+      "maturidade": "Maturity",
+      "status": "Status"
+    },
+    "sex": {
+      "male": "Male",
+      "female": "Female"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    }
+  },
+  "form": {
+    "title": "New Buffalo Registration",
+    "sections": {
+      "identification": "Identification Data",
+      "characteristics": "Characteristics and Origin",
+      "parentage": "Parentage (Optional Tags)"
+    },
+    "fields": {
+      "name": "Name (Optional)",
+      "namePlaceholder": "Enter the animal's name",
+      "tag": "Tag (Required)",
+      "tagPlaceholder": "Enter the animal's tag",
+      "microchip": "Microchip (Optional)",
+      "microchipPlaceholder": "Type or read via RFID",
+      "sex": "Sex:",
+      "maturity": "Maturity:",
+      "birthDate": "Date of Birth:",
+      "breed": "Breed:",
+      "fatherTag": "Father's Tag",
+      "fatherTagPlaceholder": "Father's Tag",
+      "motherTag": "Mother's Tag",
+      "motherTagPlaceholder": "Mother's Tag"
+    },
+    "select": {
+      "placeholder": "Select",
+      "selectSex": "Select sex",
+      "selectMaturity": "Select maturity",
+      "selectBreed": "Select breed",
+      "breedPlaceholder": "Select breed",
+      "pickDate": "Select"
+    },
+    "submit": "Save Registration",
+    "submitting": "Saving...",
+    "toast": {
+      "noProperty": "Select a property before registering.",
+      "tagRequired": "The Tag field is required.",
+      "sexRequired": "The Sex field is required.",
+      "fatherNotFound": "No father found with that tag (Male) on the property.",
+      "motherNotFound": "No mother found with that tag (Female) on the property.",
+      "success": "Buffalo registered successfully!",
+      "saveError": "Could not save the buffalo."
+    },
+    "alert": {
+      "error": "Error",
+      "success": "Success"
+    }
+  },
+  "edit": {
+    "title": "Edit Animal: {{brinco}}",
+    "basicData": "Basic Data",
+    "name": "Name",
+    "namePlaceholder": "Enter the animal's name",
+    "tag": "Tag",
+    "tagPlaceholder": "Enter the animal's tag",
+    "microchip": "Microchip",
+    "microchipPlaceholder": "Type or read via RFID",
+    "characteristics": "Characteristics",
+    "sex": "Sex",
+    "sexPlaceholder": "Enter the animal's sex",
+    "male": "Male",
+    "female": "Female",
+    "birthDate": "Date of Birth",
+    "birthDatePlaceholder": "Enter the animal's date of birth",
+    "maturity": "Maturity:",
+    "selectMaturity": "Select maturity",
+    "selectPlaceholder": "Select",
+    "breed": "Breed:",
+    "selectBreed": "Select breed",
+    "breedPlaceholder": "Select breed",
+    "parentage": "Parentage (Tag)",
+    "fatherTag": "Father's Tag",
+    "motherTag": "Mother's Tag",
+    "tagOrRfid": "Tag or RFID",
+    "notProvided": "Not provided",
+    "loading": "Loading data...",
+    "submit": "Save Changes",
+    "submitting": "Saving...",
+    "toast": {
+      "noProperty": "Property ID not found. Cannot save.",
+      "missingFields": "Fill in Name, Tag and Maturity.",
+      "fatherNotFound": "No father found with tag '{{brinco}}' (Male) on the property.",
+      "motherNotFound": "No mother found with tag '{{brinco}}' (Female) on the property.",
+      "success": "Information updated successfully!",
+      "saveError": "Could not save the changes."
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "resolveTitle": "Resolve alert?",
+  "seen": "✓ Seen",
+  "markSeen": "Mark as seen",
+  "tabs": {
+    "all": "All",
+    "unseen": "Unseen"
+  }
+}

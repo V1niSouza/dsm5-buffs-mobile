@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from "react-native";
+import { useTranslation } from "react-i18next";
 import { colors } from "../../styles/colors";
 import IconBuffs from '../../icons/agroCore';
 
@@ -25,6 +26,8 @@ export const CardGrupo = ({
   color = colors.brand.primary,
   onPress,
 }: CardGrupoProps) => {
+  const { t } = useTranslation("piquetes");
+
   return (
     <TouchableOpacity
       style={styles.container}
@@ -49,13 +52,13 @@ export const CardGrupo = ({
             </Text>
 
             <Text style={styles.location}>
-              Localização: {piquete || "Sem localização"}
+              {t("card.location", { piquete: piquete || t("card.noLocation") })}
             </Text>
           </View>
 
           <View style={styles.badge}>
             <Text style={styles.badgeText}>
-              {quantidade} Cabeças
+              {t("card.headCount", { n: quantidade })}
             </Text>
           </View>
         </View>
@@ -63,7 +66,7 @@ export const CardGrupo = ({
         <View style={styles.footer}>
           <View style={styles.progressHeader}>
             <Text style={styles.label}>
-              Ocupação
+              {t("card.occupancy")}
             </Text>
 
             <Text style={styles.percent}>

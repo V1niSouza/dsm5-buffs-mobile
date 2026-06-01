@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from "react";
 import { useFocusEffect } from "@react-navigation/native";
+import { useTranslation } from "react-i18next";
 import {
   View,
   Text,
@@ -41,12 +42,14 @@ export interface AnimalLac {
 }
 
 export const LactacaoScreen = () => {
+  const { t } = useTranslation("lactacao");
+  const { t: tc } = useTranslation("common");
   const { propriedadeSelecionada } = usePropriedade();
 
   const [animais, setAnimais] = useState<AnimalLac[]>([]);
   const [totalLactando, setTotalLactando] = useState(0);
   const [quantidadeAtual, setQuantidadeAtual] = useState(0);
-  const [dataFormatada, setDataFormatada] = useState<string>("N/D");
+  const [dataFormatada, setDataFormatada] = useState<string>(t("notAvailable"));
 
   const [industrias, setIndustrias] = useState<any[]>([]);
   const [selectedBufala, setSelectedBufala] = useState<AnimalLac | null>(null);
@@ -179,14 +182,14 @@ const fetchCiclos = async (page = 1, isInitial = false) => {
 
   const actions = [
     {
-      text: "Atualizar Estoque",
+      text: t("fab.updateStock"),
       icon: <Bucket width={18} height={18} />,
       name: "estoque",
       position: 1,
       color: colors.brand.primary,
     },
     {
-      text: "Registrar Coleta",
+      text: t("fab.registerCollection"),
       icon: <Truck width={15} height={15} />,
       name: "coleta",
       position: 2,
@@ -210,7 +213,7 @@ const fetchCiclos = async (page = 1, isInitial = false) => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerText}>LACTAÇÃO</Text>
+        <Text style={styles.headerText}>{t("header")}</Text>
       </View>
 
       <MainLayout>
@@ -242,12 +245,12 @@ const fetchCiclos = async (page = 1, isInitial = false) => {
               <View style={styles.inlineLoader}>
                 <ActivityIndicator size="large" color={colors.brand.primary} />
                 <Text style={{ marginTop: 8 }}>
-                  Atualizando lactação...
+                  {t("updating")}
                 </Text>
               </View>
             ) : (
               <Text style={{ textAlign: "center", marginTop: 20 }}>
-                Nenhum registro encontrado
+                {t("empty")}
               </Text>
             )
           }
@@ -256,17 +259,17 @@ const fetchCiclos = async (page = 1, isInitial = false) => {
             totalPaginas > 1 && !listLoading ? (
               <View style={styles.pagination}>
                 <Button
-                  title="Anterior"
+                  title={tc("pagination.previous")}
                   onPress={() => handlePageChange(paginaAtual - 1)}
                   disabled={paginaAtual === 1}
                 />
 
                 <Text style={styles.pageInfo}>
-                  Página {paginaAtual} de {totalPaginas}
+                  {tc("pagination.pageOf", { current: paginaAtual, total: totalPaginas })}
                 </Text>
 
                 <Button
-                  title="Próxima"
+                  title={tc("pagination.next")}
                   onPress={() => handlePageChange(paginaAtual + 1)}
                   disabled={paginaAtual === totalPaginas}
                 />

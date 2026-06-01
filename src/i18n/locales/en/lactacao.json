@@ -1,0 +1,107 @@
+{
+  "header": "LACTATION",
+  "updating": "Updating lactation...",
+  "empty": "No records found",
+  "notAvailable": "N/A",
+  "fab": {
+    "updateStock": "Update Stock",
+    "registerCollection": "Register Collection"
+  },
+  "dash": {
+    "title": "Milk Production",
+    "subtitle": "Lactation overview",
+    "totalProduced": "Total produced",
+    "lactatingCows": "Lactating cows",
+    "inProduction": "in production",
+    "updatedAt": "Updated on {{date}}"
+  },
+  "card": {
+    "noName": "No name",
+    "tag": "Tag No. {{brinco}}",
+    "statusLactating": "Lactating",
+    "statusDry": "Dry",
+    "breedLabel": "Breed:",
+    "cycleLabel": "Cycle:",
+    "daysLabel": "Lactation Days:",
+    "endLactation": "End lactation"
+  },
+  "confirmDry": {
+    "title": "Confirm Drying",
+    "message": "Mark {{nome}} as dry?",
+    "confirm": "Yes, Dry off",
+    "cancel": "Cancel"
+  },
+  "forms": {
+    "shared": {
+      "saving": "Saving...",
+      "alertError": "Error",
+      "alertSuccess": "Success",
+      "notesLabel": "Notes (Optional)",
+      "notesPlaceholder": "Enter notes (optional)",
+      "noProperty": "Property ID not found."
+    },
+    "estoque": {
+      "title": "Update Milk Stock",
+      "section": "Stock Details",
+      "quantityLabel": "Milk Quantity (Liters)",
+      "quantityPlaceholder": "Enter the milk quantity in stock",
+      "dateLabel": "Record Date:",
+      "submit": "Save to Stock",
+      "toast": {
+        "noUser": "User ID not found. Please log in again.",
+        "invalidQuantity": "Enter a valid stock quantity.",
+        "success": "Stock recorded successfully!",
+        "error": "Could not record the stock."
+      }
+    },
+    "coleta": {
+      "title": "Collection Record",
+      "section": "Collection Data",
+      "industryLabel": "Industry:",
+      "industrySelectTitle": "Select Industry",
+      "industryPlaceholder": "Select an industry",
+      "quantityLabel": "Collected Quantity (L)",
+      "quantityPlaceholder": "Enter the collected quantity (L)",
+      "dateLabel": "Collection Date:",
+      "testLabel": "Test Result:",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "submit": "Register Collection",
+      "toast": {
+        "noIndustry": "Select the industry.",
+        "invalidQuantity": "Enter a valid collected quantity.",
+        "noTestResult": "Enter the test result.",
+        "success": "Collection recorded successfully!",
+        "error": "Could not record the collection."
+      }
+    },
+    "lactacao": {
+      "title": "New Lactation Record",
+      "tagLabel": "BUFFALO TAG:",
+      "section": "Milking Details",
+      "quantityLabel": "Milking Quantity (L)",
+      "quantityPlaceholder": "Enter the milked quantity",
+      "periodLabel": "Period:",
+      "morning": "Morning",
+      "afternoon": "Afternoon",
+      "dateLabel": "Milking Date:",
+      "occurrenceLabel": "Occurrence (Optional)",
+      "occurrencePlaceholder": "Enter a note",
+      "submit": "Register Lactation",
+      "toast": {
+        "invalidQuantity": "Enter a valid milking quantity.",
+        "noPeriod": "Select the milking period.",
+        "noBuffalo": "Buffalo ID not found.",
+        "noCycle": "Lactation cycle not found. Try reloading the screen.",
+        "success": "Lactation recorded successfully!",
+        "error": "Could not record the lactation."
+      }
+    }
+  },
+  "table": {
+    "tag": "Tag",
+    "name": "Name",
+    "breed": "Breed",
+    "seeMore": "See More"
+  }
+}

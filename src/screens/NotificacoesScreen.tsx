@@ -10,10 +10,12 @@ import RotateLeftIcon from "../icons/arrow";
 import { usePropriedade } from "../context/PropriedadeContext";
 import { useNavigation } from "@react-navigation/native";
 import ArrowLeftIcon from "../icons/arrowLeft";
+import { useTranslation } from "react-i18next";
 
 export const NotificacoesScreen = () => {
   const navigation = useNavigation<{ goBack: () => void }>();
   const { propriedadeSelecionada } = usePropriedade();
+  const { t } = useTranslation("nav");
 
   const [loadingInicial, setLoadingInicial] = useState(true);
 
@@ -38,7 +40,7 @@ export const NotificacoesScreen = () => {
         <TouchableOpacity style={styles.headerButton} onPress={() => navigation.goBack()}>
           <ArrowLeftIcon width={24} height={24} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>ALERTAS</Text>
+        <Text style={styles.headerTitle}>{t("alerts")}</Text>
       </View>
 
       {/* CONTEÚDO */}

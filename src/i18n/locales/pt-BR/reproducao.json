@@ -1,0 +1,110 @@
+{
+  "header": "REPRODUÇÃO",
+  "updating": "Atualizando reproduções...",
+  "empty": "Nenhum registro encontrado",
+  "dash": {
+    "title": "Resumo Reprodutivo",
+    "subtitle": "Acompanhamento das coberturas e inseminações",
+    "inProcess": "Em processo",
+    "confirmed": "Confirmadas",
+    "completed": "Concluídas",
+    "failures": "Falhas",
+    "updatedAt": "Atualizado em {{date}}"
+  },
+  "card": {
+    "noId": "Sem identificação",
+    "sire": "Reprodutor:",
+    "inseminationLabel": "Inseminação:",
+    "crossingLabel": "Cruzamento:",
+    "resultLabel": "Resultado:",
+    "materialLabel": "Material",
+    "status": {
+      "inProgress": "Em andamento",
+      "confirmed": "Confirmada",
+      "completed": "Concluída",
+      "failed": "Falhou"
+    },
+    "result": {
+      "failed": "Não, falhou",
+      "pregnant": "Prenha",
+      "tracking": "Acompanhamento",
+      "success": "Sucesso",
+      "birth": "Parto {{tipo}}"
+    }
+  },
+  "forms": {
+    "shared": {
+      "alertError": "Erro",
+      "alertSuccess": "Sucesso",
+      "cancel": "Cancelar",
+      "nfcPlaceholder": "Digite ou leia via RFID"
+    },
+    "add": {
+      "title": "Nova Reprodução",
+      "typeSection": "Tipo de Inseminação",
+      "typeSelect": "Selecione o Tipo de Inseminação",
+      "animalsSection": "Animais",
+      "maleTag": "Tag do Búfalo Macho",
+      "femaleTag": "Tag da Búfala",
+      "femaleReceptorNatural": "(Fêmea Receptora)",
+      "femaleReceptorOther": "(Receptora/Gestora)",
+      "geneticSection": "Material Genético",
+      "semenLabel": "Sêmen",
+      "noSemen": "Nenhum sêmen cadastrado — sincronize primeiro.",
+      "semenSelect": "Selecionar Sêmen",
+      "semenPlaceholder": "Selecione o Sêmen",
+      "embryoLabel": "Embrião",
+      "noEmbryo": "Nenhum embrião cadastrado — sincronize primeiro.",
+      "embryoSelect": "Selecionar Embrião",
+      "embryoPlaceholder": "Selecione o Embrião",
+      "donor": "Doadora: {{nome}}",
+      "submit": "Salvar Reprodução",
+      "types": {
+        "iatf": "IATF",
+        "ia": "IA (Inseminação Artificial)",
+        "te": "TE (Transferência de Embrião)",
+        "natural": "Monta Natural"
+      },
+      "toast": {
+        "noProperty": "Selecione uma propriedade ativa antes de cadastrar.",
+        "missingFields": "Preencha a Tag da Búfala e o Tipo de Inseminação.",
+        "semenRequired": "{{tipo}} requer a seleção de um Sêmen.",
+        "embryoRequired": "TE requer a seleção de um Embrião.",
+        "maleRequired": "O Búfalo Macho é obrigatório para Monta Natural.",
+        "femaleNotFound": "Búfala receptora (Tag: {{tag}}) não encontrada ou não é fêmea.",
+        "maleNotFound": "Búfalo macho (Tag: {{tag}}) não encontrado ou não é macho.",
+        "success": "Reprodução cadastrada com sucesso!",
+        "validationFail": "Falha na validação do animal. Verifique o Brinco {{tag}}.",
+        "error": "Não foi possível cadastrar a reprodução. Verifique os dados."
+      }
+    },
+    "att": {
+      "title": "Atualizar Reprodução",
+      "detailsSection": "Detalhes",
+      "eventDate": "Data do Evento",
+      "statusLabel": "Status:",
+      "statusSelect": "Selecione o Status",
+      "birthTypeLabel": "Tipo Parto:",
+      "birthTypeSelect": "Selecione o Tipo de Parto",
+      "submit": "Salvar",
+      "status": {
+        "inProgress": "Em andamento",
+        "confirmed": "Confirmada (Prenha)",
+        "completed": "Concluída (Parto)",
+        "failed": "Falhou"
+      },
+      "birthType": {
+        "normal": "Normal",
+        "cesarean": "Cesárea",
+        "abortion": "Aborto"
+      },
+      "toast": {
+        "noProperty": "Propriedade não selecionada.",
+        "birthTypeRequired": "Para concluir a reprodução, o tipo de parto é obrigatório.",
+        "birthSuccess": "Parto registrado com sucesso!",
+        "updateSuccess": "Reprodução atualizada com sucesso!",
+        "error": "Erro ao atualizar reprodução."
+      }
+    }
+  }
+}

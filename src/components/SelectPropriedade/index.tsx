@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View, StyleSheet } from "react-native";
+import { useTranslation } from "react-i18next";
 import { colors } from "../../styles/colors";
 import TextTitle from "../TextTitle";
 import { usePropriedade } from "../../context/PropriedadeContext";
@@ -12,6 +13,7 @@ interface PropriedadesProps {
 }
 
 export default function Propriedades({ prop }: PropriedadesProps) {
+  const { t } = useTranslation("home");
   const { propriedadeSelecionada, setPropriedadeSelecionada } = usePropriedade();
   const { triggerDownload } = useSyncStatus();
   const [items, setItems] = useState<{ label: string; value: string }[]>([]);
@@ -42,7 +44,7 @@ export default function Propriedades({ prop }: PropriedadesProps) {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TextTitle>Propriedades</TextTitle>
+        <TextTitle>{t("propriedades.title")}</TextTitle>
       </View>
 
       <View style={styles.selectorRow}>
@@ -51,8 +53,8 @@ export default function Propriedades({ prop }: PropriedadesProps) {
             items={items}
             value={propriedadeSelecionada}
             onChange={(value) => setPropriedadeSelecionada(value)}
-            title="Selecionar propriedade"
-            placeholder="Selecione uma propriedade"
+            title={t("propriedades.selectTitle")}
+            placeholder={t("propriedades.selectPlaceholder")}
           />
         </View>
         <DownloadButton propertyName={propNome} />

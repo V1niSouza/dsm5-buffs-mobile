@@ -21,6 +21,7 @@ import Plus from '../../assets/images/plus.svg';
 import BuffaloLoader from "../components/BufaloLoader";
 import ArrowLeftIcon from "../icons/arrowLeft";
 import { piqueteService } from "../services/piqueteService";
+import { useTranslation } from "react-i18next";
 
 type RootStackParamList = {
   AnimalDetail: { id: string };
@@ -54,6 +55,8 @@ export const AnimalDetailScreen = () => {
   const route = useRoute<AnimalDetailRouteProp>();
   const { id } = route.params;
   const navigation = useNavigation<{ goBack: () => void }>();
+  const { t } = useTranslation("animalDetail");
+  const { t: tc } = useTranslation("common");
   const [tab, setTab] = useState<"info" | "zootec" | "sanit">("info");
   const [detalhes, setDetalhes] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -257,13 +260,13 @@ export const AnimalDetailScreen = () => {
   }) => (
     <View style={styles.pagination}>
       <Button
-          title="Anterior"
+          title={tc("pagination.previous")}
           onPress={() => onPageChange(paginaAtual - 1)}
           disabled={paginaAtual === 1 || isLoading}
         />
-        <Text style={styles.pageInfo}>Página {paginaAtual} de {totalPaginas}</Text>
+        <Text style={styles.pageInfo}>{tc("pagination.pageOf", { current: paginaAtual, total: totalPaginas })}</Text>
         <Button
-          title="Próxima"
+          title={tc("pagination.next")}
           onPress={() => onPageChange(paginaAtual + 1)}
           disabled={paginaAtual === totalPaginas || isLoading}
         />
@@ -282,19 +285,19 @@ export const AnimalDetailScreen = () => {
     return (
       <View style={styles.loadingContainer}>
         <Text style={{ fontSize: 16, color: '#666', textAlign: 'center', marginBottom: 16 }}>
-          Animal não encontrado.{'\n'}Verifique a sincronização e tente novamente.
+          {t("notFound")}
         </Text>
         <TouchableOpacity onPress={() => navigation.goBack()} style={{ padding: 12 }}>
-          <Text style={{ color: colors.yellow.dark, fontWeight: '600' }}>Voltar</Text>
+          <Text style={{ color: colors.yellow.dark, fontWeight: '600' }}>{tc("actions.back")}</Text>
         </TouchableOpacity>
       </View>
     );
   }
 
   const tabOptions = [
-    { key: "info", label: "Informações" },
-    { key: "zootec", label: "Zootécnico" },
-    { key: "sanit", label: "Sanitário" },
+    { key: "info", label: t("tabs.info") },
+    { key: "zootec", label: t("tabs.zootechnical") },
+    { key: "sanit", label: t("tabs.health") },
   ];
 
   const showAddButton = tab === "zootec" || tab === "sanit";
@@ -314,7 +317,7 @@ export const AnimalDetailScreen = () => {
           <TouchableOpacity style={styles.headerButton} onPress={() => navigation.goBack()}>
             <ArrowLeftIcon width={24} height={24} />
           </TouchableOpacity>
-          <Text style={styles.header1Text}>Prontuário: {detalhes?.brinco || 'N/A'}</Text>
+          <Text style={styles.header1Text}>{t("title", { brinco: detalhes?.brinco || 'N/A' })}</Text>
         </View>
       </View>
 
@@ -343,7 +346,7 @@ export const AnimalDetailScreen = () => {
               refreshControl={
                 <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
               }
-              ListEmptyComponent={<Text style={styles.emptyText}>Nenhum registro Zootécnico encontrado.</Text>}
+              ListEmptyComponent={<Text style={styles.emptyText}>{t("emptyZootechnical")}</Text>}
               ListFooterComponent={() =>
                 (detalhes?.dadosZootecnicos.length > 0) && totalPagesZootec > 0 ? (
                   <PaginationComponent 
@@ -367,7 +370,7 @@ export const AnimalDetailScreen = () => {
                 refreshControl={
                   <RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>
                 }
-                ListEmptyComponent={<Text style={styles.emptyText}>Nenhum registro Sanitário encontrado.</Text>}
+                ListEmptyComponent={<Text style={styles.emptyText}>{t("emptyHealth")}</Text>}
                 ListFooterComponent={() =>
                   (detalhes?.dadosSanitarios.length > 0) && totalPagesSanit > 0 ? (
                   <PaginationComponent 
